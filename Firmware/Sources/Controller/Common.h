@@ -8,7 +8,9 @@
 
 // Functions
 Boolean CMN_UpdateNodeState(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage);
-void CMN_ResetNodeFault(Boolean Emulate, Int16U NodeIDReg, Int16U NodeState,
-		volatile LogicState *CurrentState, LogicState NextState);
+void CMN_ResetNodeFault(Boolean Emulate, Int16U NodeIDReg, Int16U StateStorage, volatile LogicState *CurrentLogicState,
+		LogicState NextLogicState);
+void CMN_NodePowerOn(Boolean Emulate, Int16U NodeIDReg, pInt16U StateStorage, volatile LogicState *CurrentLogicState,
+		LogicState NextLogicState, Int16U FaultCode);
 
 #endif // __COMMON_H

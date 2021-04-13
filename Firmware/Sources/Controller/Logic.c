@@ -289,12 +289,13 @@ void LOGIC_CacheVariables()
 		
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE];
-
+		
 		FCROVU_IShortCircuit = DataTable[REG_FCROVU_I_SHORT];
-
-		LOGIC_DriverOffTicks = (((DC_Current/DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
-									(DC_Current/DC_CurrentRiseRate / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
-
+		
+		LOGIC_DriverOffTicks = (
+				((DC_Current / DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
+						(DC_Current / DC_CurrentRiseRate / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
+		
 		if(MeasurementMode == MODE_QRR_ONLY)
 		{
 			LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
@@ -356,10 +357,10 @@ Boolean LOGIC_UpdateDeviceState()
 	
 	if(!CMN_UpdateNodeState(EmulateCROVU, REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_CROVU))
 		return FALSE;
-
+	
 	if(!CMN_UpdateNodeState(EmulateFCROVU, REG_FCROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_FCROVU))
 		return FALSE;
-
+	
 	if(!CMN_UpdateNodeState(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1))
 		return FALSE;
 	
@@ -371,10 +372,10 @@ Boolean LOGIC_UpdateDeviceState()
 	
 	if(!CMN_UpdateNodeState(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1))
 		return FALSE;
-
+	
 	if(!CMN_UpdateNodeState(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2))
 		return FALSE;
-
+	
 	if(!CMN_UpdateNodeState(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3))
 		return FALSE;
 	
@@ -409,7 +410,7 @@ void LOGIC_FaultResetSequence()
 			return;
 		}
 		
-		switch (LOGIC_State)
+		switch(LOGIC_State)
 		{
 			case LS_CLR_CROVU:
 				CMN_ResetNodeFault(EmulateCROVU, REG_CROVU_NODE_ID, LOGIC_ExtDeviceState.DS_CROVU, &LOGIC_State,
@@ -420,22 +421,22 @@ void LOGIC_FaultResetSequence()
 				CMN_ResetNodeFault(EmulateFCROVU, REG_FCROVU_NODE_ID, LOGIC_ExtDeviceState.DS_FCROVU, &LOGIC_State,
 						LS_CLR_DCU1);
 				break;
-
+				
 			case LS_CLR_DCU1:
 				CMN_ResetNodeFault(EmulateDCU1, REG_DCU1_NODE_ID, LOGIC_ExtDeviceState.DS_DCU1, &LOGIC_State,
 						LS_CLR_DCU2);
 				break;
-
+				
 			case LS_CLR_DCU2:
 				CMN_ResetNodeFault(EmulateDCU2, REG_DCU2_NODE_ID, LOGIC_ExtDeviceState.DS_DCU2, &LOGIC_State,
 						LS_CLR_DCU3);
 				break;
-
+				
 			case LS_CLR_DCU3:
 				CMN_ResetNodeFault(EmulateDCU3, REG_DCU3_NODE_ID, LOGIC_ExtDeviceState.DS_DCU3, &LOGIC_State,
 						LS_CLR_RCU1);
 				break;
-
+				
 			case LS_CLR_RCU1:
 				CMN_ResetNodeFault(EmulateRCU1, REG_RCU1_NODE_ID, LOGIC_ExtDeviceState.DS_RCU1, &LOGIC_State,
 						LS_CLR_RCU2);
@@ -498,14 +499,14 @@ void LOGIC_PowerOnSequence()
 			UnitsStartTimeOut = CONTROL_TimeCounter;
 		}
 		
-		switch (LOGIC_State)
+		switch(LOGIC_State)
 		{
 			case LS_PON_CROVU:
 				{
 					// Handle CROVU node
 					if(!EmulateCROVU)
 					{
-						switch (LOGIC_ExtDeviceState.DS_CROVU)
+						switch(LOGIC_ExtDeviceState.DS_CROVU)
 						{
 							case DS_CROVU_NONE:
 								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_POWER))
@@ -540,7 +541,7 @@ void LOGIC_PowerOnSequence()
 					// Handle FCROVU node
 					if(!EmulateFCROVU)
 					{
-						switch (LOGIC_ExtDeviceState.DS_FCROVU)
+						switch(LOGIC_ExtDeviceState.DS_FCROVU)
 						{
 							case DS_FCROVU_NONE:
 								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_ENABLE_POWER))
@@ -576,7 +577,7 @@ void LOGIC_PowerOnSequence()
 					{
 						if(DataTable[REG_DCU1_ACTIVE])
 						{
-							switch (LOGIC_ExtDeviceState.DS_DCU1)
+							switch(LOGIC_ExtDeviceState.DS_DCU1)
 							{
 								case DS_DCU_NONE:
 									if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_ENABLE_POWER))
@@ -594,7 +595,7 @@ void LOGIC_PowerOnSequence()
 						
 						if(DataTable[REG_DCU2_ACTIVE])
 						{
-							switch (LOGIC_ExtDeviceState.DS_DCU2)
+							switch(LOGIC_ExtDeviceState.DS_DCU2)
 							{
 								case DS_DCU_NONE:
 									if(HLI_CAN_CallAction(DataTable[REG_DCU2_NODE_ID], ACT_DCU_ENABLE_POWER))
@@ -612,7 +613,7 @@ void LOGIC_PowerOnSequence()
 						
 						if(DataTable[REG_DCU3_ACTIVE])
 						{
-							switch (LOGIC_ExtDeviceState.DS_DCU3)
+							switch(LOGIC_ExtDeviceState.DS_DCU3)
 							{
 								case DS_DCU_NONE:
 									if(HLI_CAN_CallAction(DataTable[REG_DCU3_NODE_ID], ACT_DCU_ENABLE_POWER))
@@ -646,7 +647,7 @@ void LOGIC_PowerOnSequence()
 					{
 						if(DataTable[REG_RCU1_ACTIVE])
 						{
-							switch (LOGIC_ExtDeviceState.DS_RCU1)
+							switch(LOGIC_ExtDeviceState.DS_RCU1)
 							{
 								case DS_RCU_NONE:
 									if(HLI_CAN_CallAction(DataTable[REG_RCU1_NODE_ID], ACT_RCU_ENABLE_POWER))
@@ -664,7 +665,7 @@ void LOGIC_PowerOnSequence()
 						
 						if(DataTable[REG_RCU2_ACTIVE])
 						{
-							switch (LOGIC_ExtDeviceState.DS_RCU2)
+							switch(LOGIC_ExtDeviceState.DS_RCU2)
 							{
 								case DS_RCU_NONE:
 									if(HLI_CAN_CallAction(DataTable[REG_RCU2_NODE_ID], ACT_RCU_ENABLE_POWER))
@@ -682,7 +683,7 @@ void LOGIC_PowerOnSequence()
 						
 						if(DataTable[REG_RCU3_ACTIVE])
 						{
-							switch (LOGIC_ExtDeviceState.DS_RCU3)
+							switch(LOGIC_ExtDeviceState.DS_RCU3)
 							{
 								case DS_RCU_NONE:
 									if(HLI_CAN_CallAction(DataTable[REG_RCU3_NODE_ID], ACT_RCU_ENABLE_POWER))
@@ -729,7 +730,7 @@ void LOGIC_PowerOnSequence()
 					// Handle SCOPE node
 					if(!EmulateSCOPE)
 					{
-						switch (LOGIC_ExtDeviceState.DS_SCOPE)
+						switch(LOGIC_ExtDeviceState.DS_SCOPE)
 						{
 							case DS_SCOPE_FAULT:
 								if(HLI_RS232_CallAction(ACT_SCOPE_CLR_FAULT))
@@ -859,7 +860,7 @@ void LOGIC_ConfigureSequence()
 			return;
 		}
 		
-		switch (LOGIC_State)
+		switch(LOGIC_State)
 		{
 			case LS_CFG_CROVU:
 				{
@@ -868,7 +869,8 @@ void LOGIC_ConfigureSequence()
 					{
 						if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_EXT_SYNC))
 							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
-								if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE, CROVU_VoltageRate))
+								if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE,
+										CROVU_VoltageRate))
 									if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
 										LOGIC_State = LS_CFG_FCROVU;
 					}
@@ -886,7 +888,8 @@ void LOGIC_ConfigureSequence()
 					if(!EmulateFCROVU && !MuteCROVU)
 					{
 						if(HLI_CAN_Write16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_V_RATE_VALUE, CROVU_VoltageRate))
-							if(HLI_CAN_Write16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_I_SHORT_CIRCUIT, FCROVU_IShortCircuit))
+							if(HLI_CAN_Write16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_I_SHORT_CIRCUIT,
+									FCROVU_IShortCircuit))
 								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_CONFIG))
 									LOGIC_State = LS_CFG_DCU;
 					}
@@ -908,8 +911,10 @@ void LOGIC_ConfigureSequence()
 							if(DC_Current >= DRCU_CURRENT_MAX)
 							{
 								if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
-									if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_RATE_RISE, DC_CurrentRiseRate))
-										if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_RATE_FALL, DC_CurrentFallRate))
+									if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_RATE_RISE,
+											DC_CurrentRiseRate))
+										if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_RATE_FALL,
+												DC_CurrentFallRate))
 											if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_CONFIG))
 												DC_Current = DC_Current - DRCU_CURRENT_MAX;
 							}
@@ -920,8 +925,10 @@ void LOGIC_ConfigureSequence()
 							if(DC_Current >= DRCU_CURRENT_MAX)
 							{
 								if(HLI_CAN_Write16(DataTable[REG_DCU2_NODE_ID], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
-									if(HLI_CAN_Write16(DataTable[REG_DCU2_NODE_ID], REG_DCU_I_RATE_RISE, DC_CurrentRiseRate))
-										if(HLI_CAN_Write16(DataTable[REG_DCU2_NODE_ID], REG_DCU_I_RATE_FALL, DC_CurrentFallRate))
+									if(HLI_CAN_Write16(DataTable[REG_DCU2_NODE_ID], REG_DCU_I_RATE_RISE,
+											DC_CurrentRiseRate))
+										if(HLI_CAN_Write16(DataTable[REG_DCU2_NODE_ID], REG_DCU_I_RATE_FALL,
+												DC_CurrentFallRate))
 											if(HLI_CAN_CallAction(DataTable[REG_DCU2_NODE_ID], ACT_DCU_CONFIG))
 												DC_Current = DC_Current - DRCU_CURRENT_MAX;
 							}
@@ -930,8 +937,10 @@ void LOGIC_ConfigureSequence()
 						if((LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_READY && ResultsCounter > 0) || ResultsCounter == 0)
 						{
 							if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_MAX_VALUE, DC_CurrentMax))
-								if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_RATE_RISE, DC_CurrentRiseRate))
-									if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_RATE_FALL, DC_CurrentFallRate))
+								if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_RATE_RISE,
+										DC_CurrentRiseRate))
+									if(HLI_CAN_Write16(DataTable[REG_DCU1_NODE_ID], REG_DCU_I_RATE_FALL,
+											DC_CurrentFallRate))
 										if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_CONFIG))
 										{
 											LOGIC_State = LS_PON_RCU;
@@ -960,7 +969,8 @@ void LOGIC_ConfigureSequence()
 							if(RC_Current >= DRCU_CURRENT_MAX)
 							{
 								if(HLI_CAN_Write16(DataTable[REG_RCU1_NODE_ID], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
-									if(HLI_CAN_Write16(DataTable[REG_RCU1_NODE_ID], REG_RCU_I_RATE_FALL, RC_CurrentFallRate))
+									if(HLI_CAN_Write16(DataTable[REG_RCU1_NODE_ID], REG_RCU_I_RATE_FALL,
+											RC_CurrentFallRate))
 										if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_CONFIG))
 											RC_Current = RC_Current - DRCU_CURRENT_MAX;
 							}
@@ -971,7 +981,8 @@ void LOGIC_ConfigureSequence()
 							if(RC_Current >= DRCU_CURRENT_MAX)
 							{
 								if(HLI_CAN_Write16(DataTable[REG_RCU2_NODE_ID], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
-									if(HLI_CAN_Write16(DataTable[REG_RCU2_NODE_ID], REG_RCU_I_RATE_FALL, RC_CurrentFallRate))
+									if(HLI_CAN_Write16(DataTable[REG_RCU2_NODE_ID], REG_RCU_I_RATE_FALL,
+											RC_CurrentFallRate))
 										if(HLI_CAN_CallAction(DataTable[REG_DCU2_NODE_ID], ACT_DCU_CONFIG))
 											RC_Current = RC_Current - DRCU_CURRENT_MAX;
 							}
@@ -980,7 +991,8 @@ void LOGIC_ConfigureSequence()
 						if((LOGIC_ExtDeviceState.DS_RCU1 == DS_RCU_READY && ResultsCounter > 0) || ResultsCounter == 0)
 						{
 							if(HLI_CAN_Write16(DataTable[REG_RCU1_NODE_ID], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
-								if(HLI_CAN_Write16(DataTable[REG_RCU1_NODE_ID], REG_RCU_I_RATE_FALL, RC_CurrentFallRate))
+								if(HLI_CAN_Write16(DataTable[REG_RCU1_NODE_ID], REG_RCU_I_RATE_FALL,
+										RC_CurrentFallRate))
 									if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_CONFIG))
 									{
 										LOGIC_State = LS_CFG_SCOPE;
@@ -1004,13 +1016,14 @@ void LOGIC_ConfigureSequence()
 					// Handle SCOPE node
 					if(!EmulateSCOPE)
 					{
-						switch (LOGIC_ExtDeviceState.DS_SCOPE)
+						switch(LOGIC_ExtDeviceState.DS_SCOPE)
 						{
 							case DS_SCOPE_NONE:
 								{
 									if(HLI_RS232_Write16(REG_SCOPE_CURRENT_AMPL, DataTable[REG_DIRECT_CURRENT]))
 										if(HLI_RS232_Write16(REG_SCOPE_MEASURE_MODE, MeasurementMode))
-											if(HLI_RS232_Write16(REG_SCOPE_TR_050_METHOD, DataTable[REG_TRR_DETECTION_MODE]))
+											if(HLI_RS232_Write16(REG_SCOPE_TR_050_METHOD,
+													DataTable[REG_TRR_DETECTION_MODE]))
 												if(HLI_RS232_CallAction(ACT_SCOPE_START_TEST))
 													LOGIC_State = LS_CFG_WaitStates;
 								}
@@ -1131,14 +1144,14 @@ void LOGIC_PowerOffSequence()
 			return;
 		}
 		
-		switch (LOGIC_State)
+		switch(LOGIC_State)
 		{
 			case LS_POFF_CROVU:
 				{
 					// Handle CROVU node
 					if(!EmulateCROVU)
 					{
-						switch (LOGIC_ExtDeviceState.DS_CROVU)
+						switch(LOGIC_ExtDeviceState.DS_CROVU)
 						{
 							case DS_CROVU_NONE:
 							case DS_CROVU_READY:
@@ -1164,7 +1177,7 @@ void LOGIC_PowerOffSequence()
 					// Handle FCROVU node
 					if(!EmulateFCROVU)
 					{
-						switch (LOGIC_ExtDeviceState.DS_FCROVU)
+						switch(LOGIC_ExtDeviceState.DS_FCROVU)
 						{
 							case DS_FCROVU_NONE:
 							case DS_FCROVU_READY:
@@ -1189,7 +1202,7 @@ void LOGIC_PowerOffSequence()
 				{
 					if(!EmulateDCU1)
 					{
-						switch (LOGIC_ExtDeviceState.DS_DCU1)
+						switch(LOGIC_ExtDeviceState.DS_DCU1)
 						{
 							case DS_DCU_FAULT:
 							case DS_DCU_DISABLED:
@@ -1202,7 +1215,7 @@ void LOGIC_PowerOffSequence()
 								break;
 						}
 						
-						switch (LOGIC_ExtDeviceState.DS_DCU2)
+						switch(LOGIC_ExtDeviceState.DS_DCU2)
 						{
 							case DS_DCU_FAULT:
 							case DS_DCU_DISABLED:
@@ -1215,7 +1228,7 @@ void LOGIC_PowerOffSequence()
 								break;
 						}
 						
-						switch (LOGIC_ExtDeviceState.DS_DCU3)
+						switch(LOGIC_ExtDeviceState.DS_DCU3)
 						{
 							case DS_DCU_FAULT:
 							case DS_DCU_DISABLED:
@@ -1242,7 +1255,7 @@ void LOGIC_PowerOffSequence()
 				{
 					if(!EmulateRCU1)
 					{
-						switch (LOGIC_ExtDeviceState.DS_RCU1)
+						switch(LOGIC_ExtDeviceState.DS_RCU1)
 						{
 							case DS_RCU_FAULT:
 							case DS_RCU_DISABLED:
@@ -1255,7 +1268,7 @@ void LOGIC_PowerOffSequence()
 								break;
 						}
 						
-						switch (LOGIC_ExtDeviceState.DS_RCU2)
+						switch(LOGIC_ExtDeviceState.DS_RCU2)
 						{
 							case DS_RCU_FAULT:
 							case DS_RCU_DISABLED:
@@ -1268,7 +1281,7 @@ void LOGIC_PowerOffSequence()
 								break;
 						}
 						
-						switch (LOGIC_ExtDeviceState.DS_RCU3)
+						switch(LOGIC_ExtDeviceState.DS_RCU3)
 						{
 							case DS_RCU_FAULT:
 							case DS_RCU_DISABLED:
@@ -1296,7 +1309,7 @@ void LOGIC_PowerOffSequence()
 					// Handle SCOPE node
 					if(!EmulateSCOPE)
 					{
-						switch (LOGIC_ExtDeviceState.DS_SCOPE)
+						switch(LOGIC_ExtDeviceState.DS_SCOPE)
 						{
 							case DS_SCOPE_IN_PROCESS:
 								if(HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST))
@@ -1344,7 +1357,7 @@ void LOGIC_ReadDataSequence()
 			return;
 		}
 		
-		switch (LOGIC_State)
+		switch(LOGIC_State)
 		{
 			case LS_READ_CROVU:
 				{
@@ -1448,15 +1461,18 @@ void LOGIC_ReadDataSequence()
 									if(HLI_RS232_Read16(REG_SCOPE_RESULT_IRR, &Results[ResultsCounter].Irr))
 										if(HLI_RS232_Read16(REG_SCOPE_RESULT_TRR, &Results[ResultsCounter].Trr))
 											if(HLI_RS232_Read16(REG_SCOPE_RESULT_QRR, &Results[ResultsCounter].Qrr))
-												if(HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO, &Results[ResultsCounter].ZeroI))
-													if(HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV))
-														if(HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt))
+												if(HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO,
+														&Results[ResultsCounter].ZeroI))
+													if(HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V,
+															&Results[ResultsCounter].ZeroV))
+														if(HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT,
+																&Results[ResultsCounter].dIdt))
 														{
 															if(Register == OPRESULT_NONE)
 															{
 																LOGIC_State = LS_Error;
 																CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE,
-																		FAULTEX_READ_WRONG_STATE);
+																FAULTEX_READ_WRONG_STATE);
 															}
 															else if((Register == OPRESULT_FAIL
 																	&& Problem != PROBLEM_SCOPE_CALC_VZ)
