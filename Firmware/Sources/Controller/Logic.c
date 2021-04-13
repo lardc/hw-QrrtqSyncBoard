@@ -481,9 +481,10 @@ void LOGIC_PowerOnPrepare()
 
 void LOGIC_PowerOnSequence()
 {
-	if(LOGIC_State == LS_PON_CROVU || LOGIC_State == LS_PON_FCROVU || LOGIC_State == LS_PON_DCU
-			|| LOGIC_State == LS_PON_RCU || LOGIC_State == LS_PON_CSU || LOGIC_State == LS_PON_SCOPE
-			|| LOGIC_State == LS_PON_WaitStates)
+	if(LOGIC_State == LS_PON_CROVU || LOGIC_State == LS_PON_FCROVU || LOGIC_State == LS_PON_WaitStates
+			|| LOGIC_State == LS_PON_DCU1 || LOGIC_State == LS_PON_DCU2 || LOGIC_State == LS_PON_DCU3
+			|| LOGIC_State == LS_PON_RCU1 || LOGIC_State == LS_PON_RCU2 || LOGIC_State == LS_PON_RCU3
+			|| LOGIC_State == LS_PON_CSU || LOGIC_State == LS_PON_SCOPE)
 	{
 		if(!LOGIC_UpdateDeviceState())
 		{
@@ -502,232 +503,57 @@ void LOGIC_PowerOnSequence()
 		switch(LOGIC_State)
 		{
 			case LS_PON_CROVU:
-				{
-					// Handle CROVU node
-					if(!EmulateCROVU)
-					{
-						switch(LOGIC_ExtDeviceState.DS_CROVU)
-						{
-							case DS_CROVU_NONE:
-								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_POWER))
-									LOGIC_State = LS_PON_FCROVU;
-								break;
-							case DS_CROVU_READY:
-								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_DISABLE_POWER))
-									if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_POWER))
-										LOGIC_State = LS_PON_FCROVU;
-								break;
-							case DS_CROVU_FAULT:
-								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_CLR_FAULT))
-									if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_POWER))
-										LOGIC_State = LS_PON_FCROVU;
-								break;
-							case DS_CROVU_DISABLED:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_WRONG_STATE);
-								break;
-						}
-					}
-					else
-					{
-						LOGIC_ExtDeviceState.DS_CROVU = DS_CROVU_READY;
-						LOGIC_State = LS_PON_FCROVU;
-					}
-				}
+				CMN_NodePowerOn(EmulateCROVU, REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_CROVU, &LOGIC_State,
+						FAULT_LOGIC_CROVU, LS_PON_FCROVU);
 				break;
 				
 			case LS_PON_FCROVU:
-				{
-					// Handle FCROVU node
-					if(!EmulateFCROVU)
-					{
-						switch(LOGIC_ExtDeviceState.DS_FCROVU)
-						{
-							case DS_FCROVU_NONE:
-								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_ENABLE_POWER))
-									LOGIC_State = LS_PON_DCU;
-								break;
-							case DS_FCROVU_READY:
-								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_DISABLE_POWER))
-									if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_ENABLE_POWER))
-										LOGIC_State = LS_PON_DCU;
-								break;
-							case DS_FCROVU_FAULT:
-								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_FAULT_CLEAR))
-									if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_ENABLE_POWER))
-										LOGIC_State = LS_PON_DCU;
-								break;
-							case DS_FCROVU_DISABLED:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_WRONG_STATE);
-								break;
-						}
-					}
-					else
-					{
-						LOGIC_ExtDeviceState.DS_FCROVU = DS_FCROVU_READY;
-						LOGIC_State = LS_PON_DCU;
-					}
-				}
+				CMN_NodePowerOn(EmulateFCROVU, REG_FCROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_FCROVU, &LOGIC_State,
+						FAULT_LOGIC_FCROVU, LS_PON_DCU1);
 				break;
 				
-			case LS_PON_DCU:
-				{
-					if(!EmulateDCU1)
-					{
-						if(DataTable[REG_DCU1_ACTIVE])
-						{
-							switch(LOGIC_ExtDeviceState.DS_DCU1)
-							{
-								case DS_DCU_NONE:
-									if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_ENABLE_POWER))
-										return;
-								case DS_DCU_FAULT:
-									if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_FAULT_CLEAR))
-										if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_ENABLE_POWER))
-											return;
-								case DS_DCU_DISABLED:
-									LOGIC_State = LS_Error;
-									CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_PON_WRONG_STATE);
-									break;
-							}
-						}
-						
-						if(DataTable[REG_DCU2_ACTIVE])
-						{
-							switch(LOGIC_ExtDeviceState.DS_DCU2)
-							{
-								case DS_DCU_NONE:
-									if(HLI_CAN_CallAction(DataTable[REG_DCU2_NODE_ID], ACT_DCU_ENABLE_POWER))
-										return;
-								case DS_DCU_FAULT:
-									if(HLI_CAN_CallAction(DataTable[REG_DCU2_NODE_ID], ACT_DCU_FAULT_CLEAR))
-										if(HLI_CAN_CallAction(DataTable[REG_DCU2_NODE_ID], ACT_DCU_ENABLE_POWER))
-											return;
-								case DS_DCU_DISABLED:
-									LOGIC_State = LS_Error;
-									CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_PON_WRONG_STATE);
-									break;
-							}
-						}
-						
-						if(DataTable[REG_DCU3_ACTIVE])
-						{
-							switch(LOGIC_ExtDeviceState.DS_DCU3)
-							{
-								case DS_DCU_NONE:
-									if(HLI_CAN_CallAction(DataTable[REG_DCU3_NODE_ID], ACT_DCU_ENABLE_POWER))
-										return;
-								case DS_DCU_FAULT:
-									if(HLI_CAN_CallAction(DataTable[REG_DCU3_NODE_ID], ACT_DCU_FAULT_CLEAR))
-										if(HLI_CAN_CallAction(DataTable[REG_DCU3_NODE_ID], ACT_DCU_ENABLE_POWER))
-											return;
-								case DS_DCU_DISABLED:
-									LOGIC_State = LS_Error;
-									CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_PON_WRONG_STATE);
-									break;
-							}
-						}
-						
-						LOGIC_State = LS_PON_RCU;
-					}
-					else
-					{
-						LOGIC_ExtDeviceState.DS_DCU1 = DS_DCU_READY;
-						LOGIC_ExtDeviceState.DS_DCU2 = DS_DCU_READY;
-						LOGIC_ExtDeviceState.DS_DCU3 = DS_DCU_READY;
-						LOGIC_State = LS_PON_RCU;
-					}
-				}
+			case LS_PON_DCU1:
+				CMN_NodePowerOn(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &LOGIC_State,
+						FAULT_LOGIC_DCU1, LS_PON_DCU2);
+				break;
+
+			case LS_PON_DCU2:
+				CMN_NodePowerOn(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &LOGIC_State,
+						FAULT_LOGIC_DCU2, LS_PON_DCU3);
+				break;
+
+			case LS_PON_DCU3:
+				CMN_NodePowerOn(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &LOGIC_State,
+						FAULT_LOGIC_DCU3, LS_PON_RCU1);
+				break;
+
+			case LS_PON_RCU1:
+				CMN_NodePowerOn(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1, &LOGIC_State,
+						FAULT_LOGIC_RCU1, LS_PON_RCU2);
 				break;
 				
-			case LS_PON_RCU:
-				{
-					if(!EmulateRCU1)
-					{
-						if(DataTable[REG_RCU1_ACTIVE])
-						{
-							switch(LOGIC_ExtDeviceState.DS_RCU1)
-							{
-								case DS_RCU_NONE:
-									if(HLI_CAN_CallAction(DataTable[REG_RCU1_NODE_ID], ACT_RCU_ENABLE_POWER))
-										return;
-								case DS_RCU_FAULT:
-									if(HLI_CAN_CallAction(DataTable[REG_RCU1_NODE_ID], ACT_RCU_FAULT_CLEAR))
-										if(HLI_CAN_CallAction(DataTable[REG_RCU1_NODE_ID], ACT_RCU_ENABLE_POWER))
-											return;
-								case DS_RCU_DISABLED:
-									LOGIC_State = LS_Error;
-									CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_PON_WRONG_STATE);
-									break;
-							}
-						}
-						
-						if(DataTable[REG_RCU2_ACTIVE])
-						{
-							switch(LOGIC_ExtDeviceState.DS_RCU2)
-							{
-								case DS_RCU_NONE:
-									if(HLI_CAN_CallAction(DataTable[REG_RCU2_NODE_ID], ACT_RCU_ENABLE_POWER))
-										return;
-								case DS_RCU_FAULT:
-									if(HLI_CAN_CallAction(DataTable[REG_RCU2_NODE_ID], ACT_RCU_FAULT_CLEAR))
-										if(HLI_CAN_CallAction(DataTable[REG_RCU2_NODE_ID], ACT_RCU_ENABLE_POWER))
-											return;
-								case DS_RCU_DISABLED:
-									LOGIC_State = LS_Error;
-									CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_PON_WRONG_STATE);
-									break;
-							}
-						}
-						
-						if(DataTable[REG_RCU3_ACTIVE])
-						{
-							switch(LOGIC_ExtDeviceState.DS_RCU3)
-							{
-								case DS_RCU_NONE:
-									if(HLI_CAN_CallAction(DataTable[REG_RCU3_NODE_ID], ACT_RCU_ENABLE_POWER))
-										return;
-								case DS_RCU_FAULT:
-									if(HLI_CAN_CallAction(DataTable[REG_RCU3_NODE_ID], ACT_RCU_FAULT_CLEAR))
-										if(HLI_CAN_CallAction(DataTable[REG_RCU3_NODE_ID], ACT_RCU_ENABLE_POWER))
-											return;
-								case DS_RCU_DISABLED:
-									LOGIC_State = LS_Error;
-									CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_PON_WRONG_STATE);
-									break;
-							}
-						}
-						
-						LOGIC_State = LS_PON_CSU;
-					}
-					else
-					{
-						LOGIC_ExtDeviceState.DS_RCU1 = DS_RCU_READY;
-						LOGIC_ExtDeviceState.DS_RCU2 = DS_RCU_READY;
-						LOGIC_ExtDeviceState.DS_RCU3 = DS_RCU_READY;
-						LOGIC_State = LS_PON_CSU;
-					}
-				}
+			case LS_PON_RCU2:
+				CMN_NodePowerOn(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2, &LOGIC_State,
+						FAULT_LOGIC_RCU2, LS_PON_RCU3);
 				break;
 				
+			case LS_PON_RCU3:
+				CMN_NodePowerOn(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3, &LOGIC_State,
+						FAULT_LOGIC_RCU3, LS_PON_CSU);
+				break;
+
 			case LS_PON_CSU:
 				{
 					if(!EmulateCSU)
-					{
 						ZbGPIO_CSU_PWRCtrl(TRUE);
-					}
 					else
-					{
 						LOGIC_ExtDeviceState.DS_CSU = DS_CSU_READY;
-						LOGIC_State = LS_PON_SCOPE;
-					}
+					LOGIC_State = LS_PON_SCOPE;
 				}
 				break;
 				
 			case LS_PON_SCOPE:
 				{
-					// Handle SCOPE node
 					if(!EmulateSCOPE)
 					{
 						switch(LOGIC_ExtDeviceState.DS_SCOPE)
