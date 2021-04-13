@@ -27,14 +27,6 @@
 #define	BCCI_MASTER_TIMEOUT_TICKS_MS	1000	// in ms
 //
 #define	NODEID_SCCI_SCOPE				0
-#define NODEID_CROVU					7
-#define NODEID_FCROVU					8
-#define NODEID_DCU1						101
-#define NODEID_DCU2						102
-#define NODEID_DCU3						103
-#define NODEID_RCU1						104
-#define NODEID_RCU2						105
-#define NODEID_RCU3						106
 //
 #define TIMEOUT_REINIT_RS232			10000	// in ms
 #define TIMEOUT_HL_LOGIC				60000	// in ms

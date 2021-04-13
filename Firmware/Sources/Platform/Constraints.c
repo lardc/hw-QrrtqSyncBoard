@@ -19,22 +19,22 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
                                     		   {NO, YES, NO},															// 3
                                     		   {NO, YES, NO},															// 4
 											   {NO, YES, NO},															// 5
-											   {0, INT16U_MAX, 0},														// 6
-											   {0, INT16U_MAX, 0},														// 7
-                                    		   {0, INT16U_MAX, 0},														// 8
-                                    		   {0, INT16U_MAX, 0},														// 9
+											   {NO, YES, NO},															// 6
+											   {NO, YES, NO},															// 7
+											   {NO, YES, NO},															// 8
+											   {NO, YES, NO},															// 9
 											   {0, INT16U_MAX, 0},														// 10
 											   {0, INT16U_MAX, 0},														// 11
-											   {NO, NO, YES},															// 12
-											   {NO, NO, YES},															// 13
-											   {NO, NO, YES},															// 14
-											   {NO, NO, YES},															// 15
-											   {NO, NO, YES},															// 16
-											   {NO, NO, YES},															// 17
+											   {0, INT16U_MAX, 0},														// 12
+											   {0, INT16U_MAX, 0},														// 13
+											   {0, INT16U_MAX, 0},														// 14
+											   {0, INT16U_MAX, 0},														// 15
+											   {0, INT16U_MAX, 0},														// 16
+											   {0, INT16U_MAX, 0},														// 17
 											   {0, 0, 0},																// 18
 											   {0, 0, 0},																// 19
-											   {NO, YES, NO},															// 20
-											   {0, 0, 0},																// 21
+											   {0, INT16U_MAX, 0},														// 20
+											   {NO, YES, NO},															// 21
 											   {0, 0, 0},																// 22
 											   {0, 0, 0},																// 23
 											   {0, 0, 0},																// 24

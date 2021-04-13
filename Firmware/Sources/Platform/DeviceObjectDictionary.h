@@ -52,28 +52,33 @@
 //
 #define REG_EMULATE_FCROVU			0	// Enable FCROVU emulation
 #define REG_EMULATE_CROVU			1	// Enable CROVU emulation
-#define REG_EMULATE_DCU				2	// Enable DCU emulation
-#define REG_EMULATE_RCU				3	// Enable DCU emulation
-#define REG_EMULATE_SCOPE			4	// Enable SCOPE emulation
-#define REG_EMULATE_CSU				5	// Enable CSU emulation
+#define REG_EMULATE_DCU1			2	// Enable DCU1 emulation
+#define REG_EMULATE_DCU2			3	// Enable DCU2 emulation
+#define REG_EMULATE_DCU3			4	// Enable DCU3 emulation
+#define REG_EMULATE_RCU1			5	// Enable RCU1 emulation
+#define REG_EMULATE_RCU2			6	// Enable RCU2 emulation
+#define REG_EMULATE_RCU3			7	// Enable RCU3 emulation
+#define REG_EMULATE_SCOPE			8	// Enable SCOPE emulation
+#define REG_EMULATE_CSU				9	// Enable CSU emulation
 //
-#define REG_DCU1_CAN_ADDR			6	// DCU1 CAN address
-#define REG_DCU2_CAN_ADDR			7	// DCU2 CAN address
-#define REG_DCU3_CAN_ADDR			8	// DCU3 CAN address
-#define REG_RCU1_CAN_ADDR			9	// RCU1 CAN address
-#define REG_RCU2_CAN_ADDR			10	// RCU2 CAN address
-#define REG_RCU3_CAN_ADDR			11	// RCU3 CAN address
+#define REG_FCROVU_NODE_ID			10	// DCU1 CAN node ID
+#define REG_CROVU_NODE_ID			11	// DCU1 CAN node ID
+#define REG_DCU1_NODE_ID			12	// DCU1 CAN node ID
+#define REG_DCU2_NODE_ID			13	// DCU2 CAN node ID
+#define REG_DCU3_NODE_ID			14	// DCU3 CAN node ID
+#define REG_RCU1_NODE_ID			15	// RCU1 CAN node ID
+#define REG_RCU2_NODE_ID			16	// RCU2 CAN node ID
+#define REG_RCU3_NODE_ID			17	// RCU3 CAN node ID
 //
-#define REG_DCU1_ACTIVE				12	// DCU1 switching in active/deactive state
-#define REG_DCU2_ACTIVE				13	// DCU2 switching in active/deactive state
-#define REG_DCU3_ACTIVE				14	// DCU3 switching in active/deactive state
-#define REG_RCU1_ACTIVE				15	// RCU1 switching in active/deactive state
-#define REG_RCU2_ACTIVE				16	// RCU2 switching in active/deactive state
-#define REG_RCU3_ACTIVE				17	// RCU3 switching in active/deactive state
-//
-#define REG_CSU_V_C					18 	// CSU voltage coefficient
-//
+// Заглушки
+#define REG_DCU1_ACTIVE				0	// DCU1 switching in active/deactive state
+#define REG_DCU2_ACTIVE				0	// DCU2 switching in active/deactive state
+#define REG_DCU3_ACTIVE				0	// DCU3 switching in active/deactive state
+#define REG_RCU1_ACTIVE				0	// RCU1 switching in active/deactive state
+#define REG_RCU2_ACTIVE				0	// RCU2 switching in active/deactive state
+#define REG_RCU3_ACTIVE				0	// RCU3 switching in active/deactive state
 #define REG_SAFETY_EN				20	// Safety enable
+#define REG_CSU_V_C					21 	// CSU voltage coefficient
 // ----------------------------------------
 //
 #define REG_MODE					128	// Measurement mode
