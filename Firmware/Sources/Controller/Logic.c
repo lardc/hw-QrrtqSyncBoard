@@ -354,64 +354,58 @@ Boolean LOGIC_UpdateDeviceState()
 	Int16U Register;
 	
 	if(!EmulateCROVU)
-	{
 		if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_CROVU = Register;
 		else
 			return FALSE;
-	}
 	
 	if(!EmulateFCROVU)
-	{
 		if(HLI_CAN_Read16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_FCROVU = Register;
 		else
 			return FALSE;
-	}
 	
 	if(!EmulateDCU1)
-	{
 		if(HLI_CAN_Read16(DataTable[REG_DCU1_NODE_ID], REG_DCU_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_DCU1 = Register;
 		else
 			return FALSE;
 		
+	if(!EmulateDCU2)
 		if(HLI_CAN_Read16(DataTable[REG_DCU2_NODE_ID], REG_DCU_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_DCU2 = Register;
 		else
 			return FALSE;
 		
+	if(!EmulateDCU3)
 		if(HLI_CAN_Read16(DataTable[REG_DCU3_NODE_ID], REG_DCU_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_DCU3 = Register;
 		else
 			return FALSE;
-	}
 	
 	if(!EmulateRCU1)
-	{
 		if(HLI_CAN_Read16(DataTable[REG_RCU1_NODE_ID], REG_RCU_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_RCU1 = Register;
 		else
 			return FALSE;
-		
+
+	if(!EmulateRCU2)
 		if(HLI_CAN_Read16(DataTable[REG_RCU2_NODE_ID], REG_RCU_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_RCU2 = Register;
 		else
 			return FALSE;
-		
+
+	if(!EmulateRCU3)
 		if(HLI_CAN_Read16(DataTable[REG_RCU3_NODE_ID], REG_RCU_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_RCU3 = Register;
 		else
 			return FALSE;
-	}
 	
 	if(!EmulateSCOPE)
-	{
 		if(HLI_RS232_Read16(REG_SCOPE_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_SCOPE = Register;
 		else
 			return FALSE;
-	}
 	
 	return TRUE;
 }
