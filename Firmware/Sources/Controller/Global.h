@@ -27,12 +27,19 @@
 #define	BCCI_MASTER_TIMEOUT_TICKS_MS	1000	// in ms
 //
 #define	NODEID_SCCI_SCOPE				0
-#define NODEID_FCROVU					7
-#define NODEID_QPU						101
+#define NODEID_CROVU					7
+#define NODEID_FCROVU					8
+#define NODEID_DCU1						101
+#define NODEID_DCU2						102
+#define NODEID_DCU3						103
+#define NODEID_RCU1						104
+#define NODEID_RCU2						105
+#define NODEID_RCU3						106
 //
 #define TIMEOUT_REINIT_RS232			10000	// in ms
 #define TIMEOUT_HL_LOGIC				60000	// in ms
 #define TIMEOUT_HL_LOGIC_SHORT			2000	// in ms
+#define TIMEOUT_UNITS_STARTUP			1000	// in ms
 //
 #define UNIT_PULSE_TO_PULSE_FAST		700		// in ms
 #define UNIT_PULSE_TO_PULSE_PAUSE		1500	// in ms
@@ -59,6 +66,12 @@
 //
 #define RT_DATA_READ_DELAY				500000	// in us
 #define RT_DATA_READ_DELAY_TICK			(RT_DATA_READ_DELAY / TIMER2_PERIOD)
+//
+#define DRCU_CURRENT_MAX				1100	// in A
+#define CSU_VOLTAGE_HIGH				102		// in V
+#define CSU_VOLTAGE_LOW					98		// in V
+#define CSU_VOLTAGE_HYST				1		// in V
+#define CSU_FAN_TIMEOUT					30000	// in ms
 //--------------------------------------------------------
 
 #endif // __GLOBAL_H

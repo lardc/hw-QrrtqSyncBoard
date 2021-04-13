@@ -49,14 +49,28 @@
 #define SCI_B_RX			GPIO19
 #define SCI_B_MUX_SELECTOR	2
 //
-#define PIN_SWITCH_HV_IGBT	2
-#define PIN_SYNC_SCOPE		4
-#define PIN_SWITCH_REV_CUR	6
-#define PIN_SWITCH_DIR_CUR	8
-#define PIN_SYNC_FCROVU		10
-#define PIN_SWITCH_DUT		11
-#define PIN_DC_READY		13
-#define PIN_LED_1			33
-#define PIN_LED_2			34
+#define PIN_CSU_PS			24
+#define PIN_SWITCH_DUT		23
+#define PIN_CONTROL_DUT		12
+#define PIN_LED				34
+#define PIN_SYNC_RCU		16
+#define PIN_SYNC_DCU		6
+#define PIN_SYNC_FCROVU		4
+#define PIN_CSU_FAN			25
+#define PIN_CSU_SYNC		10
+#define PIN_CSU_DISCH		13
+#define PIN_SYNC_SCOPE		22
+#define PIN_PC_PWR			32
+#define PIN_DBG				14
+#define PIN_DCU1_READY		15
+#define PIN_DCU2_READY		2
+#define PIN_DCU3_READY		0
+#define PIN_CSU_ITRIG		26
+#define PIN_SAFETY_EN		27
+#define PIN_SAFETY			33
+#define PIN_PRESSURE		9
+#define PIN_GATE_RELAY		8
+#define PIN_SB_EN			11
+#define PIN_QCUHC_CTRL		17
 
 #endif // __BOARD_CONFIG_H

@@ -73,10 +73,10 @@ void DEVPROFILE_Init(xCCI_FUNC_CallbackAction SpecializedDispatch, volatile Bool
 	MaskChangesFlag = MaskChanges;
 
 	// Init interface
-	RS232_IOConfig.IO_SendArray16 = &ZwSCIa_SendArray16;
-	RS232_IOConfig.IO_ReceiveArray16 = &ZwSCIa_ReceiveArray16;
-	RS232_IOConfig.IO_GetBytesToReceive = &ZwSCIa_GetBytesToReceive;
-	RS232_IOConfig.IO_ReceiveByte = &ZwSCIa_ReceiveChar;
+	RS232_IOConfig.IO_SendArray16 = &ZwSCIb_SendArray16;
+	RS232_IOConfig.IO_ReceiveArray16 = &ZwSCIb_ReceiveArray16;
+	RS232_IOConfig.IO_GetBytesToReceive = &ZwSCIb_GetBytesToReceive;
+	RS232_IOConfig.IO_ReceiveByte = &ZwSCIb_ReceiveChar;
 	//
 	CAN_IOConfig.IO_SendMessage = &ZwCANa_SendMessage;
 	CAN_IOConfig.IO_SendMessageEx = &ZwCANa_SendMessageEx;
@@ -84,10 +84,10 @@ void DEVPROFILE_Init(xCCI_FUNC_CallbackAction SpecializedDispatch, volatile Bool
 	CAN_IOConfig.IO_IsMessageReceived = &ZwCANa_IsMessageReceived;
 	CAN_IOConfig.IO_ConfigMailbox = &ZwCANa_ConfigMailbox;
 	//
-	RS232_Master_IOConfig.IO_SendArray16 = &ZwSCIb_SendArray16;
-	RS232_Master_IOConfig.IO_ReceiveArray16 = &ZwSCIb_ReceiveArray16;
-	RS232_Master_IOConfig.IO_GetBytesToReceive = &ZwSCIb_GetBytesToReceive;
-	RS232_Master_IOConfig.IO_ReceiveByte = &ZwSCIb_ReceiveChar;
+	RS232_Master_IOConfig.IO_SendArray16 = &ZwSCIa_SendArray16;
+	RS232_Master_IOConfig.IO_ReceiveArray16 = &ZwSCIa_ReceiveArray16;
+	RS232_Master_IOConfig.IO_GetBytesToReceive = &ZwSCIa_GetBytesToReceive;
+	RS232_Master_IOConfig.IO_ReceiveByte = &ZwSCIa_ReceiveChar;
 	//
 	CAN_Master_IOConfig.IO_SendMessage = &ZwCANb_SendMessage;
 	CAN_Master_IOConfig.IO_SendMessageEx = &ZwCANb_SendMessageEx;

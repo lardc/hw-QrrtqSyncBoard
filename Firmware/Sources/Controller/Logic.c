@@ -18,8 +18,15 @@
 //
 typedef struct __ExternalDeviceState
 {
+	Int16U DS_CROVU;
 	Int16U DS_FCROVU;
-	Int16U DS_QPU;
+	Int16U DS_DCU1;
+	Int16U DS_DCU2;
+	Int16U DS_DCU3;
+	Int16U DS_RCU1;
+	Int16U DS_RCU2;
+	Int16U DS_RCU3;
+	Int16U DS_CSU;
 	Int16U DS_SCOPE;
 } ExternalDeviceState;
 
@@ -28,19 +35,24 @@ typedef struct __ExternalDeviceState
 volatile DeviceSubState LOGIC_StateRealTime = LSRT_None;
 volatile Int32U LOGIC_RealTimeCounter = 0;
 static volatile Int64U Timeout;
+static volatile Int64U CSU_FanTimeout;
 static volatile LogicState LOGIC_State = LS_None;
 static volatile ExternalDeviceState LOGIC_ExtDeviceState;
 //
 static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 static volatile Int16U ResultsCounter, MeasurementMode;
 //
-static Boolean EmulateFCROVU, EmulateQPU, EmulateSCOPE, MuteFCROVU;
+static Boolean EmulateCROVU, EmulateFCROVU, EmulateDCU, EmulateRCU, EmulateSCOPE, MuteCROVU, EmulateCSU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
-static Int16U QPU_Current, QPU_CurrentEdgeTime, QPU_CurrentFallRate, QPU_CurrentPlateTicks, QPU_CurrentZeroPoint;
-static Int16U FCROVU_Voltage, FCROVU_VoltageRate;
-static volatile Int16U FCROVU_TrigTime, FCROVU_TrigTime_LastHalf;
+static Int16U DC_Current, DC_CurrentRiseRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_Current, RC_CurrentFallRate, RC_CurrentFallRate;
+static Int16U DC_CurrentMax, RC_CurrentMax;
+static Int16U UnitsStartTimeOut = 0;
+static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
+static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_DCReadyRetries, LOGIC_OperationResult, LOGIC_DriverOffTicks;
+static Int16U CSUVoltage = 0;
+//
 
 // Forward functions
 //
@@ -57,21 +69,46 @@ void LOGIC_RealTime()
 	if (LOGIC_StateRealTime != LSRT_None && LOGIC_StateRealTime != LSRT_WaitForConfig)
 	{
 		// Wait for direct current ready pulse from QPU
-		if (LOGIC_StateRealTime == LSRT_DirectPulseStart && ZbGPIO_DirectCurrentReady())
+		if (LOGIC_StateRealTime == LSRT_DirectPulseStart && ZbGPIO_DCU1_Ready())
 		{
-			TimeReverseStart = LOGIC_RealTimeCounter + QPU_CurrentPlateTicks;
-			LOGIC_StateRealTime = LSRT_DirectPulseReady;
+			if (DataTable[REG_DIRECT_CURRENT] > DRCU_CURRENT_MAX)
+			{
+				if (ZbGPIO_DCU2_Ready())
+				{
+					if(DataTable[REG_DIRECT_CURRENT] > (DRCU_CURRENT_MAX + DRCU_CURRENT_MAX))
+					{
+						if (ZbGPIO_DCU3_Ready())
+						{
+							TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
+							LOGIC_StateRealTime = LSRT_DirectPulseReady;
+						}
+					}
+					else
+					{
+						TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
+						LOGIC_StateRealTime = LSRT_DirectPulseReady;
+					}
+				}
+			}
+			else
+			{
+				TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
+				LOGIC_StateRealTime = LSRT_DirectPulseReady;
+			}
 		}
 
 		// Turn off gate driver
 		if (LOGIC_RealTimeCounter >= LOGIC_DriverOffTicks)
-			ZbGPIO_SwitchDUT(FALSE);
+		{
+			ZbGPIO_DUT_Control(FALSE);
+			ZbGPIO_DUT_Switch(FALSE);
+		}
 
 		// In case of direct current ready pulse timeout
 		if (LOGIC_StateRealTime == LSRT_DirectPulseStart && LOGIC_RealTimeCounter > DC_READY_TIMEOUT_TICK)
 		{
-			ZbGPIO_SwitchDirectCurrent(FALSE);
-			ZbGPIO_SwitchHVIGBT(FALSE);
+			ZbGPIO_DCU_Sync(FALSE);
+			ZbGPIO_CSU_Sync(FALSE);
 			LOGIC_StateRealTime = LSRT_None;
 
 			if (++LOGIC_DCReadyRetries > DC_READY_RETRIES_NUM)
@@ -84,10 +121,11 @@ void LOGIC_RealTime()
 		// Start reverse current pulse and on-state voltage timer
 		if (LOGIC_StateRealTime == LSRT_DirectPulseReady && LOGIC_RealTimeCounter > TimeReverseStart)
 		{
-			ZbGPIO_SyncSCOPE(TRUE);
-			ZbGPIO_SwitchReverseCurrent(TRUE);
-			ZbGPIO_SwitchDirectCurrent(FALSE);
-			ZbGPIO_SwitchDUT(FALSE);
+			ZbGPIO_SCOPE_Sync(TRUE);
+			ZbGPIO_RCU_Sync(TRUE);
+			ZbGPIO_DCU_Sync(FALSE);
+			ZbGPIO_DUT_Control(FALSE);
+			ZbGPIO_DUT_Switch(FALSE);
 
 			LOGIC_StateRealTime = LSRT_ReversePulseStart;
 			TimeReverseStop = LOGIC_RealTimeCounter + OSV_ON_TIME_TICK;
@@ -97,11 +135,11 @@ void LOGIC_RealTime()
 		// Stop process
 		if (LOGIC_StateRealTime == LSRT_ReversePulseStart && LOGIC_RealTimeCounter >= TimeReverseStop)
 		{
-			ZbGPIO_SyncFCROVU(FALSE);
-			ZbGPIO_SyncSCOPE(FALSE);
+			ZbGPIO_FCROVU_Sync(FALSE);
+			ZbGPIO_SCOPE_Sync(FALSE);
 			//
-			ZbGPIO_SwitchReverseCurrent(FALSE);
-			ZbGPIO_SwitchHVIGBT(FALSE);
+			ZbGPIO_RCU_Sync(FALSE);
+			ZbGPIO_CSU_Sync(FALSE);
 
 			TimeBeforeDataRead = LOGIC_RealTimeCounter + RT_DATA_READ_DELAY_TICK;
 			LOGIC_StateRealTime = LSRT_ReadDataPause;
@@ -162,11 +200,11 @@ void LOGIC_Halt()
 void LOGIC_TrimTrigTime(Boolean Increase)
 {
 	if (Increase)
-		FCROVU_TrigTime += FCROVU_TrigTime_LastHalf;
+		CROVU_TrigTime += CROVU_TrigTime_LastHalf;
 	else
-		FCROVU_TrigTime -= FCROVU_TrigTime_LastHalf;
+		CROVU_TrigTime -= CROVU_TrigTime_LastHalf;
 
-	FCROVU_TrigTime_LastHalf >>= 1;
+	CROVU_TrigTime_LastHalf >>= 1;
 }
 // ----------------------------------------
 
@@ -214,8 +252,11 @@ void LOGIC_ResetState()
 void LOGIC_CacheVariables()
 {
 	DCPulseFormed = FALSE;
+	EmulateCROVU = DataTable[REG_EMULATE_CROVU] ? TRUE : FALSE;
 	EmulateFCROVU = DataTable[REG_EMULATE_FCROVU] ? TRUE : FALSE;
-	EmulateQPU = DataTable[REG_EMULATE_QPU] ? TRUE : FALSE;
+	EmulateDCU = DataTable[REG_EMULATE_DCU] ? TRUE : FALSE;
+	EmulateRCU = DataTable[REG_EMULATE_RCU] ? TRUE : FALSE;
+	EmulateCSU = DataTable[REG_EMULATE_CSU] ? TRUE : FALSE;
 	EmulateSCOPE = DataTable[REG_EMULATE_SCOPE] ? TRUE : FALSE;
 
 	if (CacheUpdate)
@@ -227,39 +268,69 @@ void LOGIC_CacheVariables()
 		LOGIC_DCReadyRetries = 0;
 		ResultsCounter = 0;
 		MeasurementMode = DataTable[REG_MODE];
-		MuteFCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
+		MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
 
-		QPU_Current = DataTable[REG_DIRECT_CURRENT];
-		QPU_CurrentEdgeTime = (DataTable[REG_DIRECT_CURRENT] * 10) / DataTable[REG_DC_RISE_RATE] + 1;
-		QPU_CurrentPlateTicks = DataTable[REG_DC_PULSE_WIDTH] / TIMER2_PERIOD;
-		QPU_CurrentFallRate = DataTable[REG_DC_FALL_RATE];
+		DC_Current = DataTable[REG_DIRECT_CURRENT];
+		DC_CurrentRiseRate = DataTable[REG_DCU_RISE_RATE];
+		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] / TIMER2_PERIOD;
+		DC_CurrentFallRate = DataTable[REG_DCU_FALL_RATE];
+		DC_CurrentZeroPoint = DC_Current * 10 / DC_CurrentFallRate;
+		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 
-		QPU_CurrentZeroPoint = QPU_Current * 10 / QPU_CurrentFallRate;
-		QPU_CurrentZeroPoint = (QPU_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (QPU_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
+		RC_Current = DataTable[REG_DIRECT_CURRENT];
+		RC_CurrentFallRate = DataTable[REG_DCU_FALL_RATE];
 
-		FCROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
-		FCROVU_VoltageRate = DataTable[REG_OSV_RATE];
+		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
+		CROVU_VoltageRate = DataTable[REG_OSV_RATE];
 
-		LOGIC_DriverOffTicks = (((QPU_CurrentEdgeTime / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
-									(QPU_CurrentEdgeTime / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
+		FCROVU_IShortCircuit = DataTable[REG_FCROVU_I_SHORT];
+
+		LOGIC_DriverOffTicks = (((DC_Current/DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
+									(DC_Current/DC_CurrentRiseRate / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
 
 		if (MeasurementMode == MODE_QRR_ONLY)
 		{
 			LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
-			FCROVU_TrigTime = QPU_CurrentZeroPoint + TQ_MAX_TIME;
+			CROVU_TrigTime = DC_CurrentZeroPoint + TQ_MAX_TIME;
 		}
 		else if (CacheSinglePulse)
 		{
 			LOGIC_PulseNumRemain = 1;
-			FCROVU_TrigTime = QPU_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
+			CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 		}
 		else
 		{
 			LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
-			FCROVU_TrigTime = QPU_CurrentZeroPoint + TQ_FIRST_PROBE;
+			CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
 		}
 
-		LOGIC_PreciseEventInit(FCROVU_TrigTime);
+		if(DataTable[REG_DCU1_ACTIVE])
+			DC_CurrentMax = DRCU_CURRENT_MAX;
+		if(DataTable[REG_DCU2_ACTIVE])
+			DC_CurrentMax += DRCU_CURRENT_MAX;
+		if(DataTable[REG_DCU3_ACTIVE])
+			DC_CurrentMax += DRCU_CURRENT_MAX;
+
+		if(DataTable[REG_RCU1_ACTIVE])
+			RC_CurrentMax = DRCU_CURRENT_MAX;
+		if(DataTable[REG_RCU2_ACTIVE])
+			RC_CurrentMax += DRCU_CURRENT_MAX;
+		if(DataTable[REG_RCU3_ACTIVE])
+			RC_CurrentMax += DRCU_CURRENT_MAX;
+
+		if(RC_Current > RC_CurrentMax)
+		{
+			RC_Current = RC_CurrentMax;
+			DataTable[REG_WARNING] = WARNING_RC_SET_TO_HIGH;
+		}
+
+		if(DC_Current > DC_CurrentMax)
+		{
+			DC_Current = DC_CurrentMax;
+			DataTable[REG_WARNING] = WARNING_DC_SET_TO_HIGH;
+		}
+
+		LOGIC_PreciseEventInit(CROVU_TrigTime);
 		CacheUpdate = FALSE;
 	}
 }
@@ -276,20 +347,74 @@ Boolean LOGIC_UpdateDeviceState()
 {
 	Int16U Register;
 
-	if (!EmulateFCROVU)
+	if (!EmulateCROVU)
 	{
-		if (HLI_CAN_Read16(NODEID_FCROVU, REG_FCROVU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_FCROVU = Register;
+		if (HLI_CAN_Read16(NODEID_CROVU, REG_CROVU_DEV_STATE, &Register))
+			LOGIC_ExtDeviceState.DS_CROVU = Register;
 		else
 			return FALSE;
 	}
 
-	if (!EmulateQPU)
+	if (!EmulateFCROVU)
+		{
+			if (HLI_CAN_Read16(NODEID_FCROVU, REG_FCROVU_DEV_STATE, &Register))
+				LOGIC_ExtDeviceState.DS_FCROVU = Register;
+			else
+				return FALSE;
+		}
+
+	if (!EmulateDCU)
 	{
-		if (HLI_CAN_Read16(NODEID_QPU, REG_QPU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_QPU = Register;
-		else
-			return FALSE;
+		if(DataTable[REG_DCU1_ACTIVE])
+		{
+			if (HLI_CAN_Read16(DataTable[REG_DCU1_CAN_ADDR], REG_DCU_DEV_STATE, &Register))
+				LOGIC_ExtDeviceState.DS_DCU1 = Register;
+			else
+				return FALSE;
+		}
+
+		if(DataTable[REG_DCU2_ACTIVE])
+		{
+			if (HLI_CAN_Read16(DataTable[REG_DCU2_CAN_ADDR], REG_DCU_DEV_STATE, &Register))
+				LOGIC_ExtDeviceState.DS_DCU2 = Register;
+			else
+				return FALSE;
+		}
+
+		if(DataTable[REG_DCU3_ACTIVE])
+		{
+			if (HLI_CAN_Read16(DataTable[REG_DCU3_CAN_ADDR], REG_DCU_DEV_STATE, &Register))
+				LOGIC_ExtDeviceState.DS_DCU3 = Register;
+			else
+				return FALSE;
+		}
+	}
+
+	if (!EmulateRCU)
+	{
+		if(DataTable[REG_RCU1_ACTIVE])
+		{
+			if (HLI_CAN_Read16(DataTable[REG_RCU1_CAN_ADDR], REG_RCU_DEV_STATE, &Register))
+				LOGIC_ExtDeviceState.DS_RCU1 = Register;
+			else
+				return FALSE;
+		}
+
+		if(DataTable[REG_RCU2_ACTIVE])
+		{
+			if (HLI_CAN_Read16(DataTable[REG_RCU2_CAN_ADDR], REG_RCU_DEV_STATE, &Register))
+				LOGIC_ExtDeviceState.DS_RCU2 = Register;
+			else
+				return FALSE;
+		}
+
+		if(DataTable[REG_RCU3_ACTIVE])
+		{
+			if (HLI_CAN_Read16(DataTable[REG_RCU3_CAN_ADDR], REG_RCU_DEV_STATE, &Register))
+				LOGIC_ExtDeviceState.DS_RCU3 = Register;
+			else
+				return FALSE;
+		}
 	}
 
 	if (!EmulateSCOPE)
@@ -307,7 +432,7 @@ Boolean LOGIC_UpdateDeviceState()
 void LOGIC_FaultResetPrepare()
 {
 	LOGIC_CacheVariables();
-	LOGIC_State = LS_CLR_FCROVU;
+	LOGIC_State = LS_CLR_CROVU;
 	//
 	CONTROL_RequestDPC(&LOGIC_FaultResetSequence);
 }
@@ -315,7 +440,8 @@ void LOGIC_FaultResetPrepare()
 
 void LOGIC_FaultResetSequence()
 {
-	if (LOGIC_State == LS_CLR_FCROVU || LOGIC_State == LS_CLR_QPU || LOGIC_State == LS_CLR_SCOPE)
+	if (LOGIC_State == LS_CLR_CROVU || LOGIC_State == LS_CLR_FCROVU || LOGIC_State == LS_CLR_DCU ||
+		LOGIC_State == LS_CLR_RCU || LOGIC_State == LS_CLR_SCOPE)
 	{
 		if (!LOGIC_UpdateDeviceState())
 		{
@@ -325,27 +451,93 @@ void LOGIC_FaultResetSequence()
 
 		switch (LOGIC_State)
 		{
+			case LS_CLR_CROVU:
+				{
+					if (!EmulateCROVU && (LOGIC_ExtDeviceState.DS_CROVU == DS_CROVU_FAULT))
+					{
+						if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_CLR_FAULT))
+							LOGIC_State = LS_CLR_FCROVU;
+					}
+					else
+						LOGIC_State = LS_CLR_FCROVU;
+				}
+				break;
+
 			case LS_CLR_FCROVU:
 				{
 					if (!EmulateFCROVU && (LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_FAULT))
 					{
-						if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_CLR_FAULT))
-							LOGIC_State = LS_CLR_QPU;
+						if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_FAULT_CLEAR))
+							LOGIC_State = LS_CLR_DCU;
 					}
 					else
-						LOGIC_State = LS_CLR_QPU;
+						LOGIC_State = LS_CLR_DCU;
 				}
 				break;
 
-			case LS_CLR_QPU:
+			case LS_CLR_DCU:
 				{
-					if (!EmulateQPU && (LOGIC_ExtDeviceState.DS_QPU == DS_QPU_FAULT))
+					if (!EmulateDCU)
 					{
-						if (HLI_CAN_CallAction(NODEID_QPU, ACT_QPU_CLR_FAULT))
-							LOGIC_State = LS_CLR_SCOPE;
+						if((DataTable[REG_DCU1_ACTIVE]) && (LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_FAULT))
+						{
+							if (HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_FAULT_CLEAR))
+								LOGIC_State = LS_CLR_RCU;
+							else
+								LOGIC_State = LS_CLR_DCU;
+						}
+
+						if((DataTable[REG_DCU2_ACTIVE]) && (LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_FAULT))
+						{
+							if (HLI_CAN_CallAction(DataTable[REG_DCU2_CAN_ADDR], ACT_DCU_FAULT_CLEAR))
+								LOGIC_State = LS_CLR_RCU;
+							else
+								LOGIC_State = LS_CLR_DCU;
+						}
+
+						if((DataTable[REG_DCU3_ACTIVE]) && (LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_FAULT))
+						{
+							if (HLI_CAN_CallAction(DataTable[REG_DCU3_CAN_ADDR], ACT_DCU_FAULT_CLEAR))
+								LOGIC_State = LS_CLR_RCU;
+							else
+								LOGIC_State = LS_CLR_DCU;
+						}
 					}
 					else
-						LOGIC_State = LS_CLR_SCOPE;
+						LOGIC_State = LS_CLR_RCU;
+				}
+				break;
+
+			case LS_CLR_RCU:
+				{
+					if (!EmulateRCU)
+					{
+						if((DataTable[REG_RCU1_ACTIVE]) && (LOGIC_ExtDeviceState.DS_RCU1 == DS_RCU_FAULT))
+						{
+							if (HLI_CAN_CallAction(DataTable[REG_RCU1_CAN_ADDR], ACT_RCU_FAULT_CLEAR))
+								LOGIC_State = LS_CLR_SCOPE;
+							else
+								LOGIC_State = LS_CLR_RCU;
+						}
+
+						if((DataTable[REG_RCU2_ACTIVE]) && (LOGIC_ExtDeviceState.DS_RCU2 == DS_RCU_FAULT))
+						{
+							if (HLI_CAN_CallAction(DataTable[REG_RCU2_CAN_ADDR], ACT_RCU_FAULT_CLEAR))
+								LOGIC_State = LS_CLR_SCOPE;
+							else
+								LOGIC_State = LS_CLR_RCU;
+						}
+
+						if((DataTable[REG_RCU2_ACTIVE]) && (LOGIC_ExtDeviceState.DS_RCU2 == DS_RCU_FAULT))
+						{
+							if (HLI_CAN_CallAction(DataTable[REG_RCU2_CAN_ADDR], ACT_RCU_FAULT_CLEAR))
+								LOGIC_State = LS_CLR_SCOPE;
+							else
+								LOGIC_State = LS_CLR_RCU;
+						}
+					}
+					else
+						LOGIC_State = LS_CLR_RCU;
 				}
 				break;
 
@@ -372,7 +564,7 @@ void LOGIC_FaultResetSequence()
 void LOGIC_PowerOnPrepare()
 {
 	LOGIC_CacheVariables();
-	LOGIC_State = LS_PON_FCROVU;
+	LOGIC_State = LS_PON_CROVU;
 	//
 	CONTROL_RequestDPC(&LOGIC_PowerOnSequence);
 }
@@ -380,8 +572,8 @@ void LOGIC_PowerOnPrepare()
 
 void LOGIC_PowerOnSequence()
 {
-	if 	(LOGIC_State == LS_PON_FCROVU || LOGIC_State == LS_PON_QPU ||
-		 LOGIC_State == LS_PON_SCOPE || LOGIC_State == LS_PON_WaitStates)
+	if 	(LOGIC_State == LS_PON_CROVU || LOGIC_State == LS_PON_FCROVU || LOGIC_State == LS_PON_DCU || LOGIC_State == LS_PON_RCU ||
+		 LOGIC_State == LS_PON_CSU ||LOGIC_State == LS_PON_SCOPE || LOGIC_State == LS_PON_WaitStates)
 	{
 		if (!LOGIC_UpdateDeviceState())
 		{
@@ -389,8 +581,51 @@ void LOGIC_PowerOnSequence()
 			return;
 		}
 
+		if(LOGIC_State != LS_PON_WaitStates)
+		{
+			if(CONTROL_TimeCounter <= (UnitsStartTimeOut + TIMEOUT_UNITS_STARTUP))
+				return;
+
+			UnitsStartTimeOut = CONTROL_TimeCounter;
+		}
+
 		switch (LOGIC_State)
 		{
+			case LS_PON_CROVU:
+				{
+					// Handle CROVU node
+					if (!EmulateCROVU)
+					{
+						switch (LOGIC_ExtDeviceState.DS_CROVU)
+						{
+							case DS_CROVU_NONE:
+								if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_ENABLE_POWER))
+									LOGIC_State = LS_PON_FCROVU;
+								break;
+							case DS_CROVU_READY:
+								if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_DISABLE_POWER))
+									if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_ENABLE_POWER))
+										LOGIC_State = LS_PON_FCROVU;
+								break;
+							case DS_CROVU_FAULT:
+								if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_CLR_FAULT))
+									if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_ENABLE_POWER))
+										LOGIC_State = LS_PON_FCROVU;
+								break;
+							case DS_CROVU_DISABLED:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_WRONG_STATE);
+								break;
+						}
+					}
+					else
+					{
+						LOGIC_ExtDeviceState.DS_CROVU = DS_CROVU_READY;
+						LOGIC_State = LS_PON_FCROVU;
+					}
+				}
+				break;
+
 			case LS_PON_FCROVU:
 				{
 					// Handle FCROVU node
@@ -400,17 +635,17 @@ void LOGIC_PowerOnSequence()
 						{
 							case DS_FCROVU_NONE:
 								if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_ENABLE_POWER))
-									LOGIC_State = LS_PON_QPU;
+									LOGIC_State = LS_PON_DCU;
 								break;
 							case DS_FCROVU_READY:
 								if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_DISABLE_POWER))
 									if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_ENABLE_POWER))
-										LOGIC_State = LS_PON_QPU;
+										LOGIC_State = LS_PON_DCU;
 								break;
 							case DS_FCROVU_FAULT:
-								if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_CLR_FAULT))
+								if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_FAULT_CLEAR))
 									if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_ENABLE_POWER))
-										LOGIC_State = LS_PON_QPU;
+										LOGIC_State = LS_PON_DCU;
 								break;
 							case DS_FCROVU_DISABLED:
 								LOGIC_State = LS_Error;
@@ -421,38 +656,160 @@ void LOGIC_PowerOnSequence()
 					else
 					{
 						LOGIC_ExtDeviceState.DS_FCROVU = DS_FCROVU_READY;
-						LOGIC_State = LS_PON_QPU;
+						LOGIC_State = LS_PON_DCU;
 					}
 				}
 				break;
 
-			case LS_PON_QPU:
+			case LS_PON_DCU:
 				{
-					if (!EmulateQPU)
+					if (!EmulateDCU)
 					{
-						switch (LOGIC_ExtDeviceState.DS_QPU)
+						if(DataTable[REG_DCU1_ACTIVE])
 						{
-							case DS_QPU_NONE:
-								if (HLI_CAN_CallAction(NODEID_QPU, ACT_QPU_ENABLE_POWER))
-									LOGIC_State = LS_PON_SCOPE;
-								break;
-							case DS_QPU_FAULT:
-								if (HLI_CAN_CallAction(NODEID_QPU, ACT_QPU_CLR_FAULT))
-									if (HLI_CAN_CallAction(NODEID_QPU, ACT_QPU_ENABLE_POWER))
-										LOGIC_State = LS_PON_SCOPE;
-								break;
-							case DS_QPU_DISABLED:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_QPU, FAULTEX_PON_WRONG_STATE);
-								break;
-							default:
-								LOGIC_State = LS_PON_SCOPE;
-								break;
+							switch (LOGIC_ExtDeviceState.DS_DCU1)
+							{
+								case DS_DCU_NONE:
+									if(HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_ENABLE_POWER))
+										return;
+								case DS_DCU_FAULT:
+									if (HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_FAULT_CLEAR))
+										if (HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_ENABLE_POWER))
+											return;
+								case DS_DCU_DISABLED:
+									LOGIC_State = LS_Error;
+									CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_PON_WRONG_STATE);
+									break;
+							}
 						}
+
+						if(DataTable[REG_DCU2_ACTIVE])
+						{
+							switch (LOGIC_ExtDeviceState.DS_DCU2)
+							{
+								case DS_DCU_NONE:
+									if(HLI_CAN_CallAction(DataTable[REG_DCU2_CAN_ADDR], ACT_DCU_ENABLE_POWER))
+										return;
+								case DS_DCU_FAULT:
+									if (HLI_CAN_CallAction(DataTable[REG_DCU2_CAN_ADDR], ACT_DCU_FAULT_CLEAR))
+										if (HLI_CAN_CallAction(DataTable[REG_DCU2_CAN_ADDR], ACT_DCU_ENABLE_POWER))
+											return;
+								case DS_DCU_DISABLED:
+									LOGIC_State = LS_Error;
+									CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_PON_WRONG_STATE);
+									break;
+							}
+						}
+
+						if(DataTable[REG_DCU3_ACTIVE])
+						{
+							switch (LOGIC_ExtDeviceState.DS_DCU3)
+							{
+								case DS_DCU_NONE:
+									if(HLI_CAN_CallAction(DataTable[REG_DCU3_CAN_ADDR], ACT_DCU_ENABLE_POWER))
+										return;
+								case DS_DCU_FAULT:
+									if (HLI_CAN_CallAction(DataTable[REG_DCU3_CAN_ADDR], ACT_DCU_FAULT_CLEAR))
+										if (HLI_CAN_CallAction(DataTable[REG_DCU3_CAN_ADDR], ACT_DCU_ENABLE_POWER))
+											return;
+								case DS_DCU_DISABLED:
+									LOGIC_State = LS_Error;
+									CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_PON_WRONG_STATE);
+									break;
+							}
+						}
+
+						LOGIC_State = LS_PON_RCU;
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_QPU = DS_QPU_READY;
+						LOGIC_ExtDeviceState.DS_DCU1 = DS_DCU_READY;
+						LOGIC_ExtDeviceState.DS_DCU2 = DS_DCU_READY;
+						LOGIC_ExtDeviceState.DS_DCU3 = DS_DCU_READY;
+						LOGIC_State = LS_PON_RCU;
+					}
+				}
+				break;
+
+			case LS_PON_RCU:
+				{
+					if (!EmulateRCU)
+					{
+						if(DataTable[REG_RCU1_ACTIVE])
+						{
+							switch (LOGIC_ExtDeviceState.DS_RCU1)
+							{
+								case DS_RCU_NONE:
+									if(HLI_CAN_CallAction(DataTable[REG_RCU1_CAN_ADDR], ACT_RCU_ENABLE_POWER))
+										return;
+								case DS_RCU_FAULT:
+									if (HLI_CAN_CallAction(DataTable[REG_RCU1_CAN_ADDR], ACT_RCU_FAULT_CLEAR))
+										if (HLI_CAN_CallAction(DataTable[REG_RCU1_CAN_ADDR], ACT_RCU_ENABLE_POWER))
+											return;
+								case DS_RCU_DISABLED:
+									LOGIC_State = LS_Error;
+									CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_PON_WRONG_STATE);
+									break;
+							}
+						}
+
+						if(DataTable[REG_RCU2_ACTIVE])
+						{
+							switch (LOGIC_ExtDeviceState.DS_RCU2)
+							{
+								case DS_RCU_NONE:
+									if(HLI_CAN_CallAction(DataTable[REG_RCU2_CAN_ADDR], ACT_RCU_ENABLE_POWER))
+										return;
+								case DS_RCU_FAULT:
+									if (HLI_CAN_CallAction(DataTable[REG_RCU2_CAN_ADDR], ACT_RCU_FAULT_CLEAR))
+										if (HLI_CAN_CallAction(DataTable[REG_RCU2_CAN_ADDR], ACT_RCU_ENABLE_POWER))
+											return;
+								case DS_RCU_DISABLED:
+									LOGIC_State = LS_Error;
+									CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_PON_WRONG_STATE);
+									break;
+							}
+						}
+
+						if(DataTable[REG_RCU3_ACTIVE])
+						{
+							switch (LOGIC_ExtDeviceState.DS_RCU3)
+							{
+								case DS_RCU_NONE:
+									if(HLI_CAN_CallAction(DataTable[REG_RCU3_CAN_ADDR], ACT_RCU_ENABLE_POWER))
+										return;
+								case DS_RCU_FAULT:
+									if (HLI_CAN_CallAction(DataTable[REG_RCU3_CAN_ADDR], ACT_RCU_FAULT_CLEAR))
+										if (HLI_CAN_CallAction(DataTable[REG_RCU3_CAN_ADDR], ACT_RCU_ENABLE_POWER))
+											return;
+								case DS_RCU_DISABLED:
+									LOGIC_State = LS_Error;
+									CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_PON_WRONG_STATE);
+									break;
+							}
+						}
+
+						LOGIC_State = LS_PON_CSU;
+					}
+					else
+					{
+						LOGIC_ExtDeviceState.DS_RCU1 = DS_RCU_READY;
+						LOGIC_ExtDeviceState.DS_RCU2 = DS_RCU_READY;
+						LOGIC_ExtDeviceState.DS_RCU3 = DS_RCU_READY;
+						LOGIC_State = LS_PON_CSU;
+					}
+				}
+				break;
+
+			case LS_PON_CSU:
+				{
+					if (!EmulateCSU)
+					{
+						ZbGPIO_CSU_PWRCtrl(TRUE);
+					}
+					else
+					{
+						LOGIC_ExtDeviceState.DS_CSU = DS_CSU_READY;
 						LOGIC_State = LS_PON_SCOPE;
 					}
 				}
@@ -497,24 +854,56 @@ void LOGIC_PowerOnSequence()
 				{
 					if (Timeout > CONTROL_TimeCounter)
 					{
-						if (LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_READY &&
-							(LOGIC_ExtDeviceState.DS_QPU == DS_QPU_READY || LOGIC_ExtDeviceState.DS_QPU == DS_QPU_CONFIG_READY || LOGIC_ExtDeviceState.DS_QPU == DS_QPU_PULSE_END) &&
-							(LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_NONE))
+						if (LOGIC_ExtDeviceState.DS_CROVU == DS_CROVU_READY && LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_READY &&
+							LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_READY 	&& LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_READY &&
+							LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_READY 	&& LOGIC_ExtDeviceState.DS_RCU1 == DS_RCU_READY &&
+							LOGIC_ExtDeviceState.DS_RCU2 == DS_RCU_READY 	&& LOGIC_ExtDeviceState.DS_RCU3 == DS_RCU_READY &&
+							LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_NONE)
 						{
 							LOGIC_State = LS_None;
 						}
 					}
 					else
 					{
-						if (LOGIC_ExtDeviceState.DS_FCROVU != DS_FCROVU_READY)
+						if (LOGIC_ExtDeviceState.DS_CROVU != DS_CROVU_READY)
+						{
+							// CROVU not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_FCROVU != DS_FCROVU_READY)
 						{
 							// FCROVU not ready
 							CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_TIMEOUT);
 						}
-						else if (LOGIC_ExtDeviceState.DS_QPU != DS_QPU_READY)
+						else if (LOGIC_ExtDeviceState.DS_DCU1 != DS_DCU_READY)
 						{
-							// QPU not ready
-							CONTROL_SwitchToFault(FAULT_LOGIC_QPU, FAULTEX_PON_TIMEOUT);
+							// DCU1 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_DCU2 != DS_DCU_READY)
+						{
+							// DCU2 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_DCU3 != DS_DCU_READY)
+						{
+							// DCU3 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_RCU1 != DS_RCU_READY)
+						{
+							// RCU1 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_RCU2 != DS_RCU_READY)
+						{
+							// RCU2 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_RCU3 != DS_RCU_READY)
+						{
+							// RCU3 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_PON_TIMEOUT);
 						}
 						else if (LOGIC_ExtDeviceState.DS_SCOPE != DS_SCOPE_NONE)
 						{
@@ -540,7 +929,7 @@ void LOGIC_PowerOnSequence()
 void LOGIC_ConfigurePrepare()
 {
 	LOGIC_CacheVariables();
-	LOGIC_State = LS_CFG_FCROVU;
+	LOGIC_State = LS_CFG_CROVU;
 	//
 	CONTROL_RequestDPC(&LOGIC_ConfigureSequence);
 }
@@ -548,8 +937,8 @@ void LOGIC_ConfigurePrepare()
 
 void LOGIC_ConfigureSequence()
 {
-	if 	(LOGIC_State == LS_CFG_FCROVU || LOGIC_State == LS_CFG_QPU ||
-		 LOGIC_State == LS_CFG_SCOPE || LOGIC_State == LS_CFG_WaitStates)
+	if 	(LOGIC_State == LS_CFG_CROVU || LOGIC_State == LS_CFG_FCROVU || LOGIC_State == LS_CFG_DCU ||
+		 LOGIC_State == LS_CFG_RCU || LOGIC_State == LS_CFG_SCOPE || LOGIC_State == LS_CFG_WaitStates)
 	{
 		if (!LOGIC_UpdateDeviceState())
 		{
@@ -559,46 +948,145 @@ void LOGIC_ConfigureSequence()
 
 		switch (LOGIC_State)
 		{
-			case LS_CFG_FCROVU:
+			case LS_CFG_CROVU:
 				{
-					// Handle FCROVU node
-					if (!EmulateFCROVU && !MuteFCROVU)
+					// Handle CROVU node
+					if (!EmulateCROVU && !MuteCROVU)
 					{
-						if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_ENABLE_EXT_SYNC))
-							if (HLI_CAN_Write16(NODEID_FCROVU, REG_FCROVU_DESIRED_VOLTAGE, FCROVU_Voltage))
-								if (HLI_CAN_Write16(NODEID_FCROVU, REG_FCROVU_VOLTAGE_RATE, FCROVU_VoltageRate))
-									if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_APPLY_SETTINGS))
-										LOGIC_State = LS_CFG_QPU;
+						if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_ENABLE_EXT_SYNC))
+							if (HLI_CAN_Write16(NODEID_CROVU, REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
+								if (HLI_CAN_Write16(NODEID_CROVU, REG_CROVU_VOLTAGE_RATE, CROVU_VoltageRate))
+									if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_APPLY_SETTINGS))
+										LOGIC_State = LS_CFG_FCROVU;
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_FCROVU = DS_FCROVU_READY;
-						LOGIC_State = LS_CFG_QPU;
+						LOGIC_ExtDeviceState.DS_CROVU = DS_CROVU_READY;
+						LOGIC_State = LS_CFG_FCROVU;
 					}
 				}
 				break;
 
-			case LS_CFG_QPU:
+			case LS_CFG_FCROVU:
 				{
-					// Handle QPU node
-					if (!EmulateQPU)
+					// Handle FCROVU node
+					if (!EmulateFCROVU && !MuteCROVU)
 					{
-						if ((LOGIC_ExtDeviceState.DS_QPU == DS_QPU_PULSE_END && ResultsCounter > 0) || ResultsCounter == 0)
-						{
-							if (HLI_CAN_Write16(NODEID_QPU, REG_QPU_PULSE_VALUE, QPU_Current))
-								if (HLI_CAN_Write16(NODEID_QPU, REG_QPU_IDC_EDGE_TIME, QPU_CurrentEdgeTime))
-									if (HLI_CAN_Write16(NODEID_QPU, REG_QPU_REVERSE_I_RATE, QPU_CurrentFallRate))
-										if (HLI_CAN_CallAction(NODEID_QPU, ACT_QPU_PULSE_CONFIG))
-											LOGIC_State = LS_CFG_SCOPE;
-						}
+						if (HLI_CAN_Write16(NODEID_FCROVU, REG_FCROVU_V_RATE_VALUE, CROVU_VoltageRate))
+							if (HLI_CAN_Write16(NODEID_FCROVU, REG_FCROVU_I_SHORT_CIRCUIT, FCROVU_IShortCircuit))
+								if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_CONFIG))
+									LOGIC_State = LS_CFG_DCU;
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_QPU = DS_QPU_CONFIG_READY;
+						LOGIC_ExtDeviceState.DS_FCROVU = DS_FCROVU_READY;
+						LOGIC_State = LS_CFG_DCU;
+					}
+				}
+				break;
+
+			case LS_CFG_DCU:
+				{
+					// Handle DCU node
+					if (!EmulateDCU)
+					{
+						if ((LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_READY && ResultsCounter > 0) || ResultsCounter == 0)
+						{
+							if(DC_Current >= DRCU_CURRENT_MAX)
+							{
+								if (HLI_CAN_Write16(DataTable[REG_DCU1_CAN_ADDR], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
+									if (HLI_CAN_Write16(DataTable[REG_DCU1_CAN_ADDR], REG_DCU_I_RATE_RISE, DC_CurrentRiseRate))
+										if (HLI_CAN_Write16(DataTable[REG_DCU1_CAN_ADDR], REG_DCU_I_RATE_FALL, DC_CurrentFallRate))
+											if (HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_CONFIG))
+												DC_Current = DC_Current - DRCU_CURRENT_MAX;
+							}
+						}
+
+						if ((LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_READY && ResultsCounter > 0) || ResultsCounter == 0)
+						{
+							if(DC_Current >= DRCU_CURRENT_MAX)
+							{
+								if (HLI_CAN_Write16(DataTable[REG_DCU2_CAN_ADDR], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
+									if (HLI_CAN_Write16(DataTable[REG_DCU2_CAN_ADDR], REG_DCU_I_RATE_RISE, DC_CurrentRiseRate))
+										if (HLI_CAN_Write16(DataTable[REG_DCU2_CAN_ADDR], REG_DCU_I_RATE_FALL, DC_CurrentFallRate))
+											if (HLI_CAN_CallAction(DataTable[REG_DCU2_CAN_ADDR], ACT_DCU_CONFIG))
+												DC_Current = DC_Current - DRCU_CURRENT_MAX;
+							}
+						}
+
+						if ((LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_READY && ResultsCounter > 0) || ResultsCounter == 0)
+						{
+							if (HLI_CAN_Write16(DataTable[REG_DCU1_CAN_ADDR], REG_DCU_I_MAX_VALUE, DC_CurrentMax))
+								if (HLI_CAN_Write16(DataTable[REG_DCU1_CAN_ADDR], REG_DCU_I_RATE_RISE, DC_CurrentRiseRate))
+									if (HLI_CAN_Write16(DataTable[REG_DCU1_CAN_ADDR], REG_DCU_I_RATE_FALL, DC_CurrentFallRate))
+										if (HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_CONFIG))
+										{
+											LOGIC_State = LS_PON_RCU;
+											DC_Current = 0;
+										}
+						}
+
+					}
+					else
+					{
+						LOGIC_ExtDeviceState.DS_DCU1 = DS_DCU_CONFIG_READY;
+						LOGIC_ExtDeviceState.DS_DCU2 = DS_DCU_CONFIG_READY;
+						LOGIC_ExtDeviceState.DS_DCU3 = DS_DCU_CONFIG_READY;
+						LOGIC_State = LS_CFG_RCU;
+					}
+				}
+				break;
+
+			case LS_CFG_RCU:
+				{
+					// Handle RCU node
+					if (!EmulateRCU)
+					{
+						if ((LOGIC_ExtDeviceState.DS_RCU3 == DS_RCU_READY && ResultsCounter > 0) || ResultsCounter == 0)
+						{
+							if(RC_Current >= DRCU_CURRENT_MAX)
+							{
+								if (HLI_CAN_Write16(DataTable[REG_RCU1_CAN_ADDR], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
+									if (HLI_CAN_Write16(DataTable[REG_RCU1_CAN_ADDR], REG_RCU_I_RATE_FALL, RC_CurrentFallRate))
+										if (HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_CONFIG))
+											RC_Current = RC_Current - DRCU_CURRENT_MAX;
+							}
+						}
+
+						if ((LOGIC_ExtDeviceState.DS_RCU2 == DS_RCU_READY && ResultsCounter > 0) || ResultsCounter == 0)
+						{
+							if(RC_Current >= DRCU_CURRENT_MAX)
+							{
+								if (HLI_CAN_Write16(DataTable[REG_RCU2_CAN_ADDR], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
+									if (HLI_CAN_Write16(DataTable[REG_RCU2_CAN_ADDR], REG_RCU_I_RATE_FALL, RC_CurrentFallRate))
+										if (HLI_CAN_CallAction(DataTable[REG_DCU2_CAN_ADDR], ACT_DCU_CONFIG))
+											RC_Current = RC_Current - DRCU_CURRENT_MAX;
+							}
+						}
+
+						if ((LOGIC_ExtDeviceState.DS_RCU1 == DS_RCU_READY && ResultsCounter > 0) || ResultsCounter == 0)
+						{
+							if (HLI_CAN_Write16(DataTable[REG_RCU1_CAN_ADDR], REG_DCU_I_MAX_VALUE, DRCU_CURRENT_MAX))
+								if (HLI_CAN_Write16(DataTable[REG_RCU1_CAN_ADDR], REG_RCU_I_RATE_FALL, RC_CurrentFallRate))
+									if (HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_CONFIG))
+									{
+										LOGIC_State = LS_CFG_SCOPE;
+										RC_Current = 0;
+									}
+						}
+
+					}
+					else
+					{
+						LOGIC_ExtDeviceState.DS_RCU1 = DS_DCU_CONFIG_READY;
+						LOGIC_ExtDeviceState.DS_RCU2 = DS_DCU_CONFIG_READY;
+						LOGIC_ExtDeviceState.DS_RCU3 = DS_DCU_CONFIG_READY;
 						LOGIC_State = LS_CFG_SCOPE;
 					}
 				}
 				break;
+
+
 
 			case LS_CFG_SCOPE:
 				{
@@ -636,8 +1124,10 @@ void LOGIC_ConfigureSequence()
 				{
 					if (Timeout > CONTROL_TimeCounter)
 					{
-						if (LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_READY &&
-							LOGIC_ExtDeviceState.DS_QPU == DS_QPU_CONFIG_READY &&
+						if (LOGIC_ExtDeviceState.DS_CROVU == DS_CROVU_READY 	&& LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_READY 	&&
+							LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_CONFIG_READY && LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_CONFIG_READY 	&&
+							LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_CONFIG_READY && LOGIC_ExtDeviceState.DS_RCU1 == DS_DCU_CONFIG_READY 	&&
+							LOGIC_ExtDeviceState.DS_RCU2 == DS_DCU_CONFIG_READY && LOGIC_ExtDeviceState.DS_RCU3 == DS_DCU_CONFIG_READY 	&&
 							LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_IN_PROCESS)
 						{
 							LOGIC_State = LS_None;
@@ -645,23 +1135,53 @@ void LOGIC_ConfigureSequence()
 					}
 					else
 					{
-						if (LOGIC_ExtDeviceState.DS_FCROVU != DS_FCROVU_READY)
+						if (LOGIC_ExtDeviceState.DS_CROVU != DS_CROVU_READY)
+						{
+							// CROVU not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_FCROVU != DS_FCROVU_READY)
 						{
 							// FCROVU not ready
-							CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_CFG_TIMEOUT);
+							CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_TIMEOUT);
 						}
-						else if (LOGIC_ExtDeviceState.DS_QPU != DS_QPU_CONFIG_READY)
+						else if (LOGIC_ExtDeviceState.DS_DCU1 != DS_DCU_CONFIG_READY)
 						{
-							// QPU not ready
-							CONTROL_SwitchToFault(FAULT_LOGIC_QPU, FAULTEX_CFG_TIMEOUT);
+							// DCU1 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_PON_TIMEOUT);
 						}
-						else if (LOGIC_ExtDeviceState.DS_SCOPE != DS_SCOPE_IN_PROCESS)
+						else if (LOGIC_ExtDeviceState.DS_DCU2 != DS_DCU_CONFIG_READY)
+						{
+							// DCU2 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_DCU3 != DS_DCU_CONFIG_READY)
+						{
+							// DCU3 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_RCU1 != DS_RCU_CONFIG_READY)
+						{
+							// RCU1 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_RCU2 != DS_RCU_CONFIG_READY)
+						{
+							// RCU2 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_RCU3 != DS_RCU_CONFIG_READY)
+						{
+							// RCU3 not ready
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_PON_TIMEOUT);
+						}
+						else if (LOGIC_ExtDeviceState.DS_SCOPE != DS_SCOPE_NONE)
 						{
 							// SCOPE not ready
-							CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_CFG_TIMEOUT);
+							CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_PON_TIMEOUT);
 						}
 						else
-							CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, FAULTEX_CFG_TIMEOUT);
+							CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, FAULTEX_PON_TIMEOUT);
 
 						LOGIC_State = LS_Error;
 					}
@@ -679,7 +1199,7 @@ void LOGIC_ConfigureSequence()
 void LOGIC_PowerOffPrepare()
 {
 	LOGIC_CacheVariables();
-	LOGIC_State = LS_POFF_FCROVU;
+	LOGIC_State = LS_POFF_CROVU;
 	//
 	CONTROL_RequestDPC(&LOGIC_PowerOffSequence);
 }
@@ -687,8 +1207,8 @@ void LOGIC_PowerOffPrepare()
 
 void LOGIC_PowerOffSequence()
 {
-	if 	(LOGIC_State == LS_POFF_FCROVU || LOGIC_State == LS_POFF_QPU ||
-		 LOGIC_State == LS_POFF_SCOPE)
+	if 	(LOGIC_State == LS_POFF_CROVU || LOGIC_State == LS_POFF_FCROVU || LOGIC_State == LS_POFF_DCU ||
+		 LOGIC_State == LS_POFF_RCU || LOGIC_State == LS_POFF_CSU || LOGIC_State == LS_POFF_SCOPE)
 	{
 		if (!LOGIC_UpdateDeviceState())
 		{
@@ -698,6 +1218,32 @@ void LOGIC_PowerOffSequence()
 
 		switch (LOGIC_State)
 		{
+			case LS_POFF_CROVU:
+				{
+					// Handle CROVU node
+					if (!EmulateCROVU)
+					{
+						switch (LOGIC_ExtDeviceState.DS_CROVU)
+						{
+							case DS_CROVU_NONE:
+							case DS_CROVU_READY:
+								if (HLI_CAN_CallAction(NODEID_CROVU, ACT_CROVU_DISABLE_POWER))
+									LOGIC_State = LS_POFF_FCROVU;
+								break;
+							default:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_POFF_WRONG_STATE);
+								break;
+						}
+					}
+					else
+					{
+						LOGIC_ExtDeviceState.DS_CROVU = DS_CROVU_NONE;
+						LOGIC_State = LS_POFF_FCROVU;
+					}
+				}
+				break;
+
 			case LS_POFF_FCROVU:
 				{
 					// Handle FCROVU node
@@ -708,7 +1254,7 @@ void LOGIC_PowerOffSequence()
 							case DS_FCROVU_NONE:
 							case DS_FCROVU_READY:
 								if (HLI_CAN_CallAction(NODEID_FCROVU, ACT_FCROVU_DISABLE_POWER))
-									LOGIC_State = LS_POFF_QPU;
+									LOGIC_State = LS_POFF_DCU;
 								break;
 							default:
 								LOGIC_State = LS_Error;
@@ -719,36 +1265,115 @@ void LOGIC_PowerOffSequence()
 					else
 					{
 						LOGIC_ExtDeviceState.DS_FCROVU = DS_FCROVU_NONE;
-						LOGIC_State = LS_POFF_QPU;
+						LOGIC_State = LS_POFF_DCU;
 					}
 				}
 				break;
 
-			case LS_POFF_QPU:
-			{
-				if (!EmulateQPU)
+			case LS_POFF_DCU:
 				{
-					switch (LOGIC_ExtDeviceState.DS_QPU)
+					if (!EmulateDCU)
 					{
-						case DS_QPU_FAULT:
-						case DS_QPU_DISABLED:
-						case DS_QPU_PULSE_START:
-						case DS_QPU_PULSE_READY:
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_QPU, FAULTEX_POFF_WRONG_STATE);
-							break;
-						default:
-							if (HLI_CAN_CallAction(NODEID_QPU, ACT_QPU_DISABLE_POWER))
-								LOGIC_State = LS_POFF_SCOPE;
-							break;
+						switch (LOGIC_ExtDeviceState.DS_DCU1)
+						{
+							case DS_DCU_FAULT:
+							case DS_DCU_DISABLED:
+							case DS_DCU_IN_PROCESS:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_POFF_WRONG_STATE);
+								break;
+							default:
+								HLI_CAN_CallAction(DataTable[REG_DCU1_CAN_ADDR], ACT_DCU_DISABLE_POWER);
+								break;
+						}
+
+						switch (LOGIC_ExtDeviceState.DS_DCU2)
+						{
+							case DS_DCU_FAULT:
+							case DS_DCU_DISABLED:
+							case DS_DCU_IN_PROCESS:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_POFF_WRONG_STATE);
+								break;
+							default:
+								HLI_CAN_CallAction(DataTable[REG_DCU2_CAN_ADDR], ACT_DCU_DISABLE_POWER);
+								break;
+						}
+
+						switch (LOGIC_ExtDeviceState.DS_DCU3)
+						{
+							case DS_DCU_FAULT:
+							case DS_DCU_DISABLED:
+							case DS_DCU_IN_PROCESS:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_POFF_WRONG_STATE);
+								break;
+							default:
+								HLI_CAN_CallAction(DataTable[REG_DCU3_CAN_ADDR], ACT_DCU_DISABLE_POWER);
+								break;
+						}
+					}
+					else
+					{
+						LOGIC_ExtDeviceState.DS_DCU1 = DS_DCU_NONE;
+						LOGIC_ExtDeviceState.DS_DCU2 = DS_DCU_NONE;
+						LOGIC_ExtDeviceState.DS_DCU3 = DS_DCU_NONE;
+						LOGIC_State = LS_POFF_RCU;
 					}
 				}
-				else
+				break;
+
+			case LS_POFF_RCU:
 				{
-					LOGIC_ExtDeviceState.DS_QPU = DS_QPU_NONE;
-					LOGIC_State = LS_POFF_SCOPE;
+					if (!EmulateRCU)
+					{
+						switch (LOGIC_ExtDeviceState.DS_RCU1)
+						{
+							case DS_RCU_FAULT:
+							case DS_RCU_DISABLED:
+							case DS_RCU_IN_PROCESS:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_POFF_WRONG_STATE);
+								break;
+							default:
+								HLI_CAN_CallAction(DataTable[REG_RCU1_CAN_ADDR], ACT_RCU_DISABLE_POWER);
+								break;
+						}
+
+						switch (LOGIC_ExtDeviceState.DS_RCU2)
+						{
+							case DS_RCU_FAULT:
+							case DS_RCU_DISABLED:
+							case DS_RCU_IN_PROCESS:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_POFF_WRONG_STATE);
+								break;
+							default:
+								HLI_CAN_CallAction(DataTable[REG_RCU2_CAN_ADDR], ACT_RCU_DISABLE_POWER);
+								break;
+						}
+
+						switch (LOGIC_ExtDeviceState.DS_RCU3)
+						{
+							case DS_RCU_FAULT:
+							case DS_RCU_DISABLED:
+							case DS_RCU_IN_PROCESS:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_POFF_WRONG_STATE);
+								break;
+							default:
+								HLI_CAN_CallAction(DataTable[REG_RCU3_CAN_ADDR], ACT_RCU_DISABLE_POWER);
+								break;
+						}
+					}
+					else
+					{
+						LOGIC_ExtDeviceState.DS_RCU1 = DS_RCU_NONE;
+						LOGIC_ExtDeviceState.DS_RCU2 = DS_RCU_NONE;
+						LOGIC_ExtDeviceState.DS_RCU3 = DS_RCU_NONE;
+						LOGIC_State = LS_POFF_SCOPE;
+					}
 				}
-			}
 				break;
 
 			case LS_POFF_SCOPE:
@@ -786,7 +1411,7 @@ void LOGIC_PowerOffSequence()
 
 void LOGIC_ReadDataPrepare()
 {
-	LOGIC_State = LS_READ_FCROVU;
+	LOGIC_State = LS_READ_CROVU;
 	CONTROL_RequestDPC(&LOGIC_ReadDataSequence);
 }
 // ----------------------------------------
@@ -795,7 +1420,7 @@ void LOGIC_ReadDataSequence()
 {
 	Int16U Register;
 
-	if 	(LOGIC_State == LS_READ_FCROVU || LOGIC_State == LS_READ_QPU ||
+	if 	(LOGIC_State == LS_READ_CROVU || LOGIC_State == LS_READ_DCU || LOGIC_State == LS_READ_RCU ||
 		 LOGIC_State == LS_READ_SCOPE)
 	{
 		if (!LOGIC_UpdateDeviceState())
@@ -806,12 +1431,41 @@ void LOGIC_ReadDataSequence()
 
 		switch (LOGIC_State)
 		{
+			case LS_READ_CROVU:
+				{
+					if (!EmulateCROVU)
+					{
+						if (LOGIC_ExtDeviceState.DS_CROVU == DS_CROVU_READY)
+							if (HLI_CAN_Read16(NODEID_CROVU, REG_CROVU_TEST_RESULT, &Register))
+							{
+								if (MeasurementMode == MODE_QRR_TQ)
+								{
+									if (Register == OPRESULT_NONE)
+									{
+										LOGIC_State = LS_Error;
+										CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_READ_WRONG_STATE);
+									}
+									else
+									{
+										Results[ResultsCounter].DeviceTriggered = (Register == OPRESULT_OK) ? FALSE : TRUE;
+										LOGIC_State = LS_READ_FCROVU;
+									}
+								}
+								else
+									LOGIC_State = LS_READ_FCROVU;
+							}
+					}
+					else
+						LOGIC_State = LS_READ_FCROVU;
+				}
+				break;
+
 			case LS_READ_FCROVU:
 				{
 					if (!EmulateFCROVU)
 					{
 						if (LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_READY)
-							if (HLI_CAN_Read16(NODEID_FCROVU, REG_FCROVU_TEST_RESULT, &Register))
+							if (HLI_CAN_Read16(NODEID_FCROVU, REG_FCROVU_TEST_FINISHED, &Register))
 							{
 								if (MeasurementMode == MODE_QRR_TQ)
 								{
@@ -823,25 +1477,42 @@ void LOGIC_ReadDataSequence()
 									else
 									{
 										Results[ResultsCounter].DeviceTriggered = (Register == OPRESULT_OK) ? FALSE : TRUE;
-										LOGIC_State = LS_READ_QPU;
+										LOGIC_State = LS_READ_DCU;
 									}
 								}
 								else
-									LOGIC_State = LS_READ_QPU;
+									LOGIC_State = LS_READ_DCU;
 							}
 					}
 					else
-						LOGIC_State = LS_READ_QPU;
+						LOGIC_State = LS_READ_DCU;
 				}
 				break;
 
-			case LS_READ_QPU:
+			case LS_READ_DCU:
 				{
-					if (!EmulateQPU)
+					if (!EmulateDCU)
 					{
-						if (LOGIC_ExtDeviceState.DS_QPU == DS_QPU_PULSE_END)
-							if (HLI_CAN_Read16(NODEID_QPU, REG_QPU_ACTUAL_IDC, &Results[ResultsCounter].Idc))
-								LOGIC_State = LS_READ_SCOPE;
+						Int16U Idc1Temp = 0, Idc2Temp = 0, Idc3Temp = 0;
+
+						LOGIC_State = LS_READ_SCOPE;
+
+						if(DataTable[REG_DCU1_ACTIVE])
+							if (LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_CHARGING)
+								if (!HLI_CAN_Read16(NODEID_DCU1, REG_DCU_DBG_I_MAX_DUT_VALUE, &Idc1Temp))
+									LOGIC_State = LS_READ_DCU;
+
+						if(DataTable[REG_DCU2_ACTIVE])
+							if (LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_CHARGING)
+								if (!HLI_CAN_Read16(NODEID_DCU2, REG_DCU_DBG_I_MAX_DUT_VALUE, &Idc2Temp))
+									LOGIC_State = LS_READ_DCU;
+
+						if(DataTable[REG_DCU3_ACTIVE])
+							if (LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_CHARGING)
+								if (!HLI_CAN_Read16(NODEID_DCU3, REG_DCU_DBG_I_MAX_DUT_VALUE, &Idc3Temp))
+									LOGIC_State = LS_READ_DCU;
+
+						Results[ResultsCounter].Idc = Idc1Temp + Idc2Temp + Idc3Temp;
 					}
 					else
 						LOGIC_State = LS_READ_SCOPE;
@@ -874,34 +1545,21 @@ void LOGIC_ReadDataSequence()
 															{
 																LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
 															}
-															else if (Results[ResultsCounter].Irr > QPU_Current)
+															else if (Results[ResultsCounter].Irr > DC_Current)
 															{
 																LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
 															}
 															else
 															{
 																// Save results
-																Results[ResultsCounter].OSVApplyTime = FCROVU_TrigTime;
+																Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
 																LOGIC_LogData(Results[ResultsCounter]);
 
 																// Apply extended Tq logic
 																if (MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
 																	LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
 
-																// Read data plots
-																if (LOGIC_PulseNumRemain == 0 && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
-																{
-																	if (HLI_RS232_ReadArray16(EP_QPU_READ_I, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
-																		if (MeasurementMode == MODE_QRR_TQ)
-																		{
-																			if (HLI_RS232_ReadArray16(EP_QPU_READ_V, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
-																				LOGIC_State = LS_None;
-																		}
-																		else
-																			LOGIC_State = LS_None;
-																}
-																else
-																	LOGIC_State = LS_None;
+																LOGIC_State = LS_None;
 
 																DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
 															}
@@ -918,15 +1576,45 @@ void LOGIC_ReadDataSequence()
 
 		if (CONTROL_TimeCounter > Timeout && LOGIC_State != LS_None)
 		{
+			if (LOGIC_ExtDeviceState.DS_CROVU != DS_CROVU_READY)
+			{
+				// CROVU not ready
+				CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_READ_TIMEOUT);
+			}
 			if (LOGIC_ExtDeviceState.DS_FCROVU != DS_FCROVU_READY)
 			{
 				// FCROVU not ready
 				CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_READ_TIMEOUT);
 			}
-			else if (LOGIC_ExtDeviceState.DS_QPU != DS_QPU_PULSE_END)
+			else if (LOGIC_ExtDeviceState.DS_DCU1 != DS_DCU_READY)
 			{
-				// QPU not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_QPU, FAULTEX_READ_TIMEOUT);
+				// DCU1 not ready
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_READ_TIMEOUT);
+			}
+			else if (LOGIC_ExtDeviceState.DS_DCU2 != DS_DCU_READY)
+			{
+				// DCU2 not ready
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_READ_TIMEOUT);
+			}
+			else if (LOGIC_ExtDeviceState.DS_DCU3 != DS_DCU_READY)
+			{
+				// DCU3 not ready
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_READ_TIMEOUT);
+			}
+			else if (LOGIC_ExtDeviceState.DS_RCU1 != DS_DCU_READY)
+			{
+				// RCU1 not ready
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_READ_TIMEOUT);
+			}
+			else if (LOGIC_ExtDeviceState.DS_RCU2 != DS_DCU_READY)
+			{
+				// RCU2 not ready
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_READ_TIMEOUT);
+			}
+			else if (LOGIC_ExtDeviceState.DS_RCU3 != DS_DCU_READY)
+			{
+				// RCU3 not ready
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_READ_TIMEOUT);
 			}
 			else if (LOGIC_ExtDeviceState.DS_SCOPE != DS_SCOPE_NONE)
 			{
@@ -958,8 +1646,8 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 			if (DeviceTriggered)
 			{
 				// Init slow thyristors measurement
-				FCROVU_TrigTime = QPU_CurrentZeroPoint + TQ_MAX_TIME;
-				FCROVU_TrigTime_LastHalf = TQ_MAX_TIME >> 1;
+				CROVU_TrigTime = DC_CurrentZeroPoint + TQ_MAX_TIME;
+				CROVU_TrigTime_LastHalf = TQ_MAX_TIME >> 1;
 			}
 			else
 			{
@@ -967,18 +1655,18 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 				TqFastThyristor = TRUE;
 				--LOGIC_PulseNumRemain;
 
-				FCROVU_TrigTime = QPU_CurrentZeroPoint * 10 + TQ_FIRST_PROBE * 10;
-				FCROVU_TrigTime_LastHalf = (TQ_FIRST_PROBE * 10) >> 1;
+				CROVU_TrigTime = DC_CurrentZeroPoint * 10 + TQ_FIRST_PROBE * 10;
+				CROVU_TrigTime_LastHalf = (TQ_FIRST_PROBE * 10) >> 1;
 				LOGIC_TrimTrigTime(FALSE);
 			}
 
-			LOGIC_PreciseEventInit(FCROVU_TrigTime);
+			LOGIC_PreciseEventInit(CROVU_TrigTime);
 		}
 		// Normal operation
 		else
 		{
 			LOGIC_TrimTrigTime(DeviceTriggered);
-			LOGIC_PreciseEventInit(FCROVU_TrigTime);
+			LOGIC_PreciseEventInit(CROVU_TrigTime);
 		}
 	}
 	// Add extra iterations to trig device and then untrig
@@ -988,12 +1676,12 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 		{
 			DUTFinalIncrease = TRUE;
 			LOGIC_PulseNumRemain = 1;
-			LOGIC_PreciseEventInit(++FCROVU_TrigTime);
+			LOGIC_PreciseEventInit(++CROVU_TrigTime);
 		}
 		else if (!DUTFinalIncrease)
 		{
 			LOGIC_PulseNumRemain = 1;
-			LOGIC_PreciseEventInit(--FCROVU_TrigTime);
+			LOGIC_PreciseEventInit(--CROVU_TrigTime);
 		}
 	}
 
@@ -1066,3 +1754,58 @@ void LOGIC_AbortMeasurement(Int16U WarningCode)
 	LOGIC_Halt();
 }
 // ----------------------------------------
+
+void LOGIC_SafetyProblem()
+{
+	DataTable[REG_PROBLEM] = PROBLEM_SAFETY;
+	LOGIC_OperationResult = OPRESULT_FAIL;
+	LOGIC_Halt();
+}
+// ----------------------------------------
+
+void CONTROL_CSU()
+{
+	// Control voltage
+	//
+	ZwADC_StartSEQ1();
+
+	if (CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
+	{
+		ZbGPIO_CSU_PWRCtrl(FALSE);
+		ZbGPIO_CSU_Disch(TRUE);
+	}
+
+	if (CSUVoltage < CSU_VOLTAGE_LOW - CSU_VOLTAGE_HYST)
+	{
+		ZbGPIO_CSU_PWRCtrl(TRUE);
+		ZbGPIO_CSU_Disch(FALSE);
+	}
+
+	if ((CSUVoltage <= CSU_VOLTAGE_HIGH) || (CSUVoltage >= CSU_VOLTAGE_LOW))
+	{
+		ZbGPIO_CSU_PWRCtrl(FALSE);
+		ZbGPIO_CSU_Disch(FALSE);
+	}
+	//
+
+
+	// Control FAN
+	//
+	if (LOGIC_StateRealTime == LSRT_DirectPulseStart)
+	{
+		ZbGPIO_CSU_FAN(TRUE);
+		CSU_FanTimeout = CONTROL_TimeCounter;
+	}
+
+	if (CONTROL_TimeCounter > CSU_FanTimeout + CSU_FAN_TIMEOUT)
+		ZbGPIO_CSU_FAN(FALSE);
+	//
+}
+// ----------------------------------------
+
+void CSU_VoltageMeasuring(Int16U * const restrict pResults)
+{
+	CSUVoltage = *(Int16U *)pResults /* (float)DataTable[REG_CSU_V_C]/1000;*/;
+}
+// ----------------------------------------
+

@@ -20,11 +20,14 @@ void InitializeCAN();
 void InitializeSCI();
 void InitializeSPI();
 void InitializeBoard();
+void InitializeADC();
 void InitializeController(Boolean GoodClock);
 // -----------------------------------------
 
 // FORWARD ISRs
 // -----------------------------------------
+// CPU External interrupt ISR
+ISRCALL XInterrupt_ISR();
 // CPU Timer 0 ISR
 ISRCALL Timer0_ISR();
 // CPU Timer 1 ISR
@@ -57,6 +60,7 @@ void main()
 		InitializeTimers();
 		InitializeCAN();
 		InitializeSPI();
+		InitializeADC();
 		InitializeBoard();
 	}
 
@@ -70,6 +74,7 @@ void main()
 		ADD_ISR(TINT2, Timer2_ISR);
 		ADD_ISR(ECAN0INTA, CAN0A_ISR);
 		ADD_ISR(ECAN0INTB, CAN0B_ISR);
+		ADD_ISR(XINT1, XInterrupt_ISR);
 	END_ISR_MAP
 
 	// Initialize controller logic
@@ -184,6 +189,18 @@ void InitializeCAN()
 }
 // -----------------------------------------
 
+void InitializeADC()
+{
+	// Initialize and prepare ADC
+	ZwADC_Init(ADC_PRESCALER, ADC_CD2, ADC_SH);
+	ZwADC_ConfigInterrupts(TRUE, FALSE);
+
+	// Enable interrupts on peripheral and CPU levels
+	ZwADC_EnableInterrupts(TRUE, FALSE);
+	ZwADC_EnableInterruptsGlobal(TRUE);
+}
+// -----------------------------------------
+
 void InitializeBoard()
 {
 	// Init DAC
@@ -203,6 +220,7 @@ void InitializeController(Boolean GoodClock)
 // ISRs
 // -----------------------------------------
 #ifdef BOOT_FROM_FLASH
+	#pragma CODE_SECTION(XInterrupt_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer0_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer1_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer2_ISR, "ramfuncs");
@@ -212,6 +230,14 @@ void InitializeController(Boolean GoodClock)
 #endif
 //
 #pragma INTERRUPT(Timer0_ISR, HPI);
+
+// External interrupt ISR
+ISRCALL XInterrupt_ISR(void)
+{
+	ZbGPIO_FCROVU_Sync(FALSE);
+
+	XINT_ISR_DONE;
+}
 
 // timer 0 ISR
 ISRCALL Timer0_ISR(void)
@@ -228,7 +254,7 @@ ISRCALL Timer0_ISR(void)
 	++LedCounter;
 	if(LedCounter == DBG_COUNTER_PERIOD)
 	{
-		ZbGPIO_ToggleLED1();
+		ZbGPIO_LED_Toggle();
 		LedCounter = 0;
 	}
 
@@ -241,10 +267,10 @@ ISRCALL Timer0_ISR(void)
 ISRCALL Timer1_ISR(void)
 {
 	ZwTimer_StopT1();
-	ZbGPIO_SwitchReverseCurrent(FALSE);
-	ZbGPIO_SwitchHVIGBT(FALSE);
+	ZbGPIO_RCU_Sync(FALSE);
+	ZbGPIO_CSU_Sync(FALSE);
 	DELAY_US(1);
-	ZbGPIO_SyncFCROVU(TRUE);
+	ZbGPIO_FCROVU_Sync(TRUE);
 
 	ZwTimer_ReloadT0();
 	ZwTimer_ReloadT2();
@@ -289,6 +315,19 @@ ISRCALL CAN0B_ISR(void)
 
 	// allow other interrupts from group 9
 	CAN_ISR_DONE;
+}
+// -----------------------------------------
+
+// ADC SEQ1 ISR
+ISRCALL SEQ1_ISR(void)
+{
+	// Handle interrupt
+	ZwADC_ProcessInterruptSEQ1();
+	// Dispatch results
+	ZwADC_Dispatch1();
+
+	// allow other interrupts from group 1
+	ADC_ISR_DONE;
 }
 // -----------------------------------------
 

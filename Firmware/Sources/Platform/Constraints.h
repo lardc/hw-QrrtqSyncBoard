@@ -30,9 +30,9 @@ typedef struct __TableItemConstraint
 
 // QPU LP
 //
-#define DIRECT_CURRENT_MIN			10		// in A
-#define DIRECT_CURRENT_MAX			500		// in A
-#define DIRECT_CURRENT_DEF			200		// in A
+#define DIRECT_CURRENT_MIN			100		// in A
+#define DIRECT_CURRENT_MAX			3200	// in A
+#define DIRECT_CURRENT_DEF			500		// in A
 
 #define IDC_PULSE_WIDTH_MIN			500		// in us
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
@@ -49,12 +49,16 @@ typedef struct __TableItemConstraint
 // FCROVU
 //
 #define OS_VOLATGE_MIN				200		// in V
-#define OS_VOLATGE_MAX				1900	// in V
+#define OS_VOLATGE_MAX				4500	// in V
 #define OS_VOLATGE_DEF				200		// in V
 
 #define OSV_RATE_MIN				20		// in V/us
 #define OSV_RATE_MAX				200		// in V/us
 #define OSV_RATE_DEF				20		// in V/us
+
+#define OSV_CURRENT_MIN				400		// in A
+#define OSV_CURRENT_MAX				1600	// in A
+#define OSV_CURRENT_DEF				1600	// in A
 
 // Variables
 //

@@ -24,9 +24,9 @@ volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause;
 static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE;
 static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 //
-#pragma DATA_SECTION(CONTROL_Values_1, "data_mem");
+#pragma DATA_SECTION(CONTROL_Values_1, "data_mem3");
 Int16U CONTROL_Values_1[VALUES_x_SIZE];
-#pragma DATA_SECTION(CONTROL_Values_2, "data_mem");
+#pragma DATA_SECTION(CONTROL_Values_2, "data_mem3");
 Int16U CONTROL_Values_2[VALUES_x_SIZE];
 #pragma DATA_SECTION(CONTROL_Values_Slave, "data_mem");
 Int16U CONTROL_Values_Slave[VALUES_x_SIZE];
@@ -57,6 +57,9 @@ void CONTROL_SwitchToReverseCurrent();
 void CONTROL_SubProcessStateMachine();
 void CONTROL_ReinitRS232();
 void CONTROL_SwitchToReady();
+void COMMUTATION_Control(Boolean State);
+void SAFETY_Handler();
+void PRESSURE_Handler();
 
 // Functions
 //
@@ -107,6 +110,8 @@ void CONTROL_Init(Boolean BadClockDetected)
 		DataTable[REG_DISABLE_REASON] = DISABLE_BAD_CLOCK;
 		CONTROL_SetDeviceState(DS_Disabled);
 	}
+
+	ZwADC_SubscribeToResults1(&CSU_VoltageMeasuring);
 }
 // ----------------------------------------
 
@@ -133,6 +138,9 @@ void CONTROL_Idle()
 	// Check long-execution process
 	CONTROL_SubProcessStateMachine();
 
+	// Control CSU
+	CONTROL_CSU();
+
 	// Update high-level logic state
 	DataTable[REG_LOGIC_STATE] = LOGIC_GetState();
 
@@ -149,10 +157,16 @@ void CONTROL_Idle()
 void CONTROL_Update()
 {
 	// Handle CAN-master interface requests
-	BCCIM_Process(&DEVICE_CAN_Master_Interface);
+	//BCCIM_Process(&DEVICE_CAN_Master_Interface);
 
 	// Process real-time tasks
-	LOGIC_RealTime();
+	//LOGIC_RealTime();
+
+	// Safety handler
+	//SAFETY_Handler();
+
+	// Pressure handler
+	//PRESSURE_Handler();
 }
 // ----------------------------------------
 
@@ -234,9 +248,9 @@ void CONTROL_ReinitRS232()
 {
 	if (!ReinitRS232 && CONTROL_TimeCounter > TIMEOUT_REINIT_RS232)
 	{
-		ZwSCIb_Init(SCIB_BR, SCIB_DB, SCIB_PARITY, SCIB_SB, FALSE);
-		ZwSCIb_InitFIFO(16, 0);
-		ZwSCIb_EnableInterrupts(FALSE, FALSE);
+		ZwSCIa_Init(SCIA_BR, SCIA_DB, SCIA_PARITY, SCIA_SB, FALSE);
+		ZwSCIa_InitFIFO(16, 0);
+		ZwSCIa_EnableInterrupts(FALSE, FALSE);
 
 		ReinitRS232 = TRUE;
 	}
@@ -256,6 +270,8 @@ void CONTROL_Start(Boolean SinglePulse)
 	CONTROL_PulseToPulsePause = CONTROL_TimeCounter;
 	LOGIC_CacheUpdateSettings(TRUE, SinglePulse);
 	LOGIC_ConfigurePrepare();
+
+	COMMUTATION_Control(TRUE);
 }
 // ----------------------------------------
 
@@ -275,9 +291,11 @@ void CONTROL_SubProcessStateMachine()
 			{
 				LOGIC_RealTimeCounter = 0;
 
-				ZbGPIO_SwitchHVIGBT(TRUE);
-				ZbGPIO_SwitchDUT(TRUE);
-				ZbGPIO_SwitchDirectCurrent(TRUE);
+				ZbGPIO_CSU_Sync(TRUE);
+				ZbGPIO_DUT_Control(TRUE);
+				ZbGPIO_DUT_Switch(TRUE);
+				ZbGPIO_DCU_Sync(TRUE);
+				ZbGPIO_DUT_Switch(TRUE);
 
 				LOGIC_StateRealTime = LSRT_DirectPulseStart;
 			}
@@ -289,6 +307,7 @@ void CONTROL_SubProcessStateMachine()
 				LOGIC_ResultToDataTable();
 				DataTable[REG_FINISHED] = LOGIC_GetOpResult();
 				CONTROL_SwitchToReady();
+				COMMUTATION_Control(FALSE);
 			}
 			else
 			{
@@ -466,57 +485,151 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 
 		case ACT_DIAG_TURN_ON_PC:
 			{
-				ZbGPIO_SwitchLED2(TRUE);
+				ZbGPIO_PC_TurnOn(TRUE);
 				DELAY_US(500000);
-				ZbGPIO_SwitchLED2(FALSE);
+				ZbGPIO_PC_TurnOn(FALSE);
 			}
 			break;
 
 		case ACT_DIAG_PULSE_DUT:
 			{
-				ZbGPIO_SwitchDUT(TRUE);
+				ZbGPIO_DUT_Control(TRUE);
 				DELAY_US(1000);
-				ZbGPIO_SwitchDUT(FALSE);
+				ZbGPIO_DUT_Control(FALSE);
 			}
 			break;
 
-		case ACT_DIAG_PULSE_DC:
+		case ACT_DIAG_PULSE_SW_DUT:
 			{
-				ZbGPIO_SwitchDirectCurrent(TRUE);
+				ZbGPIO_DUT_Switch(TRUE);
 				DELAY_US(1000);
-				ZbGPIO_SwitchDirectCurrent(FALSE);
+				ZbGPIO_DUT_Switch(FALSE);
 			}
 			break;
 
-		case ACT_DIAG_PULSE_RC:
+		case ACT_DIAG_PULSE_DC_SYNC:
 			{
-				ZbGPIO_SwitchReverseCurrent(TRUE);
+				ZbGPIO_DCU_Sync(TRUE);
 				DELAY_US(1000);
-				ZbGPIO_SwitchReverseCurrent(FALSE);
+				ZbGPIO_DCU_Sync(FALSE);
 			}
 			break;
 
-		case ACT_DIAG_PULSE_IGBT:
+		case ACT_DIAG_PULSE_RC_SYNC:
 			{
-				ZbGPIO_SwitchHVIGBT(TRUE);
+				ZbGPIO_RCU_Sync(TRUE);
 				DELAY_US(1000);
-				ZbGPIO_SwitchHVIGBT(FALSE);
+				ZbGPIO_RCU_Sync(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_PULSE_CSU_PS:
+			{
+				ZbGPIO_CSU_PWRCtrl(TRUE);
+				DELAY_US(1000);
+				ZbGPIO_CSU_PWRCtrl(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_PULSE_CSU_DISCH:
+			{
+				ZbGPIO_CSU_Disch(TRUE);
+				DELAY_US(1000);
+				ZbGPIO_CSU_Disch(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_PULSE_CSU_FAN:
+			{
+				ZbGPIO_CSU_FAN(TRUE);
+				DELAY_US(1000);
+				ZbGPIO_CSU_FAN(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_PULSE_CSU_SYNC:
+			{
+				ZbGPIO_CSU_Sync(TRUE);
+				DELAY_US(1000);
+				ZbGPIO_CSU_Sync(FALSE);
 			}
 			break;
 
 		case ACT_DIAG_PULSE_SCOPE:
 			{
-				ZbGPIO_SyncSCOPE(TRUE);
+				ZbGPIO_SCOPE_Sync(TRUE);
 				DELAY_US(1000);
-				ZbGPIO_SyncSCOPE(FALSE);
+				ZbGPIO_SCOPE_Sync(FALSE);
 			}
 			break;
 
 		case ACT_DIAG_PULSE_FCROVU:
 			{
-				ZbGPIO_SyncFCROVU(TRUE);
+				ZbGPIO_FCROVU_Sync(TRUE);
 				DELAY_US(200);
-				ZbGPIO_SyncFCROVU(FALSE);
+				ZbGPIO_FCROVU_Sync(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_PULSE_SB:
+			{
+				ZbGPIO_SensingBoardEnable(TRUE);
+				DELAY_US(1000);
+				ZbGPIO_SensingBoardEnable(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_PULSE_QCUHC:
+			{
+				ZbGPIO_QCUHCEnable(TRUE);
+				DELAY_US(1000);
+				ZbGPIO_QCUHCEnable(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_PULSE_GATE_RELAY:
+			{
+				ZbGPIO_DUT_ControlEnable(TRUE);
+				DELAY_US(1000);
+				ZbGPIO_DUT_ControlEnable(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_QRR_PULSE:
+			{
+				int i;
+
+				ZbGPIO_DCU_Sync(TRUE);
+				DELAY_US(3000);
+
+				if((DataTable[REG_RCU_SYNC_DELAY] - DataTable[REG_DCU_SYNC_DELAY]) != 0)
+				{
+					if(DataTable[REG_DCU_SYNC_DELAY])
+					{
+						ZbGPIO_RCU_Sync(TRUE);
+
+						for(i=0;i<DataTable[REG_DCU_SYNC_DELAY];i++){}
+
+						ZbGPIO_DCU_Sync(FALSE);
+					}
+					else
+					{
+						ZbGPIO_DCU_Sync(FALSE);
+
+						for(i=0;i<DataTable[REG_RCU_SYNC_DELAY];i++){}
+
+						ZbGPIO_RCU_Sync(TRUE);
+					}
+				}
+				else
+				{
+					ZbGPIO_DCU_Sync(FALSE);
+					ZbGPIO_RCU_Sync(TRUE);
+				}
+
+
+				DELAY_US(1000);
+				ZbGPIO_RCU_Sync(FALSE);
 			}
 			break;
 
@@ -525,6 +638,31 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 	}
 
 	return TRUE;
+}
+// ----------------------------------------
+
+void COMMUTATION_Control(Boolean State)
+{
+	ZbGPIO_QCUHCEnable(State);
+	ZbGPIO_SensingBoardEnable(State);
+	ZbGPIO_DUT_ControlEnable(State);
+}
+// ----------------------------------------
+
+void SAFETY_Handler()
+{
+	if((CONTROL_State == DS_InProcess) && ZbGPIO_SafetyCheck())
+		LOGIC_SafetyProblem();
+
+	// Safety system enable
+	ZbGPIO_SafetyEnable(DataTable[REG_SAFETY_EN]);
+}
+// ----------------------------------------
+
+void PRESSURE_Handler()
+{
+	if(((CONTROL_State == DS_InProcess) || (CONTROL_State == DS_Ready)) && !ZbGPIO_PressureCheck())
+		CONTROL_SwitchToFault(FAULT_PRESSURE, 0);
 }
 // ----------------------------------------
 

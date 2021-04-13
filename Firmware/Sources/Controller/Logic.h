@@ -16,27 +16,41 @@ typedef enum __LogicState
 	LS_None				= 0,
 	LS_Error			= 1,
 	//
-	LS_PON_FCROVU		= 2,
-	LS_PON_QPU			= 3,
-	LS_PON_SCOPE		= 4,
-	LS_PON_WaitStates	= 5,
+	LS_PON_CROVU		= 2,
+	LS_PON_FCROVU		= 3,
+	LS_PON_DCU			= 4,
+	LS_PON_RCU			= 5,
+	LS_PON_CSU			= 6,
+	LS_PON_SCOPE		= 7,
+	LS_PON_WaitStates	= 8,
 	//
-	LS_CFG_FCROVU		= 6,
-	LS_CFG_QPU			= 7,
-	LS_CFG_SCOPE		= 8,
-	LS_CFG_WaitStates	= 9,
+	LS_CFG_CROVU		= 9,
+	LS_CFG_FCROVU		= 10,
+	LS_CFG_DCU			= 11,
+	LS_CFG_RCU			= 12,
+	LS_CFG_CSU			= 13,
+	LS_CFG_SCOPE		= 14,
+	LS_CFG_WaitStates	= 15,
 	//
-	LS_POFF_FCROVU		= 10,
-	LS_POFF_QPU			= 11,
-	LS_POFF_SCOPE		= 12,
+	LS_POFF_CROVU		= 16,
+	LS_POFF_FCROVU		= 17,
+	LS_POFF_DCU			= 18,
+	LS_POFF_RCU			= 19,
+	LS_POFF_CSU			= 20,
+	LS_POFF_SCOPE		= 21,
 	//
-	LS_READ_FCROVU		= 13,
-	LS_READ_QPU			= 14,
-	LS_READ_SCOPE		= 15,
+	LS_READ_CROVU		= 22,
+	LS_READ_FCROVU		= 23,
+	LS_READ_DCU			= 24,
+	LS_READ_RCU			= 25,
+	LS_READ_CSU			= 26,
+	LS_READ_SCOPE		= 27,
 	//
-	LS_CLR_FCROVU		= 16,
-	LS_CLR_QPU			= 17,
-	LS_CLR_SCOPE		= 18
+	LS_CLR_CROVU		= 28,
+	LS_CLR_FCROVU		= 29,
+	LS_CLR_DCU			= 30,
+	LS_CLR_RCU			= 31,
+	LS_CLR_SCOPE		= 32
 
 } LogicState;
 //
@@ -103,6 +117,12 @@ void LOGIC_ResultToDataTable();
 void LOGIC_LogData(MeasurementResult Result);
 // Unexpected abortion of measurement
 void LOGIC_AbortMeasurement(Int16U WarningCode);
+// Control CSU
+void CONTROL_CSU();
+// CSU voltage measuring
+void CSU_VoltageMeasuring(Int16U * const restrict pResults);
+// Safety problem
+void LOGIC_SafetyProblem();
 
 // Variables
 //
