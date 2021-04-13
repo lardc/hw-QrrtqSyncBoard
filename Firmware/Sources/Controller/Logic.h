@@ -16,6 +16,16 @@ typedef enum __LogicState
 	LS_None				= 0,
 	LS_Error			= 1,
 	//
+	LS_CLR_CROVU		= 100,
+	LS_CLR_FCROVU,
+	LS_CLR_DCU1,
+	LS_CLR_DCU2,
+	LS_CLR_DCU3,
+	LS_CLR_RCU1,
+	LS_CLR_RCU2,
+	LS_CLR_RCU3,
+	LS_CLR_SCOPE,
+	//
 	LS_PON_CROVU		= 2,
 	LS_PON_FCROVU		= 3,
 	LS_PON_DCU			= 4,
@@ -44,14 +54,7 @@ typedef enum __LogicState
 	LS_READ_DCU			= 24,
 	LS_READ_RCU			= 25,
 	LS_READ_CSU			= 26,
-	LS_READ_SCOPE		= 27,
-	//
-	LS_CLR_CROVU		= 28,
-	LS_CLR_FCROVU		= 29,
-	LS_CLR_DCU			= 30,
-	LS_CLR_RCU			= 31,
-	LS_CLR_SCOPE		= 32
-
+	LS_READ_SCOPE		= 27
 } LogicState;
 //
 typedef enum __DeviceSubState

@@ -7,6 +7,7 @@
 //
 // Includes
 #include "xCCICommon.h"
+#include "Common.h"
 #include "HighLevelInterface.h"
 #include "Global.h"
 #include "DataTable.h"
@@ -353,53 +354,29 @@ Boolean LOGIC_UpdateDeviceState()
 {
 	Int16U Register;
 	
-	if(!EmulateCROVU)
-		if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_CROVU = Register;
-		else
-			return FALSE;
-	
-	if(!EmulateFCROVU)
-		if(HLI_CAN_Read16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_FCROVU = Register;
-		else
-			return FALSE;
-	
-	if(!EmulateDCU1)
-		if(HLI_CAN_Read16(DataTable[REG_DCU1_NODE_ID], REG_DCU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_DCU1 = Register;
-		else
-			return FALSE;
-		
-	if(!EmulateDCU2)
-		if(HLI_CAN_Read16(DataTable[REG_DCU2_NODE_ID], REG_DCU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_DCU2 = Register;
-		else
-			return FALSE;
-		
-	if(!EmulateDCU3)
-		if(HLI_CAN_Read16(DataTable[REG_DCU3_NODE_ID], REG_DCU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_DCU3 = Register;
-		else
-			return FALSE;
-	
-	if(!EmulateRCU1)
-		if(HLI_CAN_Read16(DataTable[REG_RCU1_NODE_ID], REG_RCU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_RCU1 = Register;
-		else
-			return FALSE;
+	if(!CMN_UpdateNodeState(EmulateCROVU, REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_CROVU))
+		return FALSE;
 
-	if(!EmulateRCU2)
-		if(HLI_CAN_Read16(DataTable[REG_RCU2_NODE_ID], REG_RCU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_RCU2 = Register;
-		else
-			return FALSE;
+	if(!CMN_UpdateNodeState(EmulateFCROVU, REG_FCROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_FCROVU))
+		return FALSE;
 
-	if(!EmulateRCU3)
-		if(HLI_CAN_Read16(DataTable[REG_RCU3_NODE_ID], REG_RCU_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.DS_RCU3 = Register;
-		else
-			return FALSE;
+	if(!CMN_UpdateNodeState(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1))
+		return FALSE;
+	
+	if(!CMN_UpdateNodeState(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2))
+		return FALSE;
+	
+	if(!CMN_UpdateNodeState(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3))
+		return FALSE;
+	
+	if(!CMN_UpdateNodeState(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1))
+		return FALSE;
+
+	if(!CMN_UpdateNodeState(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2))
+		return FALSE;
+
+	if(!CMN_UpdateNodeState(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3))
+		return FALSE;
 	
 	if(!EmulateSCOPE)
 		if(HLI_RS232_Read16(REG_SCOPE_DEV_STATE, &Register))
@@ -422,8 +399,9 @@ void LOGIC_FaultResetPrepare()
 
 void LOGIC_FaultResetSequence()
 {
-	if(LOGIC_State == LS_CLR_CROVU || LOGIC_State == LS_CLR_FCROVU || LOGIC_State == LS_CLR_DCU ||
-		LOGIC_State == LS_CLR_RCU || LOGIC_State == LS_CLR_SCOPE)
+	if(LOGIC_State == LS_CLR_CROVU || LOGIC_State == LS_CLR_FCROVU || LOGIC_State == LS_CLR_SCOPE
+			|| LOGIC_State == LS_CLR_RCU1 || LOGIC_State == LS_CLR_RCU2 || LOGIC_State == LS_CLR_RCU3
+			|| LOGIC_State == LS_CLR_DCU1 || LOGIC_State == LS_CLR_DCU2 || LOGIC_State == LS_CLR_DCU3)
 	{
 		if(!LOGIC_UpdateDeviceState())
 		{
@@ -434,100 +412,53 @@ void LOGIC_FaultResetSequence()
 		switch (LOGIC_State)
 		{
 			case LS_CLR_CROVU:
-				{
-					if(!EmulateCROVU && (LOGIC_ExtDeviceState.DS_CROVU == DS_CROVU_FAULT))
-					{
-						if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_CLR_FAULT))
-							LOGIC_State = LS_CLR_FCROVU;
-					}
-					else
-						LOGIC_State = LS_CLR_FCROVU;
-				}
+				CMN_ResetNodeFault(EmulateCROVU, REG_CROVU_NODE_ID, LOGIC_ExtDeviceState.DS_CROVU, &LOGIC_State,
+						LS_CLR_FCROVU);
 				break;
 				
 			case LS_CLR_FCROVU:
-				{
-					if(!EmulateFCROVU && (LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_FAULT))
-					{
-						if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_FAULT_CLEAR))
-							LOGIC_State = LS_CLR_DCU;
-					}
-					else
-						LOGIC_State = LS_CLR_DCU;
-				}
+				CMN_ResetNodeFault(EmulateFCROVU, REG_FCROVU_NODE_ID, LOGIC_ExtDeviceState.DS_FCROVU, &LOGIC_State,
+						LS_CLR_DCU1);
+				break;
+
+			case LS_CLR_DCU1:
+				CMN_ResetNodeFault(EmulateDCU1, REG_DCU1_NODE_ID, LOGIC_ExtDeviceState.DS_DCU1, &LOGIC_State,
+						LS_CLR_DCU2);
+				break;
+
+			case LS_CLR_DCU2:
+				CMN_ResetNodeFault(EmulateDCU2, REG_DCU2_NODE_ID, LOGIC_ExtDeviceState.DS_DCU2, &LOGIC_State,
+						LS_CLR_DCU3);
+				break;
+
+			case LS_CLR_DCU3:
+				CMN_ResetNodeFault(EmulateDCU3, REG_DCU3_NODE_ID, LOGIC_ExtDeviceState.DS_DCU3, &LOGIC_State,
+						LS_CLR_RCU1);
+				break;
+
+			case LS_CLR_RCU1:
+				CMN_ResetNodeFault(EmulateRCU1, REG_RCU1_NODE_ID, LOGIC_ExtDeviceState.DS_RCU1, &LOGIC_State,
+						LS_CLR_RCU2);
 				break;
 				
-			case LS_CLR_DCU:
-				{
-					if(!EmulateDCU1 && LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_FAULT)
-					{
-						if(HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_FAULT_CLEAR))
-							LOGIC_State = LS_CLR_RCU;
-						else
-							LOGIC_State = LS_CLR_DCU;
-					}
-					
-					if(!EmulateDCU2 && LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_FAULT)
-					{
-						if(HLI_CAN_CallAction(DataTable[REG_DCU2_NODE_ID], ACT_DCU_FAULT_CLEAR))
-							LOGIC_State = LS_CLR_RCU;
-						else
-							LOGIC_State = LS_CLR_DCU;
-					}
-					
-					if(!EmulateDCU3 && LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_FAULT)
-					{
-						if(HLI_CAN_CallAction(DataTable[REG_DCU3_NODE_ID], ACT_DCU_FAULT_CLEAR))
-							LOGIC_State = LS_CLR_RCU;
-						else
-							LOGIC_State = LS_CLR_DCU;
-					}
-				}
+			case LS_CLR_RCU2:
+				CMN_ResetNodeFault(EmulateRCU2, REG_RCU2_NODE_ID, LOGIC_ExtDeviceState.DS_RCU2, &LOGIC_State,
+						LS_CLR_RCU3);
 				break;
 				
-			case LS_CLR_RCU:
-				{
-					if(!EmulateRCU1)
-					{
-						if((DataTable[REG_RCU1_ACTIVE]) && (LOGIC_ExtDeviceState.DS_RCU1 == DS_RCU_FAULT))
-						{
-							if(HLI_CAN_CallAction(DataTable[REG_RCU1_NODE_ID], ACT_RCU_FAULT_CLEAR))
-								LOGIC_State = LS_CLR_SCOPE;
-							else
-								LOGIC_State = LS_CLR_RCU;
-						}
-						
-						if((DataTable[REG_RCU2_ACTIVE]) && (LOGIC_ExtDeviceState.DS_RCU2 == DS_RCU_FAULT))
-						{
-							if(HLI_CAN_CallAction(DataTable[REG_RCU2_NODE_ID], ACT_RCU_FAULT_CLEAR))
-								LOGIC_State = LS_CLR_SCOPE;
-							else
-								LOGIC_State = LS_CLR_RCU;
-						}
-						
-						if((DataTable[REG_RCU2_ACTIVE]) && (LOGIC_ExtDeviceState.DS_RCU2 == DS_RCU_FAULT))
-						{
-							if(HLI_CAN_CallAction(DataTable[REG_RCU2_NODE_ID], ACT_RCU_FAULT_CLEAR))
-								LOGIC_State = LS_CLR_SCOPE;
-							else
-								LOGIC_State = LS_CLR_RCU;
-						}
-					}
-					else
-						LOGIC_State = LS_CLR_RCU;
-				}
+			case LS_CLR_RCU3:
+				CMN_ResetNodeFault(EmulateRCU3, REG_RCU3_NODE_ID, LOGIC_ExtDeviceState.DS_RCU3, &LOGIC_State,
+						LS_CLR_SCOPE);
 				break;
 				
 			case LS_CLR_SCOPE:
+				if(!EmulateSCOPE && (LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_FAULT))
 				{
-					if(!EmulateSCOPE && (LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_FAULT))
-					{
-						if(HLI_RS232_CallAction(ACT_SCOPE_CLR_FAULT))
-							LOGIC_State = LS_None;
-					}
-					else
+					if(HLI_RS232_CallAction(ACT_SCOPE_CLR_FAULT))
 						LOGIC_State = LS_None;
 				}
+				else
+					LOGIC_State = LS_None;
 				break;
 		}
 		
