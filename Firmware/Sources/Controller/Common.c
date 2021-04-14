@@ -95,3 +95,70 @@ void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateSto
 	}
 }
 //-----------------------------
+
+void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState FullStateStorage,
+		volatile LogicState *CurrentLogicState)
+{
+	if(*CurrentLogicState != LS_None || *CurrentLogicState != LS_Error)
+	{
+		if(Timeout > TimeCounter)
+		{
+			if(FullStateStorage.DS_CROVU == CDS_Ready
+					&& FullStateStorage.DS_FCROVU == CDS_Ready
+					&& FullStateStorage.DS_DCU1 == CDS_Ready
+					&& FullStateStorage.DS_DCU2 == CDS_Ready
+					&& FullStateStorage.DS_DCU3 == CDS_Ready
+					&& FullStateStorage.DS_RCU1 == CDS_Ready
+					&& FullStateStorage.DS_RCU2 == CDS_Ready
+					&& FullStateStorage.DS_RCU3 == CDS_Ready
+					&& FullStateStorage.DS_SCOPE == CDS_None)
+			{
+				*CurrentLogicState = LS_None;
+			}
+		}
+		else
+		{
+			if(FullStateStorage.DS_CROVU != CDS_Ready)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_PON_TIMEOUT);
+			}
+			else if(FullStateStorage.DS_FCROVU != CDS_Ready)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_TIMEOUT);
+			}
+			else if(FullStateStorage.DS_DCU1 != CDS_Ready)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_PON_TIMEOUT);
+			}
+			else if(FullStateStorage.DS_DCU2 != CDS_Ready)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_PON_TIMEOUT);
+			}
+			else if(FullStateStorage.DS_DCU3 != CDS_Ready)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_PON_TIMEOUT);
+			}
+			else if(FullStateStorage.DS_RCU1 != CDS_Ready)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_PON_TIMEOUT);
+			}
+			else if(FullStateStorage.DS_RCU2 != CDS_Ready)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_PON_TIMEOUT);
+			}
+			else if(FullStateStorage.DS_RCU3 != CDS_Ready)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_PON_TIMEOUT);
+			}
+			else if(FullStateStorage.DS_SCOPE != CDS_None)
+			{
+				CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_PON_TIMEOUT);
+			}
+			else
+				CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, FAULTEX_PON_TIMEOUT);
+
+			*CurrentLogicState = LS_Error;
+		}
+	}
+}
+//-----------------------------

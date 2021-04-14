@@ -23,5 +23,7 @@ void CMN_NodePowerOn(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateSt
 		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState);
 void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pDRCUConfig Config,
 		volatile LogicState *CurrentLogicState, LogicState NextLogicState);
+void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState FullStateStorage,
+		volatile LogicState *CurrentLogicState);
 
 #endif // __COMMON_H
