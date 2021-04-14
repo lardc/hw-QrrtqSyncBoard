@@ -77,6 +77,35 @@ void CMN_NodePowerOn(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateSt
 }
 //-----------------------------
 
+void CMN_NodePowerOff(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage,
+		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState)
+{
+	if(!Emulate)
+	{
+		switch(*StateStorage)
+		{
+			case CDS_None:
+				break;
+
+			case CDS_Ready:
+				if(HLI_CAN_CallAction(DataTable[NodeIDReg], COMM_ACT_DISABLE_POWER))
+					*CurrentLogicState = NextLogicState;
+				break;
+
+			default:
+				*CurrentLogicState = LS_Error;
+				CONTROL_SwitchToFault(FaultCode, FAULTEX_POFF_WRONG_STATE);
+				break;
+		}
+	}
+	else
+	{
+		*StateStorage = CDS_None;
+		*CurrentLogicState = NextLogicState;
+	}
+}
+//-----------------------------
+
 void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pDRCUConfig Config,
 		volatile LogicState *CurrentLogicState, LogicState NextLogicState)
 {
