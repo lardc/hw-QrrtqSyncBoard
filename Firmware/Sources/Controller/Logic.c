@@ -15,22 +15,6 @@
 #include "Controller.h"
 #include "ZbBoard.h"
 
-// Definitions
-//
-typedef struct __ExternalDeviceState
-{
-	Int16U DS_CROVU;
-	Int16U DS_FCROVU;
-	Int16U DS_DCU1;
-	Int16U DS_DCU2;
-	Int16U DS_DCU3;
-	Int16U DS_RCU1;
-	Int16U DS_RCU2;
-	Int16U DS_RCU3;
-	Int16U DS_CSU;
-	Int16U DS_SCOPE;
-} ExternalDeviceState;
-
 // Variables
 //
 volatile DeviceSubState LOGIC_StateRealTime = LSRT_None;
@@ -54,7 +38,6 @@ static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_DCReadyRetries, LOGIC_OperationResult, LOGIC_DriverOffTicks;
 static Int16U CSUVoltage = 0;
-//
 
 // Forward functions
 //
@@ -578,66 +561,7 @@ void LOGIC_PowerOnSequence()
 				break;
 				
 			case LS_PON_WaitStates:
-				{
-					if(Timeout > CONTROL_TimeCounter)
-					{
-						if(LOGIC_ExtDeviceState.DS_CROVU == DS_CROVU_READY
-								&& LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_READY
-								&& LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_READY
-								&& LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_READY
-								&& LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_READY
-								&& LOGIC_ExtDeviceState.DS_RCU1 == DS_RCU_READY
-								&& LOGIC_ExtDeviceState.DS_RCU2 == DS_RCU_READY
-								&& LOGIC_ExtDeviceState.DS_RCU3 == DS_RCU_READY
-								&& LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_NONE)
-						{
-							LOGIC_State = LS_None;
-						}
-					}
-					else
-					{
-						if(LOGIC_ExtDeviceState.DS_CROVU != DS_CROVU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_FCROVU != DS_FCROVU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_DCU1 != DS_DCU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_DCU2 != DS_DCU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_DCU3 != DS_DCU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_RCU1 != DS_RCU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_RCU2 != DS_RCU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_RCU3 != DS_RCU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_SCOPE != DS_SCOPE_NONE)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_PON_TIMEOUT);
-						}
-						else
-							CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, FAULTEX_PON_TIMEOUT);
-						
-						LOGIC_State = LS_Error;
-					}
-				}
+				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State);
 				break;
 		}
 		
@@ -774,66 +698,7 @@ void LOGIC_ConfigureSequence()
 				break;
 				
 			case LS_CFG_WaitStates:
-				{
-					if(Timeout > CONTROL_TimeCounter)
-					{
-						if(LOGIC_ExtDeviceState.DS_CROVU == DS_CROVU_READY
-								&& LOGIC_ExtDeviceState.DS_FCROVU == DS_FCROVU_READY
-								&& LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_CONFIG_READY
-								&& LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_CONFIG_READY
-								&& LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_CONFIG_READY
-								&& LOGIC_ExtDeviceState.DS_RCU1 == DS_DCU_CONFIG_READY
-								&& LOGIC_ExtDeviceState.DS_RCU2 == DS_DCU_CONFIG_READY
-								&& LOGIC_ExtDeviceState.DS_RCU3 == DS_DCU_CONFIG_READY
-								&& LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_IN_PROCESS)
-						{
-							LOGIC_State = LS_None;
-						}
-					}
-					else
-					{
-						if(LOGIC_ExtDeviceState.DS_CROVU != DS_CROVU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_FCROVU != DS_FCROVU_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_DCU1 != DS_DCU_CONFIG_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_DCU2 != DS_DCU_CONFIG_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_DCU3 != DS_DCU_CONFIG_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_RCU1 != DS_RCU_CONFIG_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_RCU2 != DS_RCU_CONFIG_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_RCU3 != DS_RCU_CONFIG_READY)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_PON_TIMEOUT);
-						}
-						else if(LOGIC_ExtDeviceState.DS_SCOPE != DS_SCOPE_NONE)
-						{
-							CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_PON_TIMEOUT);
-						}
-						else
-							CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, FAULTEX_PON_TIMEOUT);
-						
-						LOGIC_State = LS_Error;
-					}
-				}
+				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State);
 				break;
 		}
 		
@@ -1232,59 +1097,7 @@ void LOGIC_ReadDataSequence()
 				break;
 		}
 		
-		if(CONTROL_TimeCounter > Timeout && LOGIC_State != LS_None)
-		{
-			if(LOGIC_ExtDeviceState.DS_CROVU != DS_CROVU_READY)
-			{
-				// CROVU not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_READ_TIMEOUT);
-			}
-			if(LOGIC_ExtDeviceState.DS_FCROVU != DS_FCROVU_READY)
-			{
-				// FCROVU not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_READ_TIMEOUT);
-			}
-			else if(LOGIC_ExtDeviceState.DS_DCU1 != DS_DCU_READY)
-			{
-				// DCU1 not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_READ_TIMEOUT);
-			}
-			else if(LOGIC_ExtDeviceState.DS_DCU2 != DS_DCU_READY)
-			{
-				// DCU2 not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_READ_TIMEOUT);
-			}
-			else if(LOGIC_ExtDeviceState.DS_DCU3 != DS_DCU_READY)
-			{
-				// DCU3 not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_READ_TIMEOUT);
-			}
-			else if(LOGIC_ExtDeviceState.DS_RCU1 != DS_DCU_READY)
-			{
-				// RCU1 not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_READ_TIMEOUT);
-			}
-			else if(LOGIC_ExtDeviceState.DS_RCU2 != DS_DCU_READY)
-			{
-				// RCU2 not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_READ_TIMEOUT);
-			}
-			else if(LOGIC_ExtDeviceState.DS_RCU3 != DS_DCU_READY)
-			{
-				// RCU3 not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_READ_TIMEOUT);
-			}
-			else if(LOGIC_ExtDeviceState.DS_SCOPE != DS_SCOPE_NONE)
-			{
-				// SCOPE not ready
-				CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_TIMEOUT);
-			}
-			else
-				CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, FAULTEX_READ_TIMEOUT);
-			
-			LOGIC_State = LS_Error;
-		}
-		
+		CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State);
 		LOGIC_HandleCommunicationError();
 	}
 	else

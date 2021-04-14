@@ -74,6 +74,20 @@ typedef enum __DeviceSubState
 	LSRT_ReadDataPause			= 5
 } DeviceSubState;
 //
+typedef struct __ExternalDeviceState
+{
+	Int16U DS_CROVU;
+	Int16U DS_FCROVU;
+	Int16U DS_DCU1;
+	Int16U DS_DCU2;
+	Int16U DS_DCU3;
+	Int16U DS_RCU1;
+	Int16U DS_RCU2;
+	Int16U DS_RCU3;
+	Int16U DS_CSU;
+	Int16U DS_SCOPE;
+} ExternalDeviceState;
+//
 typedef struct __MeasurementResult
 {
 	Boolean DeviceTriggered;	// If device opened by on-state voltage
