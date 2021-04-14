@@ -720,8 +720,9 @@ void LOGIC_PowerOffPrepare()
 
 void LOGIC_PowerOffSequence()
 {
-	if(LOGIC_State == LS_POFF_CROVU || LOGIC_State == LS_POFF_FCROVU || LOGIC_State == LS_POFF_DCU
-			|| LOGIC_State == LS_POFF_RCU || LOGIC_State == LS_POFF_CSU || LOGIC_State == LS_POFF_SCOPE)
+	if(LOGIC_State == LS_POFF_CROVU || LOGIC_State == LS_POFF_FCROVU || LOGIC_State == LS_POFF_SCOPE
+			|| LOGIC_State == LS_POFF_DCU1 || LOGIC_State == LS_POFF_DCU2 || LOGIC_State == LS_POFF_DCU3
+			|| LOGIC_State == LS_POFF_RCU1 || LOGIC_State == LS_POFF_RCU2 || LOGIC_State == LS_POFF_RCU3)
 	{
 		if(!LOGIC_UpdateDeviceState())
 		{
@@ -732,166 +733,47 @@ void LOGIC_PowerOffSequence()
 		switch(LOGIC_State)
 		{
 			case LS_POFF_CROVU:
-				{
-					// Handle CROVU node
-					if(!EmulateCROVU)
-					{
-						switch(LOGIC_ExtDeviceState.DS_CROVU)
-						{
-							case DS_CROVU_NONE:
-							case DS_CROVU_READY:
-								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_DISABLE_POWER))
-									LOGIC_State = LS_POFF_FCROVU;
-								break;
-							default:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_POFF_WRONG_STATE);
-								break;
-						}
-					}
-					else
-					{
-						LOGIC_ExtDeviceState.DS_CROVU = DS_CROVU_NONE;
-						LOGIC_State = LS_POFF_FCROVU;
-					}
-				}
+				CMN_NodePowerOff(EmulateCROVU, REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_CROVU, &LOGIC_State,
+						FAULT_LOGIC_CROVU, LS_POFF_FCROVU);
 				break;
 				
 			case LS_POFF_FCROVU:
-				{
-					// Handle FCROVU node
-					if(!EmulateFCROVU)
-					{
-						switch(LOGIC_ExtDeviceState.DS_FCROVU)
-						{
-							case DS_FCROVU_NONE:
-							case DS_FCROVU_READY:
-								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_DISABLE_POWER))
-									LOGIC_State = LS_POFF_DCU;
-								break;
-							default:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_POFF_WRONG_STATE);
-								break;
-						}
-					}
-					else
-					{
-						LOGIC_ExtDeviceState.DS_FCROVU = DS_FCROVU_NONE;
-						LOGIC_State = LS_POFF_DCU;
-					}
-				}
+				CMN_NodePowerOff(EmulateFCROVU, REG_FCROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_FCROVU, &LOGIC_State,
+						FAULT_LOGIC_FCROVU, LS_POFF_DCU1);
 				break;
 				
-			case LS_POFF_DCU:
-				{
-					if(!EmulateDCU1)
-					{
-						switch(LOGIC_ExtDeviceState.DS_DCU1)
-						{
-							case DS_DCU_FAULT:
-							case DS_DCU_DISABLED:
-							case DS_DCU_IN_PROCESS:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_POFF_WRONG_STATE);
-								break;
-							default:
-								HLI_CAN_CallAction(DataTable[REG_DCU1_NODE_ID], ACT_DCU_DISABLE_POWER);
-								break;
-						}
-						
-						switch(LOGIC_ExtDeviceState.DS_DCU2)
-						{
-							case DS_DCU_FAULT:
-							case DS_DCU_DISABLED:
-							case DS_DCU_IN_PROCESS:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_POFF_WRONG_STATE);
-								break;
-							default:
-								HLI_CAN_CallAction(DataTable[REG_DCU2_NODE_ID], ACT_DCU_DISABLE_POWER);
-								break;
-						}
-						
-						switch(LOGIC_ExtDeviceState.DS_DCU3)
-						{
-							case DS_DCU_FAULT:
-							case DS_DCU_DISABLED:
-							case DS_DCU_IN_PROCESS:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_POFF_WRONG_STATE);
-								break;
-							default:
-								HLI_CAN_CallAction(DataTable[REG_DCU3_NODE_ID], ACT_DCU_DISABLE_POWER);
-								break;
-						}
-					}
-					else
-					{
-						LOGIC_ExtDeviceState.DS_DCU1 = DS_DCU_NONE;
-						LOGIC_ExtDeviceState.DS_DCU2 = DS_DCU_NONE;
-						LOGIC_ExtDeviceState.DS_DCU3 = DS_DCU_NONE;
-						LOGIC_State = LS_POFF_RCU;
-					}
-				}
+			case LS_POFF_DCU1:
+				CMN_NodePowerOff(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &LOGIC_State,
+						FAULT_LOGIC_DCU1, LS_POFF_DCU2);
+				break;
+
+			case LS_POFF_DCU2:
+				CMN_NodePowerOff(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &LOGIC_State,
+						FAULT_LOGIC_DCU2, LS_POFF_DCU3);
+				break;
+
+			case LS_POFF_DCU3:
+				CMN_NodePowerOff(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &LOGIC_State,
+						FAULT_LOGIC_DCU3, LS_POFF_RCU1);
+				break;
+
+			case LS_POFF_RCU1:
+				CMN_NodePowerOff(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1, &LOGIC_State,
+						FAULT_LOGIC_RCU1, LS_POFF_RCU2);
+				break;
+
+			case LS_POFF_RCU2:
+				CMN_NodePowerOff(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2, &LOGIC_State,
+						FAULT_LOGIC_RCU2, LS_POFF_RCU3);
 				break;
 				
-			case LS_POFF_RCU:
-				{
-					if(!EmulateRCU1)
-					{
-						switch(LOGIC_ExtDeviceState.DS_RCU1)
-						{
-							case DS_RCU_FAULT:
-							case DS_RCU_DISABLED:
-							case DS_RCU_IN_PROCESS:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_POFF_WRONG_STATE);
-								break;
-							default:
-								HLI_CAN_CallAction(DataTable[REG_RCU1_NODE_ID], ACT_RCU_DISABLE_POWER);
-								break;
-						}
-						
-						switch(LOGIC_ExtDeviceState.DS_RCU2)
-						{
-							case DS_RCU_FAULT:
-							case DS_RCU_DISABLED:
-							case DS_RCU_IN_PROCESS:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_POFF_WRONG_STATE);
-								break;
-							default:
-								HLI_CAN_CallAction(DataTable[REG_RCU2_NODE_ID], ACT_RCU_DISABLE_POWER);
-								break;
-						}
-						
-						switch(LOGIC_ExtDeviceState.DS_RCU3)
-						{
-							case DS_RCU_FAULT:
-							case DS_RCU_DISABLED:
-							case DS_RCU_IN_PROCESS:
-								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_POFF_WRONG_STATE);
-								break;
-							default:
-								HLI_CAN_CallAction(DataTable[REG_RCU3_NODE_ID], ACT_RCU_DISABLE_POWER);
-								break;
-						}
-					}
-					else
-					{
-						LOGIC_ExtDeviceState.DS_RCU1 = DS_RCU_NONE;
-						LOGIC_ExtDeviceState.DS_RCU2 = DS_RCU_NONE;
-						LOGIC_ExtDeviceState.DS_RCU3 = DS_RCU_NONE;
-						LOGIC_State = LS_POFF_SCOPE;
-					}
-				}
+			case LS_POFF_RCU3:
+				CMN_NodePowerOff(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3, &LOGIC_State,
+						FAULT_LOGIC_RCU3, LS_POFF_SCOPE);
 				break;
 				
 			case LS_POFF_SCOPE:
 				{
-					// Handle SCOPE node
 					if(!EmulateSCOPE)
 					{
 						switch(LOGIC_ExtDeviceState.DS_SCOPE)
@@ -1279,4 +1161,3 @@ void CSU_VoltageMeasuring(Int16U * const restrict pResults)
 	CSUVoltage = *(Int16U *)pResults /* (float)DataTable[REG_CSU_V_C]/1000;*/;
 }
 // ----------------------------------------
-
