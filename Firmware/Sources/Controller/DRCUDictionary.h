@@ -12,13 +12,8 @@
 // States
 typedef enum __DRCUDeviceState
 {
-	DRCU_DS_None = 0,
-	DRCU_DS_Fault = 1,
-	DRCU_DS_Disabled = 2,
-	DRCU_DS_Charging = 3,
-	DRCU_DS_Ready = 4,
-	DRCU_DS_ConfigReady = 5,
-	DRCU_DS_InProcess = 6
+	DRCU_DS_Charging = 5,
+	DRCU_DS_ConfigReady = 6,
 } DRCUDeviceState;
 
 #endif // __DRCU_DICTIONARY_H
