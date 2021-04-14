@@ -4,7 +4,16 @@
 // Include
 #include "stdinc.h"
 #include "CommonDictionary.h"
+#include "DRCUDictionary.h"
 #include "Logic.h"
+
+// Types
+typedef struct __DRCUConfig
+{
+	Int16U Current;
+	Int16U RiseRate;
+	Int16U FallRate;
+} DRCUConfig, *pDRCUConfig;
 
 // Functions
 Boolean CMN_UpdateNodeState(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage);
@@ -12,5 +21,7 @@ void CMN_ResetNodeFault(Boolean Emulate, Int16U NodeIDReg, Int16U StateStorage, 
 		LogicState NextLogicState);
 void CMN_NodePowerOn(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage,
 		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState);
+void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pDRCUConfig Config,
+		volatile LogicState *CurrentLogicState, LogicState NextLogicState);
 
 #endif // __COMMON_H

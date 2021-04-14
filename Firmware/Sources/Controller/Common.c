@@ -76,3 +76,22 @@ void CMN_NodePowerOn(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateSt
 	}
 }
 //-----------------------------
+
+void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pDRCUConfig Config,
+		volatile LogicState *CurrentLogicState, LogicState NextLogicState)
+{
+	if(!Emulate)
+	{
+		if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_MAX_VALUE, Config->Current))
+			if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE_RISE, Config->RiseRate))
+				if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE_FALL, Config->FallRate))
+					if(HLI_CAN_CallAction(DataTable[NodeIDReg], DCRU_ACT_CONFIG))
+						*CurrentLogicState = NextLogicState;
+	}
+	else
+	{
+		*StateStorage = CDS_Ready;
+		*CurrentLogicState = NextLogicState;
+	}
+}
+//-----------------------------
