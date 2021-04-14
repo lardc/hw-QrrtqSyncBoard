@@ -921,54 +921,50 @@ void LOGIC_ReadDataSequence()
 					if(!EmulateSCOPE)
 					{
 						Int16U Problem;
+						Boolean Result = TRUE;
 						
 						if(LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_NONE)
-							if(HLI_RS232_Read16(REG_SCOPE_FINISHED, &Register))
-								if(HLI_RS232_Read16(REG_SCOPE_PROBLEM, &Problem))
-									if(HLI_RS232_Read16(REG_SCOPE_RESULT_IRR, &Results[ResultsCounter].Irr))
-										if(HLI_RS232_Read16(REG_SCOPE_RESULT_TRR, &Results[ResultsCounter].Trr))
-											if(HLI_RS232_Read16(REG_SCOPE_RESULT_QRR, &Results[ResultsCounter].Qrr))
-												if(HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO,
-														&Results[ResultsCounter].ZeroI))
-													if(HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V,
-															&Results[ResultsCounter].ZeroV))
-														if(HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT,
-																&Results[ResultsCounter].dIdt))
-														{
-															if(Register == OPRESULT_NONE)
-															{
-																LOGIC_State = LS_Error;
-																CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE,
-																FAULTEX_READ_WRONG_STATE);
-															}
-															else if((Register == OPRESULT_FAIL
-																	&& Problem != PROBLEM_SCOPE_CALC_VZ)
-																	|| (Register == OPRESULT_FAIL
-																			&& Problem == PROBLEM_SCOPE_CALC_VZ
-																			&& !Results[ResultsCounter].DeviceTriggered))
-															{
-																LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
-															}
-															else if(Results[ResultsCounter].Irr > DC_Current)
-															{
-																LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
-															}
-															else
-															{
-																// Save results
-																Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
-																LOGIC_LogData(Results[ResultsCounter]);
-																
-																// Apply extended Tq logic
-																if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
-																	LOGIC_TqExtraLogic(
-																			Results[ResultsCounter].DeviceTriggered);
-																
-																LOGIC_State = LS_None;
-																
-																DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
-															}
-														}
+						{
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_FINISHED, &Register);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_PROBLEM, &Problem);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IRR, &Results[ResultsCounter].Irr);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TRR, &Results[ResultsCounter].Trr);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR, &Results[ResultsCounter].Qrr);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO, &Results[ResultsCounter].ZeroI);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
+
+							if(Result && Register == OPRESULT_NONE)
+							{
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE,
+								FAULTEX_READ_WRONG_STATE);
+							}
+							else if((Register == OPRESULT_FAIL && Problem != PROBLEM_SCOPE_CALC_VZ)
+									|| (Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ
+											&& !Results[ResultsCounter].DeviceTriggered))
+							{
+								LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
+							}
+							else if(Results[ResultsCounter].Irr > DC_Current)
+							{
+								LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
+							}
+							else
+							{
+								// Save results
+								Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
+								LOGIC_LogData(Results[ResultsCounter]);
+
+								// Apply extended Tq logic
+								if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
+									LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
+
+								LOGIC_State = LS_None;
+
+								DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
+							}
+						}
 					}
 					else
 					{
@@ -984,7 +980,6 @@ void LOGIC_ReadDataSequence()
 	}
 	else
 		CONTROL_RequestDPC(NULL);
-	
 }
 // ----------------------------------------
 
