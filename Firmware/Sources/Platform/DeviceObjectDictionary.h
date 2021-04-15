@@ -71,12 +71,6 @@
 #define REG_RCU3_NODE_ID			17	// RCU3 CAN node ID
 //
 // Заглушки
-#define REG_DCU1_ACTIVE				0	// DCU1 switching in active/deactive state
-#define REG_DCU2_ACTIVE				0	// DCU2 switching in active/deactive state
-#define REG_DCU3_ACTIVE				0	// DCU3 switching in active/deactive state
-#define REG_RCU1_ACTIVE				0	// RCU1 switching in active/deactive state
-#define REG_RCU2_ACTIVE				0	// RCU2 switching in active/deactive state
-#define REG_RCU3_ACTIVE				0	// RCU3 switching in active/deactive state
 #define REG_SAFETY_EN				20	// Safety enable
 #define REG_CSU_V_C					21 	// CSU voltage coefficient
 // ----------------------------------------
@@ -455,8 +449,6 @@
 #define WARNING_SCOPE_CALC_FAILED	3	// Calculations on scope node are failed
 #define WARNING_IRR_TO_HIGH			4	// Reverse current is too high
 #define WARNING_DEVICE_TRIGGERED	5	// Device remains in trigged state
-#define WARNING_DC_SET_TO_HIGH		6	// Idc set is to high
-#define WARNING_RC_SET_TO_HIGH		7	// Irc set is to high
 #define WARNING_WATCHDOG_RESET		1001	// System has been reseted by WD
 
 // DISABLE CODES

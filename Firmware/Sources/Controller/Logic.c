@@ -294,32 +294,6 @@ void LOGIC_CacheVariables()
 			CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
 		}
 		
-		if(DataTable[REG_DCU1_ACTIVE])
-			DC_CurrentMax = DRCU_CURRENT_MAX;
-		if(DataTable[REG_DCU2_ACTIVE])
-			DC_CurrentMax += DRCU_CURRENT_MAX;
-		if(DataTable[REG_DCU3_ACTIVE])
-			DC_CurrentMax += DRCU_CURRENT_MAX;
-		
-		if(DataTable[REG_RCU1_ACTIVE])
-			RC_CurrentMax = DRCU_CURRENT_MAX;
-		if(DataTable[REG_RCU2_ACTIVE])
-			RC_CurrentMax += DRCU_CURRENT_MAX;
-		if(DataTable[REG_RCU3_ACTIVE])
-			RC_CurrentMax += DRCU_CURRENT_MAX;
-		
-		if(RC_Current > RC_CurrentMax)
-		{
-			RC_Current = RC_CurrentMax;
-			DataTable[REG_WARNING] = WARNING_RC_SET_TO_HIGH;
-		}
-		
-		if(DC_Current > DC_CurrentMax)
-		{
-			DC_Current = DC_CurrentMax;
-			DataTable[REG_WARNING] = WARNING_DC_SET_TO_HIGH;
-		}
-		
 		LOGIC_PreciseEventInit(CROVU_TrigTime);
 		CacheUpdate = FALSE;
 	}
