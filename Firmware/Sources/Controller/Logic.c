@@ -585,7 +585,7 @@ void LOGIC_ConfigureSequence()
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_CROVU = DS_CROVU_READY;
+						LOGIC_ExtDeviceState.DS_CROVU = CDS_Ready;
 						LOGIC_State = LS_CFG_FCROVU;
 					}
 				}
@@ -804,8 +804,8 @@ void LOGIC_ReadDataSequence()
 				{
 					if(!EmulateCROVU)
 					{
-						if(LOGIC_ExtDeviceState.DS_CROVU == DS_CROVU_READY)
-							if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_TEST_RESULT, &Register))
+						if(LOGIC_ExtDeviceState.DS_CROVU == CDS_Ready)
+							if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
 							{
 								if(MeasurementMode == MODE_QRR_TQ)
 								{

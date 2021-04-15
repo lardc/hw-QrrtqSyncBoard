@@ -151,55 +151,12 @@
 // CROVU SLAVE COMMANDS, REGISTERS, STATES
 //
 // Commands
-#define ACT_CROVU_ENABLE_POWER		1	// Enable flyback converter
-#define ACT_CROVU_DISABLE_POWER		2	// Disable flyback converter
-#define ACT_CROVU_CLR_FAULT			3	// Clear fault (try switch state from FAULT to NONE)
-#define ACT_CROVU_CLR_WARNING		4	// Clear warning
-//
 #define ACT_CROVU_APPLY_SETTINGS	101	// Apply settings to cells
-//
 #define ACT_CROVU_ENABLE_EXT_SYNC	106	// Enable external SYNC
 //
 // Registers
 #define REG_CROVU_DESIRED_VOLTAGE	128	// Desired plate voltage
 #define REG_CROVU_VOLTAGE_RATE		129	// dV/dt rate
-//
-#define REG_CROVU_DEV_STATE			192	// Device state
-#define REG_CROVU_FAULT_REASON		193	// Fault reason in the case DeviceState -> FAULT
-#define REG_CROVU_DISABLE_REASON	194	// Disbale reason in the case DeviceState -> DISABLE
-#define REG_CROVU_WARNING			195	// Warning if present
-#define REG_CROVU_PROBLEM			196	// Problem if present
-//
-#define REG_CROVU_TEST_RESULT		198	// Test result
-#define REG_CROVU_FAULT_REASON_EX	199 // External fault code
-//
-#define REG_CROVU_VOLTAGE_OK		200	// Charged summary
-#define REG_CROVU_VOLTAGE_OK_1		201	// Charged flag 1
-#define REG_CROVU_VOLTAGE_OK_2		202	// Charged flag 2
-#define REG_CROVU_VOLTAGE_OK_3		203	// Charged flag 3
-#define REG_CROVU_VOLTAGE_OK_4		204	// Charged flag 4
-#define REG_CROVU_VOLTAGE_OK_5		205	// Charged flag 5
-#define REG_CROVU_VOLTAGE_OK_6		206	// Charged flag 6
-#define REG_CROVU_ACTUAL_VOLTAGE_1	207	// Actual capacitor level 1
-#define REG_CROVU_ACTUAL_VOLTAGE_2	208	// Actual capacitor level 2
-#define REG_CROVU_ACTUAL_VOLTAGE_3	209	// Actual capacitor level 3
-#define REG_CROVU_ACTUAL_VOLTAGE_4	210	// Actual capacitor level 4
-#define REG_CROVU_ACTUAL_VOLTAGE_5	211	// Actual capacitor level 5
-#define REG_CROVU_ACTUAL_VOLTAGE_6	212	// Actual capacitor level 6
-#define REG_CROVU_CELL_STATE_1		213	// Cell state 1
-#define REG_CROVU_CELL_STATE_2		214	// Cell state 2
-#define REG_CROVU_CELL_STATE_3		215	// Cell state 3
-#define REG_CROVU_CELL_STATE_4		216	// Cell state 4
-#define REG_CROVU_CELL_STATE_5		217	// Cell state 5
-#define REG_CROVU_CELL_STATE_6		218	// Cell state 6
-//
-// States
-#define DS_CROVU_NONE				0
-#define DS_CROVU_FAULT				1
-#define DS_CROVU_DISABLED			2
-#define DS_CROVU_READY				3
-#define DS_CROVU_IN_PROCESS			4
-#define DS_CROVU_EXT_SYNC			5
 //
 // ----------------------------------------
 
