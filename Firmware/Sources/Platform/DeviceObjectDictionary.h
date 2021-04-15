@@ -338,11 +338,6 @@
 // SCOPE SLAVE COMMANDS, REGISTERS, STATES
 //
 // Commands
-#define ACT_SCOPE_CLR_FAULT			3	// Clear fault (try switch state from FAULT to NONE)
-#define ACT_SCOPE_CLR_WARNING		4	// Clear warning
-//
-#define ACT_SCOPE_DIAG_GEN_READ_EP	10	// Fill diagnostic endpoint with values
-//
 #define ACT_SCOPE_START_TEST		100	// Start test with defined parameters
 #define ACT_SCOPE_STOP_TEST			101	// Force test to stop
 //
@@ -351,27 +346,13 @@
 #define REG_SCOPE_MEASURE_MODE		129	// Select sampling mode (Qrr or Qrr-tq)
 #define REG_SCOPE_TR_050_METHOD		130	// Use 50% level of Irr to detect tr time
 //
-#define REG_SCOPE_DEV_STATE			192	// Device state
-#define REG_SCOPE_FAULT_REASON		193	// Fault reason in the case DeviceState -> FAULT
-#define REG_SCOPE_DISABLE_REASON	194	// Disbale reason in the case DeviceState -> DISABLE
-#define REG_SCOPE_WARNING			195	// Warning if present
-#define REG_SCOPE_PROBLEM			196	// Problem if present
-#define REG_SCOPE_DF_REASON_EX		197	// Fault or disable extended reason
-//
 // Results
-#define REG_SCOPE_FINISHED			200	// Operation result
 #define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A)
 #define REG_SCOPE_RESULT_TRR		202	// Reverse recovery time (in us x10)
 #define REG_SCOPE_RESULT_QRR		203	// Reverse recovery charge (in uQ)
 #define REG_SCOPE_RESULT_ZERO		204	// Zero-cross time (in us x10)
 #define REG_SCOPE_RESULT_ZERO_V		205	// Zero-cross time for on-state voltage (in us x10)
 #define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x10)
-//
-// States
-#define DS_SCOPE_NONE				0
-#define DS_SCOPE_FAULT				1
-#define DS_SCOPE_DISABLED			2
-#define DS_SCOPE_IN_PROCESS			3
 //
 // Problems
 #define PROBLEM_SCOPE_NONE			0	// No problem

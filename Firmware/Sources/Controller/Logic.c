@@ -336,7 +336,7 @@ Boolean LOGIC_UpdateDeviceState()
 		return FALSE;
 	
 	if(!EmulateSCOPE)
-		if(HLI_RS232_Read16(REG_SCOPE_DEV_STATE, &Register))
+		if(HLI_RS232_Read16(COMM_REG_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.DS_SCOPE = Register;
 		else
 			return FALSE;
@@ -409,9 +409,9 @@ void LOGIC_FaultResetSequence()
 				break;
 				
 			case LS_CLR_SCOPE:
-				if(!EmulateSCOPE && (LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_FAULT))
+				if(!EmulateSCOPE && (LOGIC_ExtDeviceState.DS_SCOPE == CDS_Fault))
 				{
-					if(HLI_RS232_CallAction(ACT_SCOPE_CLR_FAULT))
+					if(HLI_RS232_CallAction(COMM_ACT_FAULT_CLEAR))
 						LOGIC_State = LS_None;
 				}
 				else
@@ -506,15 +506,15 @@ void LOGIC_PowerOnSequence()
 					{
 						switch(LOGIC_ExtDeviceState.DS_SCOPE)
 						{
-							case DS_SCOPE_FAULT:
-								if(HLI_RS232_CallAction(ACT_SCOPE_CLR_FAULT))
+							case CDS_Fault:
+								if(HLI_RS232_CallAction(COMM_ACT_FAULT_CLEAR))
 									LOGIC_State = LS_PON_WaitStates;
 								break;
-							case DS_SCOPE_DISABLED:
+							case CDS_Disabled:
 								LOGIC_State = LS_Error;
 								CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_PON_WRONG_STATE);
 								break;
-							case DS_SCOPE_IN_PROCESS:
+							case CDS_InProcess:
 								if(HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST))
 									LOGIC_State = LS_PON_WaitStates;
 								break;
@@ -525,7 +525,7 @@ void LOGIC_PowerOnSequence()
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_SCOPE = DS_SCOPE_NONE;
+						LOGIC_ExtDeviceState.DS_SCOPE = CDS_None;
 						LOGIC_State = LS_PON_WaitStates;
 					}
 					
@@ -645,7 +645,7 @@ void LOGIC_ConfigureSequence()
 					{
 						switch(LOGIC_ExtDeviceState.DS_SCOPE)
 						{
-							case DS_SCOPE_NONE:
+							case CDS_None:
 								{
 									if(HLI_RS232_Write16(REG_SCOPE_CURRENT_AMPL, DataTable[REG_DIRECT_CURRENT]))
 										if(HLI_RS232_Write16(REG_SCOPE_MEASURE_MODE, MeasurementMode))
@@ -655,14 +655,14 @@ void LOGIC_ConfigureSequence()
 													LOGIC_State = LS_CFG_WaitStates;
 								}
 								break;
-							case DS_SCOPE_IN_PROCESS:
+							case CDS_InProcess:
 								HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
 								break;
 						}
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_SCOPE = DS_SCOPE_IN_PROCESS;
+						LOGIC_ExtDeviceState.DS_SCOPE = CDS_InProcess;
 						LOGIC_State = LS_CFG_WaitStates;
 					}
 					
@@ -752,7 +752,7 @@ void LOGIC_PowerOffSequence()
 					{
 						switch(LOGIC_ExtDeviceState.DS_SCOPE)
 						{
-							case DS_SCOPE_IN_PROCESS:
+							case CDS_InProcess:
 								if(HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST))
 									LOGIC_State = LS_None;
 								break;
@@ -763,7 +763,7 @@ void LOGIC_PowerOffSequence()
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_SCOPE = DS_SCOPE_NONE;
+						LOGIC_ExtDeviceState.DS_SCOPE = CDS_None;
 						LOGIC_State = LS_None;
 					}
 				}
@@ -881,10 +881,10 @@ void LOGIC_ReadDataSequence()
 						Int16U Problem;
 						Boolean Result = TRUE;
 						
-						if(LOGIC_ExtDeviceState.DS_SCOPE == DS_SCOPE_NONE)
+						if(LOGIC_ExtDeviceState.DS_SCOPE == CDS_None)
 						{
-							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_FINISHED, &Register);
-							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_PROBLEM, &Problem);
+							if(Result) Result &= HLI_RS232_Read16(COMM_REG_OP_RESULT, &Register);
+							if(Result) Result &= HLI_RS232_Read16(COMM_REG_PROBLEM, &Problem);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IRR, &Results[ResultsCounter].Irr);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TRR, &Results[ResultsCounter].Trr);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR, &Results[ResultsCounter].Qrr);
