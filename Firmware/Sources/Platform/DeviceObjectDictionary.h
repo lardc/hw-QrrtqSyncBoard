@@ -207,37 +207,11 @@
 // FCROVU SLAVE COMMANDS, REGISTERS, STATES
 //
 // Commands
-#define ACT_FCROVU_ENABLE_POWER					1	// Power enable
-#define ACT_FCROVU_DISABLE_POWER				2	// Power disable
-#define ACT_FCROVU_FAULT_CLEAR					3	// Clear fault
-#define ACT_FCROVU_WARNING_CLEAR				4	// Clear warning
-//
-#define ACT_FCROVU_START_PULSE					100	// Start pulse
-#define ACT_FCROVU_CONFIG						101	// Aply settings
-//
+#define ACT_FCROVU_CONFIG			101	// Aply settings
 
 // Registers
-#define REG_FCROVU_V_RATE_VALUE					128	// dV/dt rate [V/us]
-#define REG_FCROVU_I_SHORT_CIRCUIT				130	// Short circiut current (400, 800, 1200, 1600)À
-//
-#define REG_FCROVU_DEV_STATE					192	// Device state
-#define REG_FCROVU_FAULT_REASON					193	// Fault reason
-#define REG_FCROVU_DISABLE_REASON				194	// Disable reason
-#define REG_FCROVU_WARNING						195	// Warning
-#define REG_FCROVU_PROBLEM						196	// Problem
-#define REG_FCROVU_TEST_FINISHED				197
-//
-#define REG_FCROVU_DBG_VSO_VALUE				200	// Battery volatge (V)
-//
-
-// States
-#define DS_FCROVU_NONE							0
-#define DS_FCROVU_FAULT							1
-#define DS_FCROVU_DISABLED						2
-#define DS_FCROVU_CHARGING						3
-#define DS_FCROVU_READY							4
-#define DS_FCROVU_CONFIG_READY					5
-#define DS_FCROVU_IN_PROCESS					6
+#define REG_FCROVU_V_RATE_VALUE		128	// dV/dt rate [V/us]
+#define REG_FCROVU_I_SHORT_CIRCUIT	130	// Short circiut current (400, 800, 1200, 1600)À
 //
 // ----------------------------------------
 
