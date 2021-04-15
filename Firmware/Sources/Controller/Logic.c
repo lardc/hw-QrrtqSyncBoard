@@ -495,7 +495,7 @@ void LOGIC_PowerOnSequence()
 					if(!EmulateCSU)
 						ZbGPIO_CSU_PWRCtrl(TRUE);
 					else
-						LOGIC_ExtDeviceState.DS_CSU = DS_CSU_READY;
+						LOGIC_ExtDeviceState.DS_CSU = CDS_Ready;
 					LOGIC_State = LS_PON_SCOPE;
 				}
 				break;
