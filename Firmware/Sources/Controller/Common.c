@@ -191,3 +191,21 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState 
 	}
 }
 //-----------------------------
+
+Boolean CMN_ReadDRCUCurrent(Boolean Emulate, Int16U NodeIDReg, Int16U StateStorage, pInt16U Current)
+{
+	if(!Emulate)
+	{
+		if(StateStorage == DRCU_DS_Charging || StateStorage == CDS_Ready)
+			if(HLI_CAN_Read16(DataTable[NodeIDReg], DRCU_REG_CURRENT, Current))
+				return TRUE;
+	}
+	else
+	{
+		*Current = 0;
+		return TRUE;
+	}
+
+	return FALSE;
+}
+//-----------------------------

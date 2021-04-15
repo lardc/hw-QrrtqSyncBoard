@@ -9,6 +9,8 @@
 #define DRCU_REG_I_RATE_RISE				130	// Direct current rise rate A/us
 #define DRCU_REG_I_RATE_FALL				131	// Direct current fall rate A/us
 
+#define DRCU_REG_CURRENT					200	// Sampled current value
+
 // States
 typedef enum __DRCUDeviceState
 {

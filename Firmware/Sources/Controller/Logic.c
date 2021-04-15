@@ -888,31 +888,15 @@ void LOGIC_ReadDataSequence()
 				
 			case LS_READ_DCU:
 				{
-					if(!EmulateDCU1)
-					{
-						Int16U Idc1Temp = 0, Idc2Temp = 0, Idc3Temp = 0;
-						
-						LOGIC_State = LS_READ_SCOPE;
-						
-						if(DataTable[REG_DCU1_ACTIVE])
-							if(LOGIC_ExtDeviceState.DS_DCU1 == DS_DCU_CHARGING)
-								if(!HLI_CAN_Read16(DataTable[REG_DCU1_NODE_ID], REG_DCU_DBG_I_MAX_DUT_VALUE, &Idc1Temp))
-									LOGIC_State = LS_READ_DCU;
-						
-						if(DataTable[REG_DCU2_ACTIVE])
-							if(LOGIC_ExtDeviceState.DS_DCU2 == DS_DCU_CHARGING)
-								if(!HLI_CAN_Read16(DataTable[REG_DCU2_NODE_ID], REG_DCU_DBG_I_MAX_DUT_VALUE, &Idc2Temp))
-									LOGIC_State = LS_READ_DCU;
-						
-						if(DataTable[REG_DCU3_ACTIVE])
-							if(LOGIC_ExtDeviceState.DS_DCU3 == DS_DCU_CHARGING)
-								if(!HLI_CAN_Read16(DataTable[REG_DCU3_NODE_ID], REG_DCU_DBG_I_MAX_DUT_VALUE, &Idc3Temp))
-									LOGIC_State = LS_READ_DCU;
-						
-						Results[ResultsCounter].Idc = Idc1Temp + Idc2Temp + Idc3Temp;
-					}
-					else
-						LOGIC_State = LS_READ_SCOPE;
+					Int16U Idc1Temp = 0, Idc2Temp = 0, Idc3Temp = 0;
+
+					if(CMN_ReadDRCUCurrent(EmulateDCU1, REG_DCU1_NODE_ID, LOGIC_ExtDeviceState.DS_DCU1, &Idc1Temp))
+						if(CMN_ReadDRCUCurrent(EmulateDCU2, REG_DCU2_NODE_ID, LOGIC_ExtDeviceState.DS_DCU2, &Idc2Temp))
+							if(CMN_ReadDRCUCurrent(EmulateDCU3, REG_DCU3_NODE_ID, LOGIC_ExtDeviceState.DS_DCU3, &Idc3Temp))
+							{
+								LOGIC_State = LS_READ_SCOPE;
+								Results[ResultsCounter].Idc = Idc1Temp + Idc2Temp + Idc3Temp;
+							}
 				}
 				break;
 				
