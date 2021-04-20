@@ -1073,7 +1073,6 @@ void LOGIC_SafetyProblem()
 void CONTROL_CSU()
 {
 	// Control voltage
-	//
 	ZwADC_StartSEQ1();
 	
 	if(CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
@@ -1093,10 +1092,8 @@ void CONTROL_CSU()
 		ZbGPIO_CSU_PWRCtrl(FALSE);
 		ZbGPIO_CSU_Disch(FALSE);
 	}
-	//
 	
 	// Control FAN
-	//
 	if(LOGIC_StateRealTime == LSRT_DirectPulseStart)
 	{
 		ZbGPIO_CSU_FAN(TRUE);
@@ -1105,7 +1102,6 @@ void CONTROL_CSU()
 	
 	if(CONTROL_TimeCounter > CSU_FanTimeout + CSU_FAN_TIMEOUT)
 		ZbGPIO_CSU_FAN(FALSE);
-	//
 }
 // ----------------------------------------
 

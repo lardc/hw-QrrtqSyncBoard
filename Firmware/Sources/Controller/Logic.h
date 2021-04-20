@@ -60,12 +60,12 @@ typedef enum __LogicState
 	LS_POFF_CSU,
 	LS_POFF_SCOPE,
 	//
-	LS_READ_CROVU		= 22,
-	LS_READ_FCROVU		= 23,
-	LS_READ_DCU			= 24,
-	LS_READ_RCU			= 25,
-	LS_READ_CSU			= 26,
-	LS_READ_SCOPE		= 27
+	LS_READ_CROVU		= 500,
+	LS_READ_FCROVU,
+	LS_READ_DCU,
+	LS_READ_RCU,
+	LS_READ_CSU,
+	LS_READ_SCOPE
 } LogicState;
 //
 typedef enum __DeviceSubState
