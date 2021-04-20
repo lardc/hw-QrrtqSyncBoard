@@ -66,37 +66,39 @@ void PRESSURE_Handler();
 void CONTROL_Init(Boolean BadClockDetected)
 {
 	// Variables for endpoint configuration
-	Int16U EPIndexes[EP_COUNT] = { EP_Current, EP_Voltage,
-			EP_DIAG1_DevTrig, EP_DIAG2_OSVTime, EP_DIAG3_Irr, EP_DIAG4_Trr,
-			EP_DIAG5_Qrr, EP_DIAG6_Idc, EP_DIAG7_ZeroI, EP_DIAG8_ZeroV, EP_DIAG9_dIdt, EP_SlaveData };
-
-	Int16U EPSized[EP_COUNT] = { VALUES_x_SIZE, VALUES_x_SIZE,
-			UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES,
-			UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, VALUES_x_SIZE };
-
-	pInt16U EPCounters[EP_COUNT] = { (pInt16U)&CONTROL_Values_1_Counter, (pInt16U)&CONTROL_Values_2_Counter,
-			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
-			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
-			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_Values_Slave_Counter };
-
-	pInt16U EPDatas[EP_COUNT] = { CONTROL_Values_1, CONTROL_Values_2,
-			CONTROL_ValDiag1, CONTROL_ValDiag2, CONTROL_ValDiag3, CONTROL_ValDiag4,
-			CONTROL_ValDiag5, CONTROL_ValDiag6, CONTROL_ValDiag7, CONTROL_ValDiag8, CONTROL_ValDiag9, CONTROL_Values_Slave };
-
+	Int16U EPIndexes[EP_COUNT] = {EP_Current, EP_Voltage,
+	EP_DIAG1_DevTrig, EP_DIAG2_OSVTime, EP_DIAG3_Irr, EP_DIAG4_Trr,
+	EP_DIAG5_Qrr, EP_DIAG6_Idc, EP_DIAG7_ZeroI, EP_DIAG8_ZeroV, EP_DIAG9_dIdt, EP_SlaveData};
+	
+	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE,
+	UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES,
+	UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES,
+			UNIT_MAX_NUM_OF_PULSES, VALUES_x_SIZE};
+	
+	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_1_Counter, (pInt16U)&CONTROL_Values_2_Counter,
+			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
+			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
+			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
+			(pInt16U)&CONTROL_Values_Slave_Counter};
+	
+	pInt16U EPDatas[EP_COUNT] = {CONTROL_Values_1, CONTROL_Values_2, CONTROL_ValDiag1, CONTROL_ValDiag2,
+			CONTROL_ValDiag3, CONTROL_ValDiag4, CONTROL_ValDiag5, CONTROL_ValDiag6, CONTROL_ValDiag7, CONTROL_ValDiag8,
+			CONTROL_ValDiag9, CONTROL_Values_Slave};
+	
 	// Data-table EPROM service configuration
-	EPROMServiceConfig EPROMService = { &ZbMemory_WriteValuesEPROM, &ZbMemory_ReadValuesEPROM };
-
+	EPROMServiceConfig EPROMService = {&ZbMemory_WriteValuesEPROM, &ZbMemory_ReadValuesEPROM};
+	
 	// Init data table
 	DT_Init(EPROMService, BadClockDetected);
 	// Fill state variables with default values
 	CONTROL_FillWPPartDefault();
-
+	
 	// Device profile initialization
 	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive);
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
-
+	
 	if(!BadClockDetected)
 	{
 		if(ZwSystem_GetDogAlarmFlag())
@@ -110,7 +112,7 @@ void CONTROL_Init(Boolean BadClockDetected)
 		DataTable[REG_DISABLE_REASON] = DISABLE_BAD_CLOCK;
 		CONTROL_SetDeviceState(DS_Disabled);
 	}
-
+	
 	ZwADC_SubscribeToResults1(&CSU_VoltageMeasuring);
 }
 // ----------------------------------------
@@ -125,48 +127,48 @@ void CONTROL_Idle()
 {
 	// Handle RS232 to PC interface re-init
 	CONTROL_ReinitRS232();
-
+	
 	// Process external interface requests
 	DEVPROFILE_ProcessRequests();
-
+	
 	// Update CAN bus status
 	DEVPROFILE_UpdateCANDiagStatus();
-
+	
 	// Check high-level interface status
 	CONTROL_StatusHLI();
-
+	
 	// Check long-execution process
 	CONTROL_SubProcessStateMachine();
-
+	
 	// Control CSU
 	CONTROL_CSU();
-
+	
 	// Update high-level logic state
 	DataTable[REG_LOGIC_STATE] = LOGIC_GetState();
-
+	
 	// Process deferred procedures
 	FUNC_AsyncDelegate DPCDelegateCopy = DPCDelegate;
-	if (DPCDelegateCopy)
+	if(DPCDelegateCopy)
 		DPCDelegateCopy();
 }
 // ----------------------------------------
 
 #ifdef BOOT_FROM_FLASH
-	#pragma CODE_SECTION(CONTROL_Update, "ramfuncs");
+#pragma CODE_SECTION(CONTROL_Update, "ramfuncs");
 #endif
 void CONTROL_Update()
 {
 	// Handle CAN-master interface requests
-	//BCCIM_Process(&DEVICE_CAN_Master_Interface);
-
+	BCCIM_Process(&DEVICE_CAN_Master_Interface);
+	
 	// Process real-time tasks
-	//LOGIC_RealTime();
-
+	LOGIC_RealTime();
+	
 	// Safety handler
-	//SAFETY_Handler();
-
+	SAFETY_Handler();
+	
 	// Pressure handler
-	//PRESSURE_Handler();
+	PRESSURE_Handler();
 }
 // ----------------------------------------
 
@@ -207,7 +209,7 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_SLAVE_EXTDATA] = 0;
 	//
 	DataTable[REG_DC_READY_RETRIES] = 0;
-
+	
 	DataTable[REG_FINISHED] = OPRESULT_NONE;
 	DataTable[REG_RES_QRR] = 0;
 	DataTable[REG_RES_IRR] = 0;
@@ -234,7 +236,7 @@ void CONTROL_SwitchToFault(Int16U FaultReason, Int16U FaultReasonExt)
 void CONTROL_StatusHLI()
 {
 	HLIError err = HLI_GetError();
-	if (err.ErrorCode != ERR_NO_ERROR)
+	if(err.ErrorCode != ERR_NO_ERROR)
 	{
 		DataTable[REG_SLAVE_DEVICE] = err.Device;
 		DataTable[REG_SLAVE_FUNC] = err.Func;
@@ -246,12 +248,12 @@ void CONTROL_StatusHLI()
 
 void CONTROL_ReinitRS232()
 {
-	if (!ReinitRS232 && CONTROL_TimeCounter > TIMEOUT_REINIT_RS232)
+	if(!ReinitRS232 && CONTROL_TimeCounter > TIMEOUT_REINIT_RS232)
 	{
 		ZwSCIa_Init(SCIA_BR, SCIA_DB, SCIA_PARITY, SCIA_SB, FALSE);
 		ZwSCIa_InitFIFO(16, 0);
 		ZwSCIa_EnableInterrupts(FALSE, FALSE);
-
+		
 		ReinitRS232 = TRUE;
 	}
 }
@@ -261,48 +263,48 @@ void CONTROL_Start(Boolean SinglePulse)
 {
 	DEVPROFILE_ResetEPReadState();
 	DEVPROFILE_ResetScopes(0, 0xFFFF);
-
+	
 	CONTROL_FillWPPartDefault();
-
+	
 	CONTROL_SetDeviceState(DS_InProcess);
 	LOGIC_StateRealTime = LSRT_WaitForConfig;
-
+	
 	CONTROL_PulseToPulsePause = CONTROL_TimeCounter;
 	LOGIC_CacheUpdateSettings(TRUE, SinglePulse);
 	LOGIC_ConfigurePrepare();
-
+	
 	COMMUTATION_Control(TRUE);
 }
 // ----------------------------------------
 
 void CONTROL_SubProcessStateMachine()
 {
-	if (CONTROL_State == DS_PowerOn)
+	if(CONTROL_State == DS_PowerOn)
 	{
-		if (LOGIC_GetState() == LS_None)
+		if(LOGIC_GetState() == LS_None)
 			CONTROL_SetDeviceState(DS_Ready);
 	}
-
-	if (CONTROL_State == DS_InProcess)
+	
+	if(CONTROL_State == DS_InProcess)
 	{
-		if (LOGIC_StateRealTime == LSRT_WaitForConfig)
+		if(LOGIC_StateRealTime == LSRT_WaitForConfig)
 		{
-			if (LOGIC_GetState() == LS_None && CONTROL_TimeCounter > CONTROL_PulseToPulsePause)
+			if(LOGIC_GetState() == LS_None && CONTROL_TimeCounter > CONTROL_PulseToPulsePause)
 			{
 				LOGIC_RealTimeCounter = 0;
-
+				
 				ZbGPIO_CSU_Sync(TRUE);
 				ZbGPIO_DUT_Control(TRUE);
 				ZbGPIO_DUT_Switch(TRUE);
 				ZbGPIO_DCU_Sync(TRUE);
 				ZbGPIO_DUT_Switch(TRUE);
-
+				
 				LOGIC_StateRealTime = LSRT_DirectPulseStart;
 			}
 		}
-		else if (LOGIC_GetState() == LS_None && LOGIC_StateRealTime == LSRT_None)
+		else if(LOGIC_GetState() == LS_None && LOGIC_StateRealTime == LSRT_None)
 		{
-			if (LOGIC_GetPulsesRemain() == 0)
+			if(LOGIC_GetPulsesRemain() == 0)
 			{
 				LOGIC_ResultToDataTable();
 				DataTable[REG_FINISHED] = LOGIC_GetOpResult();
@@ -311,13 +313,15 @@ void CONTROL_SubProcessStateMachine()
 			}
 			else
 			{
-				CONTROL_PulseToPulsePause = CONTROL_TimeCounter +
-					(LOGIC_DCPulseFormed() ? (LOGIC_DUTTriggered() ? UNIT_PULSE_TO_PULSE_PAUSE : UNIT_PULSE_TO_PULSE_FAST) : UNIT_PULSE_TO_PULSE_LONG);
-
+				CONTROL_PulseToPulsePause = CONTROL_TimeCounter
+						+ (LOGIC_DCPulseFormed() ?
+								(LOGIC_DUTTriggered() ? UNIT_PULSE_TO_PULSE_PAUSE : UNIT_PULSE_TO_PULSE_FAST) :
+								UNIT_PULSE_TO_PULSE_LONG);
+				
 				LOGIC_StateRealTime = LSRT_WaitForConfig;
 				LOGIC_ConfigurePrepare();
 			}
-
+			
 		}
 	}
 }
@@ -329,56 +333,56 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 	{
 		case ACT_ENABLE_POWER:
 			{
-				if (CONTROL_State == DS_None)
+				if(CONTROL_State == DS_None)
 				{
 					CONTROL_SetDeviceState(DS_PowerOn);
 					LOGIC_PowerOnPrepare();
 				}
-				else if (CONTROL_State != DS_PowerOn && CONTROL_State != DS_Ready)
+				else if(CONTROL_State != DS_PowerOn && CONTROL_State != DS_Ready)
 					*UserError = ERR_OPERATION_BLOCKED;
 			}
 			break;
-
+			
 		case ACT_DISABLE_POWER:
 			{
-				if (CONTROL_State == DS_Ready)
+				if(CONTROL_State == DS_Ready)
 				{
 					CONTROL_SetDeviceState(DS_None);
 					LOGIC_PowerOffPrepare();
 				}
-				else if (CONTROL_State != DS_None)
+				else if(CONTROL_State != DS_None)
 					*UserError = ERR_DEVICE_NOT_READY;
 			}
 			break;
-
+			
 		case ACT_START:
 			{
 				(CONTROL_State == DS_Ready) ? CONTROL_Start(FALSE) : (*UserError = ERR_DEVICE_NOT_READY);
 			}
 			break;
-
+			
 		case ACT_SINGLE_START:
 			{
 				(CONTROL_State == DS_Ready) ? CONTROL_Start(TRUE) : (*UserError = ERR_DEVICE_NOT_READY);
 			}
 			break;
-
+			
 		case ACT_STOP:
 			{
 				LOGIC_AbortMeasurement(WARNING_MANUAL_STOP);
 				CONTROL_SwitchToReady();
 			}
 			break;
-
+			
 		case ACT_CLR_FAULT:
-			if (CONTROL_State == DS_Fault || CONTROL_State == DS_None)
+			if(CONTROL_State == DS_Fault || CONTROL_State == DS_None)
 			{
 				CONTROL_RequestDPC(NULL);
 				LOGIC_ResetState();
 				HLI_ResetError();
 				CONTROL_FillWPPartDefault();
-
-				if (CONTROL_State == DS_Fault)
+				
+				if(CONTROL_State == DS_Fault)
 				{
 					LOGIC_CacheUpdateSettings(FALSE, FALSE);
 					LOGIC_FaultResetPrepare();
@@ -388,17 +392,19 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			else
 				*UserError = ERR_OPERATION_BLOCKED;
 			break;
-
+			
 		case ACT_CLR_WARNING:
 			DataTable[REG_WARNING] = WARNING_NONE;
 			break;
-
+			
 		case ACT_DIAG_READ_REG:
 			{
 				Int16U val;
-				Boolean ret = (DataTable[REG_DIAG_NID] == 0) ? 	HLI_RS232_Read16(DataTable[REG_DIAG_IN_1], &val) :
-																HLI_CAN_Read16(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1], &val);
-				if (ret)
+				Boolean ret =
+						(DataTable[REG_DIAG_NID] == 0) ?
+								HLI_RS232_Read16(DataTable[REG_DIAG_IN_1], &val) :
+								HLI_CAN_Read16(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1], &val);
+				if(ret)
 				{
 					DataTable[REG_DIAG_OUT_1] = ERR_NO_ERROR;
 					DataTable[REG_DIAG_OUT_2] = val;
@@ -410,12 +416,15 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				}
 			}
 			break;
-
+			
 		case ACT_DIAG_WRITE_REG:
 			{
-				Boolean ret = (DataTable[REG_DIAG_NID] == 0) ? 	HLI_RS232_Write16(DataTable[REG_DIAG_IN_1], DataTable[REG_DIAG_IN_2]) :
-																HLI_CAN_Write16(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1], DataTable[REG_DIAG_IN_2]);
-				if (ret)
+				Boolean ret =
+						(DataTable[REG_DIAG_NID] == 0) ?
+								HLI_RS232_Write16(DataTable[REG_DIAG_IN_1], DataTable[REG_DIAG_IN_2]) :
+								HLI_CAN_Write16(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1],
+										DataTable[REG_DIAG_IN_2]);
+				if(ret)
 					DataTable[REG_DIAG_OUT_1] = ERR_NO_ERROR;
 				else
 				{
@@ -424,12 +433,14 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				}
 			}
 			break;
-
+			
 		case ACT_DIAG_CALL:
 			{
-				Boolean ret = (DataTable[REG_DIAG_NID] == 0) ? 	HLI_RS232_CallAction(DataTable[REG_DIAG_IN_1]) :
-																HLI_CAN_CallAction(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1]);
-				if (ret)
+				Boolean ret =
+						(DataTable[REG_DIAG_NID] == 0) ?
+								HLI_RS232_CallAction(DataTable[REG_DIAG_IN_1]) :
+								HLI_CAN_CallAction(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1]);
+				if(ret)
 					DataTable[REG_DIAG_OUT_1] = ERR_NO_ERROR;
 				else
 				{
@@ -438,15 +449,19 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				}
 			}
 			break;
-
+			
 		case ACT_DIAG_READ_EP:
 			{
 				DEVPROFILE_ResetEPReadState();
 				DEVPROFILE_ResetScopes(0, BIT10);
-
-				Boolean ret = (DataTable[REG_DIAG_NID] == 0) ? 	HLI_RS232_ReadArray16(DataTable[REG_DIAG_IN_1], CONTROL_Values_Slave, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_Slave_Counter) :
-																HLI_CAN_ReadArray16(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1], CONTROL_Values_Slave, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_Slave_Counter);
-				if (ret)
+				
+				Boolean ret =
+						(DataTable[REG_DIAG_NID] == 0) ?
+								HLI_RS232_ReadArray16(DataTable[REG_DIAG_IN_1], CONTROL_Values_Slave, VALUES_x_SIZE,
+										(pInt16U)&CONTROL_Values_Slave_Counter) :
+								HLI_CAN_ReadArray16(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1],
+										CONTROL_Values_Slave, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_Slave_Counter);
+				if(ret)
 				{
 					DataTable[REG_DIAG_OUT_1] = ERR_NO_ERROR;
 					DataTable[REG_DIAG_OUT_2] = CONTROL_Values_Slave_Counter;
@@ -458,16 +473,16 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				}
 			}
 			break;
-
+			
 		case ACT_DIAG_FILL_RESULTS:
 			{
 				Int16U i;
 				MeasurementResult Result;
-
+				
 				DEVPROFILE_ResetEPReadState();
 				DEVPROFILE_ResetScopes(0, 0xFFFF);
-
-				for (i = 0; i < UNIT_MAX_NUM_OF_PULSES; ++i)
+				
+				for(i = 0; i < UNIT_MAX_NUM_OF_PULSES; ++i)
 				{
 					Result.DeviceTriggered = i % 2;
 					Result.OSVApplyTime = i + 10;
@@ -477,12 +492,12 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 					Result.Idc = i + 50;
 					Result.ZeroI = i + 60;
 					Result.ZeroV = i + 70;
-
+					
 					LOGIC_LogData(Result);
 				}
 			}
 			break;
-
+			
 		case ACT_DIAG_TURN_ON_PC:
 			{
 				ZbGPIO_PC_TurnOn(TRUE);
@@ -490,7 +505,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_PC_TurnOn(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_DUT:
 			{
 				ZbGPIO_DUT_Control(TRUE);
@@ -498,7 +513,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_DUT_Control(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_SW_DUT:
 			{
 				ZbGPIO_DUT_Switch(TRUE);
@@ -506,7 +521,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_DUT_Switch(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_DC_SYNC:
 			{
 				ZbGPIO_DCU_Sync(TRUE);
@@ -514,7 +529,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_DCU_Sync(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_RC_SYNC:
 			{
 				ZbGPIO_RCU_Sync(TRUE);
@@ -522,7 +537,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_RCU_Sync(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_CSU_PS:
 			{
 				ZbGPIO_CSU_PWRCtrl(TRUE);
@@ -530,7 +545,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_CSU_PWRCtrl(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_CSU_DISCH:
 			{
 				ZbGPIO_CSU_Disch(TRUE);
@@ -538,7 +553,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_CSU_Disch(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_CSU_FAN:
 			{
 				ZbGPIO_CSU_FAN(TRUE);
@@ -546,7 +561,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_CSU_FAN(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_CSU_SYNC:
 			{
 				ZbGPIO_CSU_Sync(TRUE);
@@ -554,7 +569,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_CSU_Sync(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_SCOPE:
 			{
 				ZbGPIO_SCOPE_Sync(TRUE);
@@ -562,7 +577,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_SCOPE_Sync(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_FCROVU:
 			{
 				ZbGPIO_FCROVU_Sync(TRUE);
@@ -570,7 +585,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_FCROVU_Sync(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_SB:
 			{
 				ZbGPIO_SensingBoardEnable(TRUE);
@@ -578,7 +593,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_SensingBoardEnable(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_QCUHC:
 			{
 				ZbGPIO_QCUHCEnable(TRUE);
@@ -586,7 +601,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_QCUHCEnable(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_PULSE_GATE_RELAY:
 			{
 				ZbGPIO_DUT_ControlEnable(TRUE);
@@ -594,30 +609,26 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_DUT_ControlEnable(FALSE);
 			}
 			break;
-
+			
 		case ACT_DIAG_QRR_PULSE:
 			{
 				int i;
-
+				
 				ZbGPIO_DCU_Sync(TRUE);
 				DELAY_US(3000);
-
-				if((DataTable[REG_RCU_SYNC_DELAY] - DataTable[REG_DCU_SYNC_DELAY]) != 0)
+				
+				if(DataTable[REG_RCU_SYNC_DELAY] - DataTable[REG_DCU_SYNC_DELAY])
 				{
 					if(DataTable[REG_DCU_SYNC_DELAY])
 					{
 						ZbGPIO_RCU_Sync(TRUE);
-
-						for(i=0;i<DataTable[REG_DCU_SYNC_DELAY];i++){}
-
+						for(i = 0; i < DataTable[REG_DCU_SYNC_DELAY]; i++);
 						ZbGPIO_DCU_Sync(FALSE);
 					}
 					else
 					{
 						ZbGPIO_DCU_Sync(FALSE);
-
-						for(i=0;i<DataTable[REG_RCU_SYNC_DELAY];i++){}
-
+						for(i = 0; i < DataTable[REG_RCU_SYNC_DELAY]; i++);
 						ZbGPIO_RCU_Sync(TRUE);
 					}
 				}
@@ -626,17 +637,16 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 					ZbGPIO_DCU_Sync(FALSE);
 					ZbGPIO_RCU_Sync(TRUE);
 				}
-
-
+				
 				DELAY_US(1000);
 				ZbGPIO_RCU_Sync(FALSE);
 			}
 			break;
-
+			
 		default:
 			return FALSE;
 	}
-
+	
 	return TRUE;
 }
 // ----------------------------------------
@@ -653,7 +663,7 @@ void SAFETY_Handler()
 {
 	if((CONTROL_State == DS_InProcess) && ZbGPIO_SafetyCheck())
 		LOGIC_SafetyProblem();
-
+	
 	// Safety system enable
 	ZbGPIO_SafetyEnable(DataTable[REG_SAFETY_EN]);
 }
@@ -665,5 +675,3 @@ void PRESSURE_Handler()
 		CONTROL_SwitchToFault(FAULT_PRESSURE, 0);
 }
 // ----------------------------------------
-
-// No more.
