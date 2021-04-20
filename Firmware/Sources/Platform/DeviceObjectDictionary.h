@@ -60,7 +60,7 @@
 #define REG_EMULATE_RCU3			7	// Enable RCU3 emulation
 #define REG_EMULATE_SCOPE			8	// Enable SCOPE emulation
 #define REG_EMULATE_CSU				9	// Enable CSU emulation
-//
+
 #define REG_CROVU_NODE_ID			10	// DCU1 CAN node ID
 #define REG_FCROVU_NODE_ID			11	// DCU1 CAN node ID
 #define REG_DCU1_NODE_ID			12	// DCU1 CAN node ID
@@ -69,10 +69,22 @@
 #define REG_RCU1_NODE_ID			15	// RCU1 CAN node ID
 #define REG_RCU2_NODE_ID			16	// RCU2 CAN node ID
 #define REG_RCU3_NODE_ID			17	// RCU3 CAN node ID
-//
-// Заглушки
+
 #define REG_SAFETY_EN				20	// Safety enable
 #define REG_CSU_V_C					21 	// CSU voltage coefficient
+
+#define REG_RCU_TOFFS_R050			30	// Сдвиг срабатывания синхронизации RCU при 0.5А/мкс
+#define REG_RCU_TOFFS_R075			31	// Сдвиг срабатывания синхронизации RCU при 0.75А/мкс
+#define REG_RCU_TOFFS_R100			32	// Сдвиг срабатывания синхронизации RCU при 1А/мкс
+#define REG_RCU_TOFFS_R250			33	// Сдвиг срабатывания синхронизации RCU при 2.5А/мкс
+#define REG_RCU_TOFFS_R500			34	// Сдвиг срабатывания синхронизации RCU при 5А/мкс
+#define REG_RCU_TOFFS_R750			35	// Сдвиг срабатывания синхронизации RCU при 7.5А/мкс
+#define REG_RCU_TOFFS_R1000			36	// Сдвиг срабатывания синхронизации RCU при 10А/мкс
+#define REG_RCU_TOFFS_R1500			37	// Сдвиг срабатывания синхронизации RCU при 15А/мкс
+#define REG_RCU_TOFFS_R2500			38	// Сдвиг срабатывания синхронизации RCU при 25А/мкс
+#define REG_RCU_TOFFS_R3000			39	// Сдвиг срабатывания синхронизации RCU при 30А/мкс
+#define REG_RCU_TOFFS_R5000			40	// Сдвиг срабатывания синхронизации RCU при 50А/мкс
+//
 // ----------------------------------------
 //
 #define REG_MODE					128	// Measurement mode
@@ -84,7 +96,7 @@
 #define REG_OSV_RATE				134 // Off-state voltage rise rate (in V/us)
 #define REG_TRIG_TIME				135	// Time to apply on-state voltage in single-pulse mode (in us)
 #define REG_TRR_DETECTION_MODE		136	// Select trr detection mode (0 - 90%-25%; 1 - 90%-50%)
-#define REG_FCROVU_I_SHORT			137
+#define REG_FCROVU_I_SHORT			137	// FCROVU short circuit current
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1
