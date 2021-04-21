@@ -10,9 +10,10 @@
 // Types
 typedef struct __DRCUConfig
 {
-	Int16U Current;
-	Int16U RiseRate;
-	Int16U FallRate;
+	Int16U Current_x10;
+	Int16U RiseRate_x100;
+	Int16U FallRate_x100;
+	Int32U RCUTrigOffsetTicks;
 } DRCUConfig, *pDRCUConfig;
 
 // Functions

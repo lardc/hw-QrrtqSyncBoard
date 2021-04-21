@@ -71,19 +71,22 @@
 #define REG_RCU3_NODE_ID			17	// RCU3 CAN node ID
 
 #define REG_SAFETY_EN				20	// Safety enable
-#define REG_CSU_V_C					21 	// CSU voltage coefficient
+#define REG_CSU_VOLTAGE_K			21 	// CSU voltage coefficient
+#define REG_DCU_CURRENT_PER_UNIT	22	// Максимальный ток DCU на блок (в А)
+#define REG_RCU_CURRENT_PER_UNIT	23	// Максимальный ток RCU на блок (в А)
+#define REG_RCU_DEF_FALL_RATE		24	// Скорость спада тока RCU на блок (в А/мкс х10)
 
-#define REG_RCU_TOFFS_R050			30	// Сдвиг срабатывания синхронизации RCU при 0.5А/мкс
-#define REG_RCU_TOFFS_R075			31	// Сдвиг срабатывания синхронизации RCU при 0.75А/мкс
-#define REG_RCU_TOFFS_R100			32	// Сдвиг срабатывания синхронизации RCU при 1А/мкс
-#define REG_RCU_TOFFS_R250			33	// Сдвиг срабатывания синхронизации RCU при 2.5А/мкс
-#define REG_RCU_TOFFS_R500			34	// Сдвиг срабатывания синхронизации RCU при 5А/мкс
-#define REG_RCU_TOFFS_R750			35	// Сдвиг срабатывания синхронизации RCU при 7.5А/мкс
-#define REG_RCU_TOFFS_R1000			36	// Сдвиг срабатывания синхронизации RCU при 10А/мкс
-#define REG_RCU_TOFFS_R1500			37	// Сдвиг срабатывания синхронизации RCU при 15А/мкс
-#define REG_RCU_TOFFS_R2500			38	// Сдвиг срабатывания синхронизации RCU при 25А/мкс
-#define REG_RCU_TOFFS_R3000			39	// Сдвиг срабатывания синхронизации RCU при 30А/мкс
-#define REG_RCU_TOFFS_R5000			40	// Сдвиг срабатывания синхронизации RCU при 50А/мкс
+#define REG_RCU_TOFFS_R050			30	// Сдвиг срабатывания синхронизации RCU при 0.5А/мкс (в нс)
+#define REG_RCU_TOFFS_R075			31	// Сдвиг срабатывания синхронизации RCU при 0.75А/мкс (в нс)
+#define REG_RCU_TOFFS_R100			32	// Сдвиг срабатывания синхронизации RCU при 1А/мкс (в нс)
+#define REG_RCU_TOFFS_R250			33	// Сдвиг срабатывания синхронизации RCU при 2.5А/мкс (в нс)
+#define REG_RCU_TOFFS_R500			34	// Сдвиг срабатывания синхронизации RCU при 5А/мкс (в нс)
+#define REG_RCU_TOFFS_R750			35	// Сдвиг срабатывания синхронизации RCU при 7.5А/мкс (в нс)
+#define REG_RCU_TOFFS_R1000			36	// Сдвиг срабатывания синхронизации RCU при 10А/мкс (в нс)
+#define REG_RCU_TOFFS_R1500			37	// Сдвиг срабатывания синхронизации RCU при 15А/мкс (в нс)
+#define REG_RCU_TOFFS_R2500			38	// Сдвиг срабатывания синхронизации RCU при 25А/мкс (в нс)
+#define REG_RCU_TOFFS_R3000			39	// Сдвиг срабатывания синхронизации RCU при 30А/мкс (в нс)
+#define REG_RCU_TOFFS_R5000			40	// Сдвиг срабатывания синхронизации RCU при 50А/мкс (в нс)
 //
 // ----------------------------------------
 //
@@ -91,7 +94,7 @@
 #define REG_DIRECT_CURRENT			129	// Direct current amplitude (in A)
 #define REG_DCU_PULSE_WIDTH			130	// Direct current pulse duration (in us)
 #define REG_DCU_RISE_RATE			131	// Direct current rise rate (in A/us x10)
-#define REG_DCU_FALL_RATE			132 // Direct current fall rate (in A/us x10)
+#define REG_CURRENT_FALL_RATE		132 // Direct current fall rate (in A/us x10)
 #define REG_OFF_STATE_VOLTAGE		133 // Off-state voltage (in V)
 #define REG_OSV_RATE				134 // Off-state voltage rise rate (in V/us)
 #define REG_TRIG_TIME				135	// Time to apply on-state voltage in single-pulse mode (in us)

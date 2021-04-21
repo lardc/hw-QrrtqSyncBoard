@@ -31,19 +31,21 @@ static Boolean EmulateCROVU, EmulateFCROVU, EmulateDCU1, EmulateDCU2, EmulateDCU
 		EmulateRCU3, EmulateSCOPE, MuteCROVU, EmulateCSU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
-static Int16U DC_Current, DC_CurrentRiseRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_Current,
-		RC_CurrentFallRate, RC_CurrentFallRate;
-static Int16U DC_CurrentMax, RC_CurrentMax;
+static Int16U DC_Current, DC_CurrentRiseRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_DCReadyRetries, LOGIC_OperationResult, LOGIC_DriverOffTicks;
 static Int16U CSUVoltage = 0;
+static DRCUConfig DCUConfig, RCUConfig;
 
 // Forward functions
 //
 void LOGIC_PreciseEventInit(Int16U usTime);
 void LOGIC_PreciseEventStart();
 void LOGIC_TqExtraLogic(Boolean DeviceTriggered);
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current,
+		Int16U RiseRate_x10, Int16U FallRate_x10, pDRCUConfig Config, Int16U RCUTrigOffset);
+Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x100);
 
 // Functions
 //
@@ -54,32 +56,11 @@ void LOGIC_RealTime()
 	if(LOGIC_StateRealTime != LSRT_None && LOGIC_StateRealTime != LSRT_WaitForConfig)
 	{
 		// Wait for direct current ready pulse from QPU
-		if(LOGIC_StateRealTime == LSRT_DirectPulseStart && ZbGPIO_DCU1_Ready())
+		if(LOGIC_StateRealTime == LSRT_DirectPulseStart && (EmulateDCU1 || ZbGPIO_DCU1_Ready())
+				&& (EmulateDCU2 || ZbGPIO_DCU2_Ready()) && (EmulateDCU3 || ZbGPIO_DCU3_Ready()))
 		{
-			if(DataTable[REG_DIRECT_CURRENT] > DRCU_CURRENT_MAX)
-			{
-				if(ZbGPIO_DCU2_Ready())
-				{
-					if(DataTable[REG_DIRECT_CURRENT] > (DRCU_CURRENT_MAX + DRCU_CURRENT_MAX))
-					{
-						if(ZbGPIO_DCU3_Ready())
-						{
-							TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
-							LOGIC_StateRealTime = LSRT_DirectPulseReady;
-						}
-					}
-					else
-					{
-						TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
-						LOGIC_StateRealTime = LSRT_DirectPulseReady;
-					}
-				}
-			}
-			else
-			{
-				TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
-				LOGIC_StateRealTime = LSRT_DirectPulseReady;
-			}
+			TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
+			LOGIC_StateRealTime = LSRT_DirectPulseReady;
 		}
 		
 		// Turn off gate driver
@@ -108,6 +89,7 @@ void LOGIC_RealTime()
 		{
 			ZbGPIO_SCOPE_Sync(TRUE);
 			ZbGPIO_RCU_Sync(TRUE);
+			DSP28x_usDelay(RCUConfig.RCUTrigOffsetTicks);
 			ZbGPIO_DCU_Sync(FALSE);
 			ZbGPIO_DUT_Control(FALSE);
 			ZbGPIO_DUT_Switch(FALSE);
@@ -262,12 +244,19 @@ void LOGIC_CacheVariables()
 		DC_Current = DataTable[REG_DIRECT_CURRENT];
 		DC_CurrentRiseRate = DataTable[REG_DCU_RISE_RATE];
 		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] / TIMER2_PERIOD;
-		DC_CurrentFallRate = DataTable[REG_DCU_FALL_RATE];
+		DC_CurrentFallRate = DataTable[REG_CURRENT_FALL_RATE];
+
+		// Подготовка конфигурации DCU и RCU
+		Int16U SplittedFallRate = DC_CurrentFallRate * 10 / 2;
+		LOGIC_PrepareDRCUConfig(EmulateDCU1, EmulateDCU2, EmulateDCU3, DC_Current,
+				DC_CurrentRiseRate * 10, SplittedFallRate, &DCUConfig, 0);
+
+		Int16U TrigOffset = LOGIC_FindRCUTrigOffset(SplittedFallRate);
+		LOGIC_PrepareDRCUConfig(EmulateRCU1, EmulateRCU2, EmulateRCU3, DC_Current,
+				SplittedFallRate, DataTable[REG_RCU_DEF_FALL_RATE] * 10, &RCUConfig, TrigOffset);
+
 		DC_CurrentZeroPoint = DC_Current * 10 / DC_CurrentFallRate;
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
-		
-		RC_Current = DataTable[REG_DIRECT_CURRENT];
-		RC_CurrentFallRate = DataTable[REG_DCU_FALL_RATE];
 		
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE];
@@ -557,8 +546,6 @@ void LOGIC_ConfigurePrepare()
 
 void LOGIC_ConfigureSequence()
 {
-	DRCUConfig DummyConfig = {0, 0, 0};
-
 	if(LOGIC_State == LS_CFG_CROVU || LOGIC_State == LS_CFG_FCROVU || LOGIC_State == LS_CFG_SCOPE
 			|| LOGIC_State == LS_CFG_DCU1 || LOGIC_State == LS_CFG_DCU2 || LOGIC_State == LS_CFG_DCU3
 			|| LOGIC_State == LS_CFG_RCU1 || LOGIC_State == LS_CFG_RCU2 || LOGIC_State == LS_CFG_RCU3
@@ -610,32 +597,32 @@ void LOGIC_ConfigureSequence()
 				break;
 				
 			case LS_CFG_DCU1:
-				CMN_ConfigDRCU(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &DummyConfig, &LOGIC_State,
+				CMN_ConfigDRCU(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &DCUConfig, &LOGIC_State,
 						LS_CFG_DCU2);
 				break;
 
 			case LS_CFG_DCU2:
-				CMN_ConfigDRCU(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &DummyConfig, &LOGIC_State,
+				CMN_ConfigDRCU(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &DCUConfig, &LOGIC_State,
 						LS_CFG_DCU3);
 				break;
 
 			case LS_CFG_DCU3:
-				CMN_ConfigDRCU(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &DummyConfig, &LOGIC_State,
+				CMN_ConfigDRCU(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &DCUConfig, &LOGIC_State,
 						LS_CFG_RCU1);
 				break;
 
 			case LS_CFG_RCU1:
-				CMN_ConfigDRCU(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1, &DummyConfig, &LOGIC_State,
+				CMN_ConfigDRCU(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1, &RCUConfig, &LOGIC_State,
 						LS_CFG_RCU2);
 				break;
 
 			case LS_CFG_RCU2:
-				CMN_ConfigDRCU(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2, &DummyConfig, &LOGIC_State,
+				CMN_ConfigDRCU(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2, &RCUConfig, &LOGIC_State,
 						LS_CFG_RCU3);
 				break;
 				
 			case LS_CFG_RCU3:
-				CMN_ConfigDRCU(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3, &DummyConfig, &LOGIC_State,
+				CMN_ConfigDRCU(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3, &RCUConfig, &LOGIC_State,
 						LS_CFG_SCOPE);
 				break;
 				
@@ -1107,6 +1094,70 @@ void CONTROL_CSU()
 
 void CSU_VoltageMeasuring(Int16U * const restrict pResults)
 {
-	CSUVoltage = *(Int16U *)pResults /* (float)DataTable[REG_CSU_V_C]/1000;*/;
+	CSUVoltage = *(Int16U *)pResults;
+}
+// ----------------------------------------
+
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current,
+		Int16U RiseRate_x100, Int16U FallRate_x100, pDRCUConfig Config, Int16U RCUTrigOffset)
+{
+	Int16U BlockCounter = 0;
+
+	BlockCounter += Emulation1 ? 1 : 0;
+	BlockCounter += Emulation2 ? 1 : 0;
+	BlockCounter += Emulation3 ? 1 : 0;
+
+	if(BlockCounter)
+	{
+		Config->Current_x10 = Current * 10 / BlockCounter;
+		Config->RiseRate_x100 = RiseRate_x100 / BlockCounter;
+		Config->FallRate_x100 = FallRate_x100 / BlockCounter;
+
+		Int32S Ticks = ((Int32S)RCUTrigOffset * CPU_FRQ_MHZ / 1000 - 9) / 5;
+		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
+	}
+}
+// ----------------------------------------
+
+Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x100)
+{
+	switch(FallRate_x100)
+	{
+		case 50:
+			return DataTable[REG_RCU_TOFFS_R050];
+
+		case 75:
+			return DataTable[REG_RCU_TOFFS_R075];
+
+		case 100:
+			return DataTable[REG_RCU_TOFFS_R100];
+
+		case 250:
+			return DataTable[REG_RCU_TOFFS_R250];
+
+		case 500:
+			return DataTable[REG_RCU_TOFFS_R500];
+
+		case 750:
+			return DataTable[REG_RCU_TOFFS_R750];
+
+		case 1000:
+			return DataTable[REG_RCU_TOFFS_R1000];
+
+		case 1500:
+			return DataTable[REG_RCU_TOFFS_R1500];
+
+		case 2500:
+			return DataTable[REG_RCU_TOFFS_R2500];
+
+		case 3000:
+			return DataTable[REG_RCU_TOFFS_R3000];
+
+		case 5000:
+			return DataTable[REG_RCU_TOFFS_R5000];
+
+		default:
+			return DataTable[REG_RCU_TOFFS_R1000];
+	}
 }
 // ----------------------------------------

@@ -28,7 +28,7 @@ typedef struct __TableItemConstraint
 #define X_D_DEF2					1000
 #define X_D_DEF3					10000
 
-// in us
+// in ns
 #define MAX_RCU_TRIG_OFFSET			5000
 
 // QPU LP
