@@ -123,7 +123,7 @@ void ZbGPIO_DCU_Sync(Boolean Set)
 
 void ZbGPIO_FCROVU_Sync(Boolean Set)
 {
-	ZwGPIO_WritePin(PIN_SYNC_FCROVU, !Set);
+	ZwGPIO_WritePin(PIN_SYNC_FCROVU, Set);
 }
 // ----------------------------------------
 
