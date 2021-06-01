@@ -26,7 +26,7 @@
 #define HWUSE_SCI_A
 
 // IO debug LED
-#define DBG_LED				33
+#define DBG_LED				34
 
 // IO placement
 #define SCI_A_QSEL			GPAQSEL2
