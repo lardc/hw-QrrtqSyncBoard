@@ -75,6 +75,7 @@
 #define REG_DCU_CURRENT_PER_UNIT	22	// Максимальный ток DCU на блок (в А)
 #define REG_RCU_CURRENT_PER_UNIT	23	// Максимальный ток RCU на блок (в А)
 #define REG_RCU_DEF_FALL_RATE		24	// Скорость спада тока RCU на блок (в А/мкс х10)
+#define REG_DCU_I_RISE_RATE			25	// Скорость нарастания тока в DCU (в А/мкс x10)
 
 #define REG_RCU_TOFFS_R050			30	// Сдвиг срабатывания синхронизации RCU при 0.5А/мкс (в нс)
 #define REG_RCU_TOFFS_R075			31	// Сдвиг срабатывания синхронизации RCU при 0.75А/мкс (в нс)
@@ -93,13 +94,12 @@
 #define REG_MODE					128	// Measurement mode
 #define REG_DIRECT_CURRENT			129	// Direct current amplitude (in A)
 #define REG_DCU_PULSE_WIDTH			130	// Direct current pulse duration (in us)
-#define REG_DCU_RISE_RATE			131	// Direct current rise rate (in A/us x10)
-#define REG_CURRENT_FALL_RATE		132 // Direct current fall rate (in A/us x10)
-#define REG_OFF_STATE_VOLTAGE		133 // Off-state voltage (in V)
-#define REG_OSV_RATE				134 // Off-state voltage rise rate (in V/us)
-#define REG_TRIG_TIME				135	// Time to apply on-state voltage in single-pulse mode (in us)
-#define REG_TRR_DETECTION_MODE		136	// Select trr detection mode (0 - 90%-25%; 1 - 90%-50%)
-#define REG_FCROVU_I_SHORT			137	// FCROVU short circuit current
+#define REG_CURRENT_FALL_RATE		131 // Direct current fall rate (in A/us x10)
+#define REG_OFF_STATE_VOLTAGE		132 // Off-state voltage (in V)
+#define REG_OSV_RATE				133 // Off-state voltage rise rate (in V/us)
+#define REG_TRIG_TIME				134	// Time to apply on-state voltage in single-pulse mode (in us)
+#define REG_TRR_DETECTION_MODE		135	// Select trr detection mode (0 - 90%-25%; 1 - 90%-50%)
+#define REG_FCROVU_I_SHORT			136	// FCROVU short circuit current
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1

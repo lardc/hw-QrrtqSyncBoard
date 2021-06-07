@@ -43,8 +43,8 @@ static DRCUConfig DCUConfig, RCUConfig;
 void LOGIC_PreciseEventInit(Int16U usTime);
 void LOGIC_PreciseEventStart();
 void LOGIC_TqExtraLogic(Boolean DeviceTriggered);
-void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current,
-		Int16U RiseRate_x10, Int16U FallRate_x10, pDRCUConfig Config, Int16U RCUTrigOffset);
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate_x10,
+		pDRCUConfig Config, Int16U RCUTrigOffset);
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x100);
 
 // Functions
@@ -242,18 +242,16 @@ void LOGIC_CacheVariables()
 		MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
 		
 		DC_Current = DataTable[REG_DIRECT_CURRENT];
-		DC_CurrentRiseRate = DataTable[REG_DCU_RISE_RATE];
 		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] / TIMER2_PERIOD;
+		DC_CurrentRiseRate = DataTable[REG_DCU_I_RISE_RATE];
 		DC_CurrentFallRate = DataTable[REG_CURRENT_FALL_RATE];
 
 		// Подготовка конфигурации DCU и RCU
 		Int16U SplittedFallRate = DC_CurrentFallRate * 10 / 2;
-		LOGIC_PrepareDRCUConfig(EmulateDCU1, EmulateDCU2, EmulateDCU3, DC_Current,
-				DC_CurrentRiseRate * 10, SplittedFallRate, &DCUConfig, 0);
+		LOGIC_PrepareDRCUConfig(EmulateDCU1, EmulateDCU2, EmulateDCU3, DC_Current, SplittedFallRate, &DCUConfig, 0);
 
 		Int16U TrigOffset = LOGIC_FindRCUTrigOffset(SplittedFallRate);
-		LOGIC_PrepareDRCUConfig(EmulateRCU1, EmulateRCU2, EmulateRCU3, DC_Current,
-				SplittedFallRate, DataTable[REG_RCU_DEF_FALL_RATE] * 10, &RCUConfig, TrigOffset);
+		LOGIC_PrepareDRCUConfig(EmulateRCU1, EmulateRCU2, EmulateRCU3, DC_Current, SplittedFallRate, &RCUConfig, TrigOffset);
 
 		DC_CurrentZeroPoint = DC_Current * 10 / DC_CurrentFallRate;
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
@@ -1098,8 +1096,8 @@ void CSU_VoltageMeasuring(Int16U * const restrict pResults)
 }
 // ----------------------------------------
 
-void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current,
-		Int16U RiseRate_x100, Int16U FallRate_x100, pDRCUConfig Config, Int16U RCUTrigOffset)
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate_x100,
+		pDRCUConfig Config, Int16U RCUTrigOffset)
 {
 	Int16U BlockCounter = 0;
 
@@ -1110,7 +1108,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 	if(BlockCounter)
 	{
 		Config->Current_x10 = Current * 10 / BlockCounter;
-		Config->CurrentRate_x100 = RiseRate_x100 / BlockCounter;
+		Config->CurrentRate_x100 = FallRate_x100 / BlockCounter;
 
 		Int32S Ticks = ((Int32S)RCUTrigOffset * CPU_FRQ_MHZ / 1000 - 9) / 5;
 		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;

@@ -23,8 +23,6 @@ typedef struct __TableItemConstraint
 
 // Restrictions
 //
-#define DRCU_CURRENT_MAX			1100		// in A
-//
 #define X_D_DEF0					10
 #define X_D_DEF1					100
 #define X_D_DEF2					1000
@@ -33,8 +31,11 @@ typedef struct __TableItemConstraint
 // in ns
 #define MAX_RCU_TRIG_OFFSET			5000
 
-// QPU LP
+// DCU/RCU
 //
+#define DCU_I_RISE_RATE_MAX			300		// in A/us x100
+#define DCU_I_RISE_RATE_DEF			66		// in A/us x100
+
 #define DIRECT_CURRENT_MIN			100		// in A
 #define DIRECT_CURRENT_MAX			3200	// in A
 #define DIRECT_CURRENT_DEF			500		// in A
@@ -42,10 +43,6 @@ typedef struct __TableItemConstraint
 #define IDC_PULSE_WIDTH_MIN			500		// in us
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
 #define IDC_PULSE_WIDTH_DEF			2000	// in us
-
-#define IDC_RISE_RATE_MIN			1		// in A/us x10
-#define IDC_RISE_RATE_MAX			50		// in A/us x10
-#define IDC_RISE_RATE_DEF			5		// in A/us x10
 
 #define REVERSE_RATE_MIN			10		// in A/us x10
 #define REVERSE_RATE_MAX			1000	// in A/us x10
