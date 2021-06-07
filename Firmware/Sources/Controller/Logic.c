@@ -1110,8 +1110,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 	if(BlockCounter)
 	{
 		Config->Current_x10 = Current * 10 / BlockCounter;
-		Config->RiseRate_x100 = RiseRate_x100 / BlockCounter;
-		Config->FallRate_x100 = FallRate_x100 / BlockCounter;
+		Config->CurrentRate_x100 = RiseRate_x100 / BlockCounter;
 
 		Int32S Ticks = ((Int32S)RCUTrigOffset * CPU_FRQ_MHZ / 1000 - 9) / 5;
 		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
