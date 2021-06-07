@@ -250,9 +250,9 @@ void CONTROL_ReinitRS232()
 {
 	if(!ReinitRS232 && CONTROL_TimeCounter > TIMEOUT_REINIT_RS232)
 	{
-		ZwSCIa_Init(SCIA_BR, SCIA_DB, SCIA_PARITY, SCIA_SB, FALSE);
-		ZwSCIa_InitFIFO(16, 0);
-		ZwSCIa_EnableInterrupts(FALSE, FALSE);
+		ZwSCIb_Init(SCIB_BR, SCIB_DB, SCIB_PARITY, SCIB_SB, FALSE);
+		ZwSCIb_InitFIFO(16, 0);
+		ZwSCIb_EnableInterrupts(FALSE, FALSE);
 		
 		ReinitRS232 = TRUE;
 	}
