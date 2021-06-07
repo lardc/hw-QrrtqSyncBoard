@@ -23,6 +23,8 @@ typedef struct __TableItemConstraint
 
 // Restrictions
 //
+#define DRCU_CURRENT_MAX			1100		// in A
+//
 #define X_D_DEF0					10
 #define X_D_DEF1					100
 #define X_D_DEF2					1000
