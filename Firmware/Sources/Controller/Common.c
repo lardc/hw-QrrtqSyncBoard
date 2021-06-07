@@ -196,7 +196,7 @@ Boolean CMN_ReadDRCUCurrent(Boolean Emulate, Int16U NodeIDReg, Int16U StateStora
 {
 	if(!Emulate)
 	{
-		if(StateStorage == DRCU_DS_Charging || StateStorage == CDS_Ready)
+		if(StateStorage == DRCU_DS_InProcess || StateStorage == CDS_Ready)
 			if(HLI_CAN_Read16(DataTable[NodeIDReg], DRCU_REG_CURRENT, Current))
 				return TRUE;
 	}
