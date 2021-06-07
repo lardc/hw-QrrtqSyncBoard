@@ -171,7 +171,7 @@ Boolean ZbGPIO_SafetyCheck()
 
 Boolean ZbGPIO_PressureCheck()
 {
-	return ZwGPIO_ReadPin(PIN_PRESSURE);
+	return !ZwGPIO_ReadPin(PIN_PRESSURE);
 }
 // ----------------------------------------
 
