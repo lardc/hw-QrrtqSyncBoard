@@ -1101,9 +1101,9 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 {
 	Int16U BlockCounter = 0;
 
-	BlockCounter += Emulation1 ? 1 : 0;
-	BlockCounter += Emulation2 ? 1 : 0;
-	BlockCounter += Emulation3 ? 1 : 0;
+	BlockCounter += Emulation1 ? 0 : 1;
+	BlockCounter += Emulation2 ? 0 : 1;
+	BlockCounter += Emulation3 ? 0 : 1;
 
 	if(BlockCounter)
 	{
@@ -1120,38 +1120,38 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x100)
 {
 	switch(FallRate_x100)
 	{
-		case 50:
-			return DataTable[REG_RCU_TOFFS_R050];
-
-		case 75:
-			return DataTable[REG_RCU_TOFFS_R075];
-
 		case 100:
-			return DataTable[REG_RCU_TOFFS_R100];
+			return DataTable[REG_RCU_TOFFS_R010];
 
-		case 250:
-			return DataTable[REG_RCU_TOFFS_R250];
+		case 150:
+			return DataTable[REG_RCU_TOFFS_R015];
+
+		case 200:
+			return DataTable[REG_RCU_TOFFS_R020];
 
 		case 500:
-			return DataTable[REG_RCU_TOFFS_R500];
-
-		case 750:
-			return DataTable[REG_RCU_TOFFS_R750];
+			return DataTable[REG_RCU_TOFFS_R050];
 
 		case 1000:
-			return DataTable[REG_RCU_TOFFS_R1000];
+			return DataTable[REG_RCU_TOFFS_R100];
 
 		case 1500:
-			return DataTable[REG_RCU_TOFFS_R1500];
+			return DataTable[REG_RCU_TOFFS_R150];
 
-		case 2500:
-			return DataTable[REG_RCU_TOFFS_R2500];
+		case 2000:
+			return DataTable[REG_RCU_TOFFS_R200];
 
 		case 3000:
-			return DataTable[REG_RCU_TOFFS_R3000];
+			return DataTable[REG_RCU_TOFFS_R300];
 
 		case 5000:
-			return DataTable[REG_RCU_TOFFS_R5000];
+			return DataTable[REG_RCU_TOFFS_R500];
+
+		case 6000:
+			return DataTable[REG_RCU_TOFFS_R600];
+
+		case 10000:
+			return DataTable[REG_RCU_TOFFS_R1000];
 
 		default:
 			return DataTable[REG_RCU_TOFFS_R1000];
