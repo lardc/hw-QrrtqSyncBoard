@@ -45,7 +45,7 @@ void LOGIC_PreciseEventStart();
 void LOGIC_TqExtraLogic(Boolean DeviceTriggered);
 void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate_x10,
 		pDRCUConfig Config, Int16U RCUTrigOffset);
-Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x100);
+Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x10);
 
 // Functions
 //
@@ -250,7 +250,7 @@ void LOGIC_CacheVariables()
 		Int16U SplittedFallRate = DC_CurrentFallRate * 10 / 2;
 		LOGIC_PrepareDRCUConfig(EmulateDCU1, EmulateDCU2, EmulateDCU3, DC_Current, SplittedFallRate, &DCUConfig, 0);
 
-		Int16U TrigOffset = LOGIC_FindRCUTrigOffset(SplittedFallRate);
+		Int16U TrigOffset = LOGIC_FindRCUTrigOffset(DC_CurrentFallRate);
 		LOGIC_PrepareDRCUConfig(EmulateRCU1, EmulateRCU2, EmulateRCU3, DC_Current, SplittedFallRate, &RCUConfig, TrigOffset);
 
 		DC_CurrentZeroPoint = DC_Current * 10 / DC_CurrentFallRate;
@@ -1107,7 +1107,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 
 	if(BlockCounter)
 	{
-		Config->Current_x10 = Current * 10 / BlockCounter;
+		Config->Current = Current / BlockCounter;
 		Config->CurrentRate_x100 = FallRate_x100 / BlockCounter;
 
 		Int32S Ticks = ((Int32S)RCUTrigOffset * CPU_FRQ_MHZ / 1000 - 9) / 5;
@@ -1116,41 +1116,41 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 }
 // ----------------------------------------
 
-Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x100)
+Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x10)
 {
-	switch(FallRate_x100)
+	switch(FallRate_x10)
 	{
-		case 100:
+		case 10:
 			return DataTable[REG_RCU_TOFFS_R010];
 
-		case 150:
+		case 15:
 			return DataTable[REG_RCU_TOFFS_R015];
 
-		case 200:
+		case 20:
 			return DataTable[REG_RCU_TOFFS_R020];
 
-		case 500:
+		case 50:
 			return DataTable[REG_RCU_TOFFS_R050];
 
-		case 1000:
+		case 100:
 			return DataTable[REG_RCU_TOFFS_R100];
 
-		case 1500:
+		case 150:
 			return DataTable[REG_RCU_TOFFS_R150];
 
-		case 2000:
+		case 200:
 			return DataTable[REG_RCU_TOFFS_R200];
 
-		case 3000:
+		case 300:
 			return DataTable[REG_RCU_TOFFS_R300];
 
 		case 5000:
 			return DataTable[REG_RCU_TOFFS_R500];
 
-		case 6000:
+		case 600:
 			return DataTable[REG_RCU_TOFFS_R600];
 
-		case 10000:
+		case 1000:
 			return DataTable[REG_RCU_TOFFS_R1000];
 
 		default:
