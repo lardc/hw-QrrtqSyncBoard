@@ -522,7 +522,7 @@ void LOGIC_PowerOnSequence()
 				break;
 				
 			case LS_PON_WaitStates:
-				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State);
+				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
 				break;
 		}
 		
@@ -647,7 +647,7 @@ void LOGIC_ConfigureSequence()
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_SCOPE = CDS_InProcess;
+						LOGIC_ExtDeviceState.DS_SCOPE = CDS_None;
 						LOGIC_State = LS_CFG_WaitStates;
 					}
 					
@@ -657,7 +657,7 @@ void LOGIC_ConfigureSequence()
 				break;
 				
 			case LS_CFG_WaitStates:
-				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State);
+				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State, TRUE);
 				break;
 		}
 		
@@ -918,7 +918,7 @@ void LOGIC_ReadDataSequence()
 				break;
 		}
 		
-		CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State);
+		CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
 		LOGIC_HandleCommunicationError();
 	}
 	else
