@@ -34,7 +34,7 @@ static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static Int16U DC_Current, DC_CurrentRiseRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
-static volatile Int16U LOGIC_PulseNumRemain, LOGIC_DCReadyRetries, LOGIC_OperationResult, LOGIC_DriverOffTicks;
+static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
 static Int16U CSUVoltage = 0;
 static DRCUConfig DCUConfig, RCUConfig;
 
@@ -76,12 +76,8 @@ void LOGIC_RealTime()
 			ZbGPIO_DCU_Sync(FALSE);
 			ZbGPIO_CSU_Sync(FALSE);
 			LOGIC_StateRealTime = LSRT_None;
-			
-			if(++LOGIC_DCReadyRetries > DC_READY_RETRIES_NUM)
-			{
-				DataTable[REG_DC_READY_RETRIES] = LOGIC_DCReadyRetries;
-				LOGIC_AbortMeasurement(WARNING_NO_DIRECT_CURRENT);
-			}
+
+			LOGIC_AbortMeasurement(WARNING_NO_DIRECT_CURRENT);
 		}
 		
 		// Start reverse current pulse and on-state voltage timer
@@ -123,7 +119,7 @@ void LOGIC_RealTime()
 			LOGIC_StateRealTime = LSRT_None;
 			DCPulseFormed = TRUE;
 		}
-		
+
 		++LOGIC_RealTimeCounter;
 	}
 }
@@ -236,7 +232,6 @@ void LOGIC_CacheVariables()
 		DUTFinalIncrease = FALSE;
 		LOGIC_OperationResult = OPRESULT_OK;
 		
-		LOGIC_DCReadyRetries = 0;
 		ResultsCounter = 0;
 		MeasurementMode = DataTable[REG_MODE];
 		MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
@@ -774,8 +769,8 @@ void LOGIC_ReadDataSequence()
 {
 	Int16U Register;
 	
-	if(LOGIC_State == LS_READ_CROVU || LOGIC_State == LS_READ_DCU || LOGIC_State == LS_READ_RCU
-			|| LOGIC_State == LS_READ_SCOPE)
+	if(LOGIC_State == LS_READ_CROVU || LOGIC_State == LS_READ_FCROVU || LOGIC_State == LS_READ_DCU || LOGIC_State == LS_READ_RCU
+			|| LOGIC_State == LS_READ_SCOPE || LOGIC_State == LS_WAIT_READY)
 	{
 		if(!LOGIC_UpdateDeviceState())
 		{
@@ -849,16 +844,29 @@ void LOGIC_ReadDataSequence()
 				{
 					Int16U Idc1Temp = 0, Idc2Temp = 0, Idc3Temp = 0;
 
-					if(CMN_ReadDRCUCurrent(EmulateDCU1, REG_DCU1_NODE_ID, LOGIC_ExtDeviceState.DS_DCU1, &Idc1Temp))
-						if(CMN_ReadDRCUCurrent(EmulateDCU2, REG_DCU2_NODE_ID, LOGIC_ExtDeviceState.DS_DCU2, &Idc2Temp))
-							if(CMN_ReadDRCUCurrent(EmulateDCU3, REG_DCU3_NODE_ID, LOGIC_ExtDeviceState.DS_DCU3, &Idc3Temp))
+					if(CMN_ReadDRCUCurrent(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &Idc1Temp))
+						if(CMN_ReadDRCUCurrent(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &Idc2Temp))
+							if(CMN_ReadDRCUCurrent(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &Idc3Temp))
 							{
-								LOGIC_State = LS_READ_SCOPE;
+								LOGIC_State = LS_READ_RCU;
 								Results[ResultsCounter].Idc = Idc1Temp + Idc2Temp + Idc3Temp;
 							}
 				}
 				break;
 				
+			case LS_READ_RCU:
+				{
+					if(EmulateRCU1)
+						LOGIC_ExtDeviceState.DS_RCU1 = CDS_Ready;
+					if(EmulateRCU2)
+						LOGIC_ExtDeviceState.DS_RCU2 = CDS_Ready;
+					if(EmulateRCU3)
+						LOGIC_ExtDeviceState.DS_RCU3 = CDS_Ready;
+
+					LOGIC_State = LS_READ_SCOPE;
+				}
+				break;
+
 			case LS_READ_SCOPE:
 				{
 					if(!EmulateSCOPE)
@@ -903,8 +911,9 @@ void LOGIC_ReadDataSequence()
 								if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
 									LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
 
-								LOGIC_State = LS_None;
+								LOGIC_State = LS_WAIT_READY;
 
+								Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
 								DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
 							}
 						}
@@ -912,13 +921,17 @@ void LOGIC_ReadDataSequence()
 					else
 					{
 						++ResultsCounter;
-						LOGIC_State = LS_None;
+						Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
+						LOGIC_State = LS_WAIT_READY;
 					}
 				}
 				break;
+
+			case LS_WAIT_READY:
+				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
+				break;
 		}
-		
-		CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
+
 		LOGIC_HandleCommunicationError();
 	}
 	else
@@ -1034,8 +1047,6 @@ void LOGIC_ResultToDataTable()
 	DataTable[REG_RES_TQ] = Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
 	DataTable[REG_RES_DIDT] = AvgdIdt / AvgCounter;
 	DataTable[REG_RES_QRR_INT] = (AvgQrr * 10) / AvgCounter;
-	
-	DataTable[REG_DC_READY_RETRIES] = LOGIC_DCReadyRetries;
 }
 // ----------------------------------------
 

@@ -134,8 +134,6 @@
 #define REG_SLAVE_ERR				203	// Slave error
 #define REG_SLAVE_EXTDATA			204	// Slave call extended data
 //
-#define REG_DC_READY_RETRIES		205	// Number of attempts to start direct current
-//
 #define REG_RES_QRR					210	// Reverse recovery charge (in uC x10)
 #define REG_RES_IRR					211	// Reverse recovery current amplitude (in A)
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)

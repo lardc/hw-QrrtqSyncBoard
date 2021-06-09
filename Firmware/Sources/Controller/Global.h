@@ -41,7 +41,7 @@
 //--------------------------------------------------------
 #define UNIT_TQ_MEASURE_PULSES			11		// (in pulses) + 1
 #define UNIT_TQ_EXTRA_PULSES			15		// in pulses
-#define QRR_AVG_COUNTER					3		// in pulses
+#define QRR_AVG_COUNTER					1		// in pulses
 #define UNIT_MAX_NUM_OF_PULSES			(UNIT_TQ_MEASURE_PULSES + UNIT_TQ_EXTRA_PULSES)	// in pulses
 #define TQ_MAX_TIME						1000	// in us
 #define TQ_FIRST_PROBE					100		// in us
@@ -50,7 +50,6 @@
 #define OSV_ON_TIME						500		// in us
 #define OSV_ON_TIME_TICK				(OSV_ON_TIME / TIMER2_PERIOD)
 //
-#define DC_READY_RETRIES_NUM			3
 #define DC_READY_TIMEOUT_DELAY			10000	// in us
 #define DC_READY_TIMEOUT_TICK			(DC_READY_TIMEOUT_DELAY / TIMER2_PERIOD)
 #define DC_DRIVER_OFF_DELAY_MIN			200		// in us

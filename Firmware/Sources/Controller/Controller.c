@@ -160,7 +160,7 @@ void CONTROL_Update()
 {
 	// Handle CAN-master interface requests
 	BCCIM_Process(&DEVICE_CAN_Master_Interface);
-	
+
 	// Process real-time tasks
 	LOGIC_RealTime();
 	
@@ -208,8 +208,6 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_SLAVE_ERR] = 0;
 	DataTable[REG_SLAVE_EXTDATA] = 0;
 	//
-	DataTable[REG_DC_READY_RETRIES] = 0;
-	
 	DataTable[REG_FINISHED] = OPRESULT_NONE;
 	DataTable[REG_RES_QRR] = 0;
 	DataTable[REG_RES_IRR] = 0;

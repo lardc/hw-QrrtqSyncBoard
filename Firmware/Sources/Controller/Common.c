@@ -125,11 +125,22 @@ void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateSto
 //-----------------------------
 
 void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState FullStateStorage,
-		volatile LogicState *CurrentLogicState, Boolean DRCUWaitConfig)
+		volatile LogicState *CurrentLogicState, Boolean NodesConfig)
 {
-	Int16U DRCUWaitState = DRCUWaitConfig ? DRCU_DS_ConfigReady : CDS_Ready;
+	Int16U DRCUWaitState, Fault;
 
-	if(*CurrentLogicState != LS_None || *CurrentLogicState != LS_Error)
+	if(NodesConfig)
+	{
+		DRCUWaitState = DRCU_DS_ConfigReady;
+		Fault = FAULTEX_CFG_TIMEOUT;
+	}
+	else
+	{
+		DRCUWaitState = CDS_Ready;
+		Fault = FAULTEX_PON_TIMEOUT;
+	}
+
+	if(*CurrentLogicState != LS_None && *CurrentLogicState != LS_Error)
 	{
 		if(Timeout > TimeCounter)
 		{
@@ -150,42 +161,42 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState 
 		{
 			if(FullStateStorage.DS_CROVU != CDS_Ready)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, Fault);
 			}
 			else if(FullStateStorage.DS_FCROVU != CDS_Ready)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, Fault);
 			}
 			else if(FullStateStorage.DS_DCU1 != DRCUWaitState)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, Fault);
 			}
 			else if(FullStateStorage.DS_DCU2 != DRCUWaitState)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, Fault);
 			}
 			else if(FullStateStorage.DS_DCU3 != DRCUWaitState)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, Fault);
 			}
 			else if(FullStateStorage.DS_RCU1 != DRCUWaitState)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, Fault);
 			}
 			else if(FullStateStorage.DS_RCU2 != DRCUWaitState)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, Fault);
 			}
 			else if(FullStateStorage.DS_RCU3 != DRCUWaitState)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, Fault);
 			}
 			else if(FullStateStorage.DS_SCOPE != CDS_None)
 			{
-				CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, Fault);
 			}
 			else
-				CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, FAULTEX_PON_TIMEOUT);
+				CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, Fault);
 
 			*CurrentLogicState = LS_Error;
 		}
@@ -193,17 +204,19 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState 
 }
 //-----------------------------
 
-Boolean CMN_ReadDRCUCurrent(Boolean Emulate, Int16U NodeIDReg, Int16U StateStorage, pInt16U Current)
+Boolean CMN_ReadDRCUCurrent(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pInt16U Current)
 {
 	if(!Emulate)
 	{
-		if(StateStorage == DRCU_DS_InProcess || StateStorage == CDS_Ready)
+		if(*StateStorage == DRCU_DS_InProcess || *StateStorage == CDS_Ready)
 			if(HLI_CAN_Read16(DataTable[NodeIDReg], DRCU_REG_CURRENT, Current))
 				return TRUE;
 	}
 	else
 	{
 		*Current = 0;
+		*StateStorage = CDS_Ready;
+
 		return TRUE;
 	}
 

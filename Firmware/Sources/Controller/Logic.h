@@ -65,7 +65,9 @@ typedef enum __LogicState
 	LS_READ_DCU,
 	LS_READ_RCU,
 	LS_READ_CSU,
-	LS_READ_SCOPE
+	LS_READ_SCOPE,
+	//
+	LS_WAIT_READY		= 600
 } LogicState;
 //
 typedef enum __DeviceSubState

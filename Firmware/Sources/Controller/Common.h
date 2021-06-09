@@ -26,7 +26,7 @@ void CMN_NodePowerOff(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateS
 void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pDRCUConfig Config,
 		volatile LogicState *CurrentLogicState, LogicState NextLogicState);
 void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState FullStateStorage,
-		volatile LogicState *CurrentLogicState, Boolean DRCUWaitConfig);
-Boolean CMN_ReadDRCUCurrent(Boolean Emulate, Int16U NodeIDReg, Int16U StateStorage, pInt16U Current);
+		volatile LogicState *CurrentLogicState, Boolean NodesConfig);
+Boolean CMN_ReadDRCUCurrent(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pInt16U Current);
 
 #endif // __COMMON_H
