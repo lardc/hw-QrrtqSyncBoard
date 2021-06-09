@@ -165,7 +165,7 @@ void ZbGPIO_SafetyEnable(Boolean Set)
 
 Boolean ZbGPIO_SafetyCheck()
 {
-	return ZwGPIO_ReadPin(PIN_SAFETY);
+	return !ZwGPIO_ReadPin(PIN_SAFETY);
 }
 // ----------------------------------------
 
