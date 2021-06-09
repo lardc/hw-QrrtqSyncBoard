@@ -671,5 +671,7 @@ void PRESSURE_Handler()
 {
 	if(((CONTROL_State == DS_InProcess) || (CONTROL_State == DS_Ready)) && !ZbGPIO_PressureCheck())
 		CONTROL_SwitchToFault(FAULT_PRESSURE, 0);
+
+	DataTable[REG_PRESSURE] = ZbGPIO_PressureCheck();
 }
 // ----------------------------------------

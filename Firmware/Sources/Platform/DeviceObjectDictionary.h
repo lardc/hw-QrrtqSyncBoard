@@ -158,6 +158,8 @@
 #define REG_DIAG_OUT_2				231	// Output diagnostic register 2
 #define REG_DIAG_OUT_3				232	// Output diagnostic register 3
 //
+#define REG_PRESSURE				240	// Pressure flag
+//
 #define REG_SP__3					255
 //
 // ----------------------------------------
