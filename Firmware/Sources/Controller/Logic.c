@@ -206,6 +206,12 @@ LogicState LOGIC_GetState()
 }
 // ----------------------------------------
 
+void LOGIC_SetState(LogicState State)
+{
+	LOGIC_State = State;
+}
+// ----------------------------------------
+
 void LOGIC_ResetState()
 {
 	LOGIC_State = LS_None;

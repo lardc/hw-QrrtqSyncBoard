@@ -15,6 +15,7 @@ typedef enum __LogicState
 {
 	LS_None				= 0,
 	LS_Error			= 1,
+	LS_WaitCommutation,
 	//
 	LS_CLR_CROVU		= 100,
 	LS_CLR_FCROVU,
@@ -121,6 +122,8 @@ Boolean LOGIC_DCPulseFormed();
 Boolean LOGIC_DUTTriggered();
 // Read current state
 LogicState LOGIC_GetState();
+// Set current state
+void LOGIC_SetState(LogicState State);
 // Halt process
 void LOGIC_Halt();
 void LOGIC_ResetState();

@@ -287,9 +287,10 @@ ISRCALL Timer2_ISR(void)
 {
 	// Allow HPI interrupt
 	EINT;
-
+	ZwGPIO_WritePin(PIN_LED, TRUE);
 	// Invoke control routine
 	CONTROL_Update();
+	ZwGPIO_WritePin(PIN_LED, FALSE);
 
 	// no PIE
 	TIMER2_ISR_DONE;

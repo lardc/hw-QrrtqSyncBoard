@@ -20,7 +20,7 @@
 // Variables
 //
 volatile DeviceState CONTROL_State = DS_None;
-volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause;
+volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause, CONTROL_CommutationDelay;
 static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE;
 static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 //
@@ -264,14 +264,14 @@ void CONTROL_Start(Boolean SinglePulse)
 	
 	CONTROL_FillWPPartDefault();
 	
-	CONTROL_SetDeviceState(DS_InProcess);
-	LOGIC_StateRealTime = LSRT_WaitForConfig;
-	
 	CONTROL_PulseToPulsePause = CONTROL_TimeCounter;
 	LOGIC_CacheUpdateSettings(TRUE, SinglePulse);
-	LOGIC_ConfigurePrepare();
 	
 	COMMUTATION_Control(TRUE);
+	CONTROL_CommutationDelay = CONTROL_TimeCounter + DELAY_COMMUTATION;
+
+	CONTROL_SetDeviceState(DS_InProcess);
+	LOGIC_SetState(LS_WaitCommutation);
 }
 // ----------------------------------------
 
@@ -285,6 +285,12 @@ void CONTROL_SubProcessStateMachine()
 	
 	if(CONTROL_State == DS_InProcess)
 	{
+		if(LOGIC_GetState() == LS_WaitCommutation && CONTROL_TimeCounter > CONTROL_CommutationDelay)
+		{
+			LOGIC_StateRealTime = LSRT_WaitForConfig;
+			LOGIC_ConfigurePrepare();
+		}
+
 		if(LOGIC_StateRealTime == LSRT_WaitForConfig)
 		{
 			if(LOGIC_GetState() == LS_None && CONTROL_TimeCounter > CONTROL_PulseToPulsePause)
