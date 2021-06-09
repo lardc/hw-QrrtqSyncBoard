@@ -1155,7 +1155,7 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x10)
 		case 300:
 			return DataTable[REG_RCU_TOFFS_R300];
 
-		case 5000:
+		case 500:
 			return DataTable[REG_RCU_TOFFS_R500];
 
 		case 600:
