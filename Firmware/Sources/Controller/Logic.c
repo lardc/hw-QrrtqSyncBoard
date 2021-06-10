@@ -1076,8 +1076,8 @@ void CONTROL_CSU()
 {
 	// Control voltage
 	ZwADC_StartSEQ1();
-	
-	if(CONTROL_State == DS_PowerOn || CONTROL_State == DS_Ready || CONTROL_State == DS_InProcess)
+
+	if(CONTROL_State == DS_PowerOn || CONTROL_State == DS_Ready || CONTROL_State == DS_InProcess || CONTROL_State == DS_None)
 	{
 		if(CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
 		{
