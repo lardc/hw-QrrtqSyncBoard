@@ -109,8 +109,11 @@ void InitializeBoard()
 {
 	// Turn off indication
 	ZwGPIO_WritePin(34, FALSE);
-	//
 	ZwGPIO_PinToOutput(34);
+
+	// Turn off CSU
+	ZwGPIO_WritePin(24, TRUE);
+	ZwGPIO_PinToOutput(24);
 }
 // -----------------------------------------
 
