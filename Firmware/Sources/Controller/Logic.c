@@ -1091,7 +1091,7 @@ void CONTROL_CSU()
 			ZbGPIO_CSU_Disch(FALSE);
 		}
 
-		if((CSUVoltage <= CSU_VOLTAGE_HIGH) || (CSUVoltage >= CSU_VOLTAGE_LOW))
+		if((CSUVoltage <= CSU_VOLTAGE_HIGH) && (CSUVoltage >= CSU_VOLTAGE_LOW))
 		{
 			ZbGPIO_CSU_PWRCtrl(FALSE);
 			ZbGPIO_CSU_Disch(FALSE);
