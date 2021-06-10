@@ -1077,19 +1077,27 @@ void CONTROL_CSU()
 	// Control voltage
 	ZwADC_StartSEQ1();
 	
-	if(CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
+	if(CONTROL_State == DS_PowerOn || CONTROL_State == DS_Ready || CONTROL_State == DS_InProcess)
 	{
-		ZbGPIO_CSU_PWRCtrl(FALSE);
-		ZbGPIO_CSU_Disch(TRUE);
+		if(CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
+		{
+			ZbGPIO_CSU_PWRCtrl(FALSE);
+			ZbGPIO_CSU_Disch(TRUE);
+		}
+
+		if(CSUVoltage < CSU_VOLTAGE_LOW - CSU_VOLTAGE_HYST)
+		{
+			ZbGPIO_CSU_PWRCtrl(TRUE);
+			ZbGPIO_CSU_Disch(FALSE);
+		}
+
+		if((CSUVoltage <= CSU_VOLTAGE_HIGH) || (CSUVoltage >= CSU_VOLTAGE_LOW))
+		{
+			ZbGPIO_CSU_PWRCtrl(FALSE);
+			ZbGPIO_CSU_Disch(FALSE);
+		}
 	}
-	
-	if(CSUVoltage < CSU_VOLTAGE_LOW - CSU_VOLTAGE_HYST)
-	{
-		ZbGPIO_CSU_PWRCtrl(TRUE);
-		ZbGPIO_CSU_Disch(FALSE);
-	}
-	
-	if((CSUVoltage <= CSU_VOLTAGE_HIGH) || (CSUVoltage >= CSU_VOLTAGE_LOW))
+	else
 	{
 		ZbGPIO_CSU_PWRCtrl(FALSE);
 		ZbGPIO_CSU_Disch(FALSE);
@@ -1104,12 +1112,14 @@ void CONTROL_CSU()
 	
 	if(CONTROL_TimeCounter > CSU_FanTimeout + CSU_FAN_TIMEOUT)
 		ZbGPIO_CSU_FAN(FALSE);
+
+	DataTable[REG_CSU_VOLATGE] = CSUVoltage;
 }
 // ----------------------------------------
 
 void CSU_VoltageMeasuring(Int16U * const restrict pResults)
 {
-	CSUVoltage = *(Int16U *)pResults;
+	CSUVoltage = *(Int16U *)pResults * DataTable[REG_CSU_VOLTAGE_K] / 1000;
 }
 // ----------------------------------------
 
