@@ -38,6 +38,8 @@ ISRCALL Timer2_ISR();
 ISRCALL CAN0A_ISR();
 // CANb Line 0 ISR
 ISRCALL CAN0B_ISR();
+// ADC SEQ1 ISR
+ISRCALL SEQ1_ISR();
 // ILLEGAL ISR
 ISRCALL IllegalInstruction_ISR();
 // -----------------------------------------
@@ -75,6 +77,7 @@ void main()
 		ADD_ISR(ECAN0INTA, CAN0A_ISR);
 		ADD_ISR(ECAN0INTB, CAN0B_ISR);
 		ADD_ISR(XINT1, XInterrupt_ISR);
+		ADD_ISR(SEQ1INT, SEQ1_ISR);
 	END_ISR_MAP
 
 	// Initialize controller logic
@@ -226,6 +229,7 @@ void InitializeController(Boolean GoodClock)
 	#pragma CODE_SECTION(Timer2_ISR, "ramfuncs");
 	#pragma CODE_SECTION(CAN0A_ISR, "ramfuncs");
 	#pragma CODE_SECTION(CAN0B_ISR, "ramfuncs");
+	#pragma CODE_SECTION(SEQ1_ISR, "ramfuncs");
 	#pragma CODE_SECTION(IllegalInstruction_ISR, "ramfuncs");
 #endif
 //
