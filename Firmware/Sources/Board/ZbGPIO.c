@@ -18,7 +18,7 @@ void ZbGPIO_Init()
 	ZwGPIO_PinToInput(PIN_PRESSURE, TRUE, GPIO_NSAMPLE);
 
 	// Reset to default state
-	ZwGPIO_WritePin(PIN_CSU_PS, FALSE);
+	ZwGPIO_WritePin(PIN_CSU_PS, TRUE);
 	ZwGPIO_WritePin(PIN_SWITCH_DUT, FALSE);
 	ZwGPIO_WritePin(PIN_CONTROL_DUT, FALSE);
 	ZwGPIO_WritePin(PIN_LED, FALSE);
@@ -81,7 +81,7 @@ Boolean ZbGPIO_DCU3_Ready()
 
 void ZbGPIO_CSU_PWRCtrl(Boolean Set)
 {
-	ZwGPIO_WritePin(PIN_CSU_PS, Set);
+	ZwGPIO_WritePin(PIN_CSU_PS, !Set);
 }
 // ----------------------------------------
 
