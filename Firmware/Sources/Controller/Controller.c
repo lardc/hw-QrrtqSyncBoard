@@ -301,7 +301,6 @@ void CONTROL_SubProcessStateMachine()
 				ZbGPIO_DUT_Control(TRUE);
 				ZbGPIO_DUT_Switch(TRUE);
 				ZbGPIO_DCU_Sync(TRUE);
-				ZbGPIO_DUT_Switch(TRUE);
 				
 				LOGIC_StateRealTime = LSRT_DirectPulseStart;
 			}
