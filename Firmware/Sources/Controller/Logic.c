@@ -562,12 +562,11 @@ void LOGIC_ConfigureSequence()
 				{
 					if(!EmulateCROVU && !MuteCROVU)
 					{
-						if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_EXT_SYNC))
-							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
-								if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE,
-										CROVU_VoltageRate))
-									if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
-										LOGIC_State = LS_CFG_FCROVU;
+						if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
+							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE,
+									CROVU_VoltageRate))
+								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
+									LOGIC_State = LS_CFG_FCROVU;
 					}
 					else
 					{
@@ -1077,7 +1076,7 @@ void CONTROL_CSU()
 	// Control voltage
 	ZwADC_StartSEQ1();
 
-	if(CONTROL_State == DS_PowerOn || CONTROL_State == DS_Ready || CONTROL_State == DS_InProcess || CONTROL_State == DS_None)
+	if(CONTROL_State == DS_PowerOn || CONTROL_State == DS_Ready || CONTROL_State == DS_InProcess)
 	{
 		if(CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
 		{
@@ -1119,7 +1118,9 @@ void CONTROL_CSU()
 
 void CSU_VoltageMeasuring(Int16U * const restrict pResults)
 {
-	CSUVoltage = *(Int16U *)pResults * DataTable[REG_CSU_VOLTAGE_K] / 1000;
+	Int32U Voltage = *(Int16U *)pResults;
+	Voltage = Voltage * DataTable[REG_CSU_VOLTAGE_K] / 1000;
+	CSUVoltage = Voltage;
 }
 // ----------------------------------------
 

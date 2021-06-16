@@ -168,7 +168,7 @@
 // CROVU SLAVE COMMANDS, REGISTERS, STATES
 //
 // Commands
-#define ACT_CROVU_APPLY_SETTINGS	101	// Apply settings to cells
+#define ACT_CROVU_APPLY_SETTINGS	10	// Apply settings to cells
 #define ACT_CROVU_ENABLE_EXT_SYNC	106	// Enable external SYNC
 //
 // Registers
