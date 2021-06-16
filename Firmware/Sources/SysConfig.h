@@ -23,7 +23,7 @@
 
 // Power control
 //--------------------------------------------------------
-#define SYS_PUMOD			ZW_POWER_SPID_CLK | \
+#define SYS_PUMOD			ZW_POWER_ADC_CLK | ZW_POWER_SPID_CLK | \
 							ZW_POWER_SCIA_CLK | ZW_POWER_SCIB_CLK | \
 							ZW_POWER_CANA_CLK | ZW_POWER_CANB_CLK
 
@@ -34,7 +34,7 @@
 //--------------------------------------------------------
 #define ADC_PRESCALER		0			// HSPCLK / (1 * 1) = 50 MHz
 #define ADC_CD2				TRUE		// Div ADC core / 2 = 25MHz
-#define ADC_SH				0			// S/H sample window = 1 => 12.5 MSPS
+#define ADC_SH				2			// S/H sample window = 1 => 12.5 MSPS
 //--------------------------------------------------------
 
 // GPIO

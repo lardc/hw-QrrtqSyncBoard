@@ -73,4 +73,7 @@
 #define PIN_SB_EN			11
 #define PIN_QCUHC_CTRL		17
 
+// ADC placement
+#define AIN_V_CSU			0x00	// INA 0
+
 #endif // __BOARD_CONFIG_H

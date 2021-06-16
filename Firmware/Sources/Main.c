@@ -229,11 +229,11 @@ void InitializeController(Boolean GoodClock)
 	#pragma CODE_SECTION(Timer2_ISR, "ramfuncs");
 	#pragma CODE_SECTION(CAN0A_ISR, "ramfuncs");
 	#pragma CODE_SECTION(CAN0B_ISR, "ramfuncs");
-	#pragma CODE_SECTION(SEQ1_ISR, "ramfuncs");
 	#pragma CODE_SECTION(IllegalInstruction_ISR, "ramfuncs");
 #endif
 //
 #pragma INTERRUPT(Timer0_ISR, HPI);
+#pragma INTERRUPT(SEQ1_ISR, HPI);
 
 // External interrupt ISR
 ISRCALL XInterrupt_ISR(void)
