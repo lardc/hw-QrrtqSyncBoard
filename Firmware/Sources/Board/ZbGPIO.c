@@ -63,19 +63,19 @@ void ZbGPIO_Init()
 
 Boolean ZbGPIO_DCU1_Ready()
 {
-	return !ZwGPIO_ReadPin(PIN_DCU1_READY);
+	return ZwGPIO_ReadPin(PIN_DCU1_READY);
 }
 // ----------------------------------------
 
 Boolean ZbGPIO_DCU2_Ready()
 {
-	return !ZwGPIO_ReadPin(PIN_DCU2_READY);
+	return ZwGPIO_ReadPin(PIN_DCU2_READY);
 }
 // ----------------------------------------
 
 Boolean ZbGPIO_DCU3_Ready()
 {
-	return !ZwGPIO_ReadPin(PIN_DCU3_READY);
+	return ZwGPIO_ReadPin(PIN_DCU3_READY);
 }
 // ----------------------------------------
 
