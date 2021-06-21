@@ -1138,7 +1138,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 		Config->Current = Current / BlockCounter;
 		Config->CurrentRate_x100 = FallRate_x100 / BlockCounter;
 
-		Int32S Ticks = ((Int32S)RCUTrigOffset * CPU_FRQ_MHZ / 1000 - 9) / 5;
+		Int32S Ticks = ((Int32S)RCUTrigOffset * 10 * CPU_FRQ_MHZ / 1000 - 9) / 5;
 		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
 	}
 }

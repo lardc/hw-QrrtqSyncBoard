@@ -29,7 +29,7 @@ typedef struct __TableItemConstraint
 #define X_D_DEF3					10000
 
 // in ns
-#define MAX_RCU_TRIG_OFFSET			5000
+#define MAX_RCU_TRIG_OFFSET			20000
 
 // DCU/RCU
 //
