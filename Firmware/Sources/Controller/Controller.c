@@ -348,7 +348,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DISABLE_POWER:
 			{
-				if(CONTROL_State == DS_Ready)
+				if(CONTROL_State == DS_Ready | CONTROL_State == DS_PowerOn)
 				{
 					CONTROL_SetDeviceState(DS_None);
 					LOGIC_PowerOffPrepare();
