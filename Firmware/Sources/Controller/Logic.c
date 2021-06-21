@@ -481,10 +481,22 @@ void LOGIC_PowerOnSequence()
 			case LS_PON_CSU:
 				{
 					if(!EmulateCSU)
+					{
+						LOGIC_ExtDeviceState.DS_CSU = CDS_InProcess;
+
 						ZbGPIO_CSU_PWRCtrl(TRUE);
+
+						if((CSUVoltage <= CSU_VOLTAGE_HIGH) && (CSUVoltage >= CSU_VOLTAGE_LOW))
+						{
+							LOGIC_ExtDeviceState.DS_CSU = CDS_Ready;
+							LOGIC_State = LS_PON_SCOPE;
+						}
+					}
 					else
+					{
 						LOGIC_ExtDeviceState.DS_CSU = CDS_Ready;
-					LOGIC_State = LS_PON_SCOPE;
+						LOGIC_State = LS_PON_SCOPE;
+					}
 				}
 				break;
 				
