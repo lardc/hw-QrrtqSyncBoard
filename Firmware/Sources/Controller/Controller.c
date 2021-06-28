@@ -519,9 +519,10 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DIAG_PULSE_SW_DUT:
 			{
-				ZbGPIO_DUT_Switch(TRUE);
-				DELAY_US(1000);
-				ZbGPIO_DUT_Switch(FALSE);
+				if(DataTable[REG_DBG])
+					ZbGPIO_DUT_Switch(TRUE);
+				else
+					ZbGPIO_DUT_Switch(FALSE);
 			}
 			break;
 			
@@ -559,9 +560,10 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DIAG_PULSE_CSU_FAN:
 			{
-				ZbGPIO_CSU_FAN(TRUE);
-				DELAY_US(1000);
-				ZbGPIO_CSU_FAN(FALSE);
+				if(DataTable[REG_DBG])
+					ZbGPIO_CSU_FAN(TRUE);
+				else
+					ZbGPIO_CSU_FAN(FALSE);
 			}
 			break;
 			
@@ -591,25 +593,28 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DIAG_PULSE_SB:
 			{
-				ZbGPIO_SensingBoardEnable(TRUE);
-				DELAY_US(1000);
-				ZbGPIO_SensingBoardEnable(FALSE);
+				if(DataTable[REG_DBG])
+					ZbGPIO_SensingBoardEnable(TRUE);
+				else
+					ZbGPIO_SensingBoardEnable(FALSE);
 			}
 			break;
 			
 		case ACT_DIAG_PULSE_QCUHC:
 			{
-				ZbGPIO_QCUHCEnable(TRUE);
-				DELAY_US(1000);
-				ZbGPIO_QCUHCEnable(FALSE);
+				if(DataTable[REG_DBG])
+					ZbGPIO_QCUHCEnable(TRUE);
+				else
+					ZbGPIO_QCUHCEnable(FALSE);
 			}
 			break;
 			
 		case ACT_DIAG_PULSE_GATE_RELAY:
 			{
-				ZbGPIO_DUT_ControlEnable(TRUE);
-				DELAY_US(1000);
-				ZbGPIO_DUT_ControlEnable(FALSE);
+				if(DataTable[REG_DBG])
+					ZbGPIO_DUT_ControlEnable(TRUE);
+				else
+					ZbGPIO_DUT_ControlEnable(FALSE);
 			}
 			break;
 			
