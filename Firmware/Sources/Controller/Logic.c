@@ -258,7 +258,7 @@ void LOGIC_CacheVariables()
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 		
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
-		CROVU_VoltageRate = DataTable[REG_OSV_RATE];
+		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		
 		FCROVU_IShortCircuit = DataTable[REG_FCROVU_I_SHORT];
 		
