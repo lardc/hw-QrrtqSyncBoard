@@ -110,6 +110,8 @@
 #define REG_DCU_SYNC_DELAY			160
 #define REG_RCU_SYNC_DELAY			161
 //
+#define REG_DBG						170	// Отладочный регистр
+//
 #define REG_PWD_1					180	// Unlock password location 1
 #define REG_PWD_2					181	// Unlock password location 2
 #define REG_PWD_3					182	// Unlock password location 3
