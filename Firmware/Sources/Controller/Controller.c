@@ -503,9 +503,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DIAG_TURN_ON_PC:
 			{
-				ZbGPIO_PC_TurnOn(TRUE);
-				DELAY_US(500000);
-				ZbGPIO_PC_TurnOn(FALSE);
+				ZbGPIO_PC_TurnOn();
 			}
 			break;
 			

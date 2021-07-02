@@ -104,6 +104,9 @@ void main()
 	// Start update cycle
 	ZwTimer_StartT2();
 
+	// Turn-on PC
+	ZbGPIO_PC_TurnOn();
+
 	// Low-priority services
 	while(TRUE)
 		CONTROL_Idle();

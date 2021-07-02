@@ -145,9 +145,11 @@ void ZbGPIO_DUT_Control(Boolean Set)
 }
 // ----------------------------------------
 
-void ZbGPIO_PC_TurnOn(Boolean Set)
+void ZbGPIO_PC_TurnOn()
 {
-	ZwGPIO_WritePin(PIN_PC_PWR, Set);
+	ZwGPIO_WritePin(PIN_PC_PWR, TRUE);
+	DELAY_US(500000);
+	ZwGPIO_WritePin(PIN_PC_PWR, FALSE);
 }
 // ----------------------------------------
 
