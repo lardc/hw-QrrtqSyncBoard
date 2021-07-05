@@ -225,6 +225,8 @@ void CONTROL_SwitchToReady()
 
 void CONTROL_SwitchToFault(Int16U FaultReason, Int16U FaultReasonExt)
 {
+	COMMUTATION_Control(FALSE);
+
 	CONTROL_SetDeviceState(DS_Fault);
 	DataTable[REG_FAULT_REASON] = FaultReason;
 	DataTable[REG_FAULT_REASON_EXT] = FaultReasonExt;
