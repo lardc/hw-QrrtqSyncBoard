@@ -22,7 +22,7 @@
 #define EP_COUNT						12
 #define VALUES_x_SIZE					2000
 //
-#define	SCCI_MASTER_TIMEOUT_TICKS_MS	100		// in ms
+#define	SCCI_MASTER_TIMEOUT_TICKS_MS	500		// in ms
 #define	SCCI_SLAVE_TIMEOUT_TICKS_MS		100		// in ms
 #define	BCCI_MASTER_TIMEOUT_TICKS_MS	1000	// in ms
 //
