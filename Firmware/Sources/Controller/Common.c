@@ -152,7 +152,7 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState 
 					&& FullStateStorage.DS_RCU1 == DRCUWaitState
 					&& FullStateStorage.DS_RCU2 == DRCUWaitState
 					&& FullStateStorage.DS_RCU3 == DRCUWaitState
-					&& FullStateStorage.DS_SCOPE == CDS_None)
+					&& (FullStateStorage.DS_SCOPE == CDS_None || FullStateStorage.DS_SCOPE == CDS_Ready))
 			{
 				*CurrentLogicState = LS_None;
 			}
@@ -191,7 +191,7 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState 
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, Fault);
 			}
-			else if(FullStateStorage.DS_SCOPE != CDS_None)
+			else if(FullStateStorage.DS_SCOPE != CDS_None && FullStateStorage.DS_SCOPE != CDS_Ready)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, Fault);
 			}
