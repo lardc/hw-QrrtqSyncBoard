@@ -17,6 +17,10 @@
 #include "HighLevelInterface.h"
 #include "Logic.h"
 
+// Definitions
+//
+#define PRESSURE_FAULT_COUNTER_MAX			1000
+
 // Variables
 //
 volatile DeviceState CONTROL_State = DS_None;
@@ -681,8 +685,17 @@ void SAFETY_Handler()
 
 void PRESSURE_Handler()
 {
+	static Int16U PressureFaultCounter = 0;
+
 	if(((CONTROL_State == DS_InProcess) || (CONTROL_State == DS_Ready)) && !ZbGPIO_PressureCheck())
-		CONTROL_SwitchToFault(FAULT_PRESSURE, 0);
+	{
+		PressureFaultCounter++;
+
+		if(PressureFaultCounter > PRESSURE_FAULT_COUNTER_MAX)
+			CONTROL_SwitchToFault(FAULT_PRESSURE, 0);
+	}
+	else
+		PressureFaultCounter = 0;
 
 	DataTable[REG_PRESSURE] = ZbGPIO_PressureCheck();
 }
