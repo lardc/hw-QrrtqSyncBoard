@@ -54,8 +54,8 @@ typedef struct __TableItemConstraint
 #define OS_VOLATGE_MAX				4500	// in V
 #define OS_VOLATGE_DEF				200		// in V
 
-#define OSV_RATE_MIN				20		// in V/us
-#define OSV_RATE_MAX				200		// in V/us
+#define OSV_RATE_MIN				10		// in V/us
+#define OSV_RATE_MAX				2000	// in V/us
 #define OSV_RATE_DEF				20		// in V/us
 
 #define OSV_CURRENT_MIN				400		// in A
