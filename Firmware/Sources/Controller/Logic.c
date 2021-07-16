@@ -860,15 +860,14 @@ void LOGIC_ReadDataSequence()
 				
 			case LS_READ_DCU:
 				{
-					Int16U Idc1Temp = 0, Idc2Temp = 0, Idc3Temp = 0;
+					if(EmulateDCU1)
+						LOGIC_ExtDeviceState.DS_DCU1 = CDS_Ready;
+					if(EmulateDCU2)
+						LOGIC_ExtDeviceState.DS_DCU2 = CDS_Ready;
+					if(EmulateDCU3)
+						LOGIC_ExtDeviceState.DS_DCU3 = CDS_Ready;
 
-					if(CMN_ReadDRCUCurrent(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &Idc1Temp))
-						if(CMN_ReadDRCUCurrent(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &Idc2Temp))
-							if(CMN_ReadDRCUCurrent(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &Idc3Temp))
-							{
-								LOGIC_State = LS_READ_RCU;
-								Results[ResultsCounter].Idc = Idc1Temp + Idc2Temp + Idc3Temp;
-							}
+					LOGIC_State = LS_READ_RCU;
 				}
 				break;
 				
@@ -902,6 +901,8 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO, &Results[ResultsCounter].ZeroI);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IDC, &Results[ResultsCounter].Idc);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VD, &Results[ResultsCounter].Vd);
 
 							if(!Result)
 							{
@@ -1039,22 +1040,23 @@ void LOGIC_LogData(MeasurementResult Result)
 void LOGIC_ResultToDataTable()
 {
 	Int16U i, AvgCounter = 0;
-	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, AvgIdc = 0, AvgdIdt = 0, Irr, Trr;
-	
+	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, AvgIdc = 0, AvgdIdt = 0, AvgVd = 0, Irr, Trr;
+
 	for(i = 0; i < ResultsCounter; ++i)
 	{
-		if(Results[i].Irr && Results[i].Trr && Results[i].Qrr && Results[i].Idc && Results[i].dIdt)
+		if(Results[i].Irr && Results[i].Trr && Results[i].Qrr && Results[i].Idc && Results[i].dIdt && Results[i].Vd)
 		{
 			AvgIrr += Results[i].Irr;
 			AvgTrr += Results[i].Trr;
 			AvgQrr += Results[i].Qrr;
 			AvgIdc += Results[i].Idc;
 			AvgdIdt += Results[i].dIdt;
+			AvgVd += Results[i].Vd;
 			
 			++AvgCounter;
 		}
 	}
-	
+
 	// Prevent division by zero
 	if(AvgCounter == 0)
 		AvgCounter = 1;
@@ -1066,6 +1068,7 @@ void LOGIC_ResultToDataTable()
 	DataTable[REG_RES_TRR] = Trr;
 	DataTable[REG_RES_IRR] = Irr;
 	DataTable[REG_RES_IDC] = AvgIdc / AvgCounter;
+	DataTable[REG_RES_VD] = AvgVd / AvgCounter;
 	DataTable[REG_RES_TQ] = Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
 	DataTable[REG_RES_DIDT] = AvgdIdt / AvgCounter;
 	DataTable[REG_RES_QRR_INT] = (AvgQrr * 10) / AvgCounter;

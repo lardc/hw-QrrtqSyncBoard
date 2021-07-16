@@ -103,6 +103,7 @@ typedef struct __MeasurementResult
 	Int16U Trr;					// Reverse recovery time (in us x10)
 	Int16U Qrr;					// Reverse recovery charge (in uQ)
 	Int16U Idc;					// Actual direct current (in A)
+	Int16U Vd;					// Actual direct voltage (in V)
 	Int16U ZeroI;				// Time of current zero-crossing (in us x10)
 	Int16U ZeroV;				// Time of voltage zero-crossing (in us x10)
 	Int16U dIdt;				// Actual dIdt value (in A/us x10)
