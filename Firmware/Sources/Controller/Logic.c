@@ -932,7 +932,20 @@ void LOGIC_ReadDataSequence()
 										if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
 											LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
 
-										LOGIC_State = LS_WAIT_READY;
+										// Read data plots
+										if (LOGIC_PulseNumRemain == 0 && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
+										{
+											if (HLI_RS232_ReadArray16(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
+												if (MeasurementMode == MODE_QRR_TQ)
+												{
+													if (HLI_RS232_ReadArray16(EP_SCOPE_VD, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
+														LOGIC_State = LS_WAIT_READY;
+												}
+												else
+													LOGIC_State = LS_WAIT_READY;
+										}
+										else
+											LOGIC_State = LS_WAIT_READY;
 
 										Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
 										DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;

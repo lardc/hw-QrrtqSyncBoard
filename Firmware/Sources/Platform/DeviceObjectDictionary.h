@@ -223,6 +223,9 @@
 #define PROBLEM_SCOPE_CALC_DIDT		5	// Problem calculating actual dIdt
 #define PROBLEM_SAFETY				6	// Problem safety
 //
+// Endpoints
+#define EP_SCOPE_IDC				1	// Scope current data
+#define EP_SCOPE_VD					2	// Scope voltage data
 // ----------------------------------------
 
 // ENDPOINTS
