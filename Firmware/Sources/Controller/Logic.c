@@ -21,7 +21,7 @@ volatile DeviceSubState LOGIC_StateRealTime = LSRT_None;
 volatile Int32U LOGIC_RealTimeCounter = 0;
 static volatile Int64U Timeout;
 static volatile Int64U CSU_FanTimeout;
-static volatile LogicState LOGIC_State = LS_None;
+volatile LogicState LOGIC_State = LS_None;
 static volatile ExternalDeviceState LOGIC_ExtDeviceState;
 //
 static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
@@ -261,7 +261,7 @@ void LOGIC_CacheVariables()
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		
 		FCROVU_IShortCircuit = DataTable[REG_FCROVU_I_SHORT];
-		
+
 		LOGIC_DriverOffTicks = (
 				((DC_Current / DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
 						(DC_Current / DC_CurrentRiseRate / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
@@ -577,8 +577,9 @@ void LOGIC_ConfigureSequence()
 						if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
 							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE,
 									CROVU_VoltageRate))
-								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
-									LOGIC_State = LS_CFG_FCROVU;
+								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_EXT_SYNC))
+									if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
+										LOGIC_State = LS_CFG_FCROVU;
 					}
 					else
 					{
@@ -642,6 +643,9 @@ void LOGIC_ConfigureSequence()
 					{
 						switch(LOGIC_ExtDeviceState.DS_SCOPE)
 						{
+							case CDS_InProcess:
+								HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
+
 							case CDS_None:
 								{
 									if(HLI_RS232_Write16(REG_SCOPE_CURRENT_AMPL, DataTable[REG_DIRECT_CURRENT]))
@@ -651,9 +655,6 @@ void LOGIC_ConfigureSequence()
 												if(HLI_RS232_CallAction(ACT_SCOPE_START_TEST))
 													LOGIC_State = LS_CFG_WaitStates;
 								}
-								break;
-							case CDS_InProcess:
-								HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
 								break;
 						}
 					}
@@ -882,7 +883,7 @@ void LOGIC_ReadDataSequence()
 
 					LOGIC_State = LS_READ_SCOPE;
 				}
-				break;
+				break;;
 
 			case LS_READ_SCOPE:
 				{
@@ -902,36 +903,40 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
 
-							if(Result && Register == OPRESULT_NONE)
+							if(!Result)
 							{
 								LOGIC_State = LS_Error;
-								CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE,
-								FAULTEX_READ_WRONG_STATE);
-							}
-							else if((Register == OPRESULT_FAIL && Problem != PROBLEM_SCOPE_CALC_VZ)
-									|| (Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ
-											&& !Results[ResultsCounter].DeviceTriggered))
-							{
-								LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
-							}
-							else if(Results[ResultsCounter].Irr > DC_Current)
-							{
-								LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
+								CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_TIMEOUT);
 							}
 							else
 							{
-								// Save results
-								Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
-								LOGIC_LogData(Results[ResultsCounter]);
+								if((Register == OPRESULT_FAIL && Problem != PROBLEM_SCOPE_CALC_VZ)
+										|| (Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ
+												&& !Results[ResultsCounter].DeviceTriggered))
+								{
+									LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
+								}
 
-								// Apply extended Tq logic
-								if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
-									LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
+								if(Register == OPRESULT_OK)
+								{
+									if(Results[ResultsCounter].Irr > DC_Current)
+										LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
+									else
+									{
+										// Save results
+										Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
+										LOGIC_LogData(Results[ResultsCounter]);
 
-								LOGIC_State = LS_WAIT_READY;
+										// Apply extended Tq logic
+										if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
+											LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
 
-								Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
-								DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
+										LOGIC_State = LS_WAIT_READY;
+
+										Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
+										DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
+									}
+								}
 							}
 						}
 					}
