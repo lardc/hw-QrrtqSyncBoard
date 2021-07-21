@@ -575,9 +575,10 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DIAG_PULSE_CSU_SYNC:
 			{
-				ZbGPIO_CSU_Sync(TRUE);
-				DELAY_US(1000);
-				ZbGPIO_CSU_Sync(FALSE);
+				if(DataTable[REG_DBG])
+					ZbGPIO_CSU_Sync(TRUE);
+				else
+					ZbGPIO_CSU_Sync(FALSE);
 			}
 			break;
 			
