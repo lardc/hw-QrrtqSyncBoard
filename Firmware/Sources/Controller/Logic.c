@@ -557,6 +557,8 @@ void LOGIC_ConfigurePrepare()
 
 void LOGIC_ConfigureSequence()
 {
+	static Boolean CROVU_StrartConfig = TRUE;
+
 	if(LOGIC_State == LS_CFG_CROVU || LOGIC_State == LS_CFG_FCROVU || LOGIC_State == LS_CFG_SCOPE
 			|| LOGIC_State == LS_CFG_DCU1 || LOGIC_State == LS_CFG_DCU2 || LOGIC_State == LS_CFG_DCU3
 			|| LOGIC_State == LS_CFG_RCU1 || LOGIC_State == LS_CFG_RCU2 || LOGIC_State == LS_CFG_RCU3
@@ -574,12 +576,22 @@ void LOGIC_ConfigureSequence()
 				{
 					if(!EmulateCROVU && !MuteCROVU)
 					{
-						if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
-							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE,
-									CROVU_VoltageRate))
-								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_EXT_SYNC))
+						if(CROVU_StrartConfig)
+						{
+							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
+								if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE, CROVU_VoltageRate))
 									if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
-										LOGIC_State = LS_CFG_FCROVU;
+										CROVU_StrartConfig = FALSE;
+						}
+						else
+						{
+							if(LOGIC_ExtDeviceState.DS_CROVU == CDS_Ready)
+								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_EXT_SYNC))
+								{
+									CROVU_StrartConfig = TRUE;
+									LOGIC_State = LS_CFG_FCROVU;
+								}
+						}
 					}
 					else
 					{
@@ -803,6 +815,7 @@ void LOGIC_ReadDataSequence()
 					if(!EmulateCROVU)
 					{
 						if(LOGIC_ExtDeviceState.DS_CROVU == CDS_Ready)
+						{
 							if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
 							{
 								if(MeasurementMode == MODE_QRR_TQ)
@@ -822,6 +835,14 @@ void LOGIC_ReadDataSequence()
 								else
 									LOGIC_State = LS_READ_FCROVU;
 							}
+						}
+
+						if(LOGIC_ExtDeviceState.DS_CROVU == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_READ_WRONG_STATE);
+						}
+
 					}
 					else
 						LOGIC_State = LS_READ_FCROVU;
@@ -833,6 +854,7 @@ void LOGIC_ReadDataSequence()
 					if(!EmulateFCROVU)
 					{
 						if(LOGIC_ExtDeviceState.DS_FCROVU == CDS_Ready)
+						{
 							if(HLI_CAN_Read16(DataTable[REG_FCROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
 							{
 								if(MeasurementMode == MODE_QRR_TQ)
@@ -852,6 +874,13 @@ void LOGIC_ReadDataSequence()
 								else
 									LOGIC_State = LS_READ_DCU;
 							}
+						}
+
+						if(LOGIC_ExtDeviceState.DS_FCROVU == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_READ_WRONG_STATE);
+						}
 					}
 					else
 						LOGIC_State = LS_READ_DCU;
@@ -862,10 +891,36 @@ void LOGIC_ReadDataSequence()
 				{
 					if(EmulateDCU1)
 						LOGIC_ExtDeviceState.DS_DCU1 = CDS_Ready;
+					else
+					{
+						if(LOGIC_ExtDeviceState.DS_DCU1 == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_READ_WRONG_STATE);
+						}
+					}
+
 					if(EmulateDCU2)
 						LOGIC_ExtDeviceState.DS_DCU2 = CDS_Ready;
+					else
+					{
+						if(LOGIC_ExtDeviceState.DS_DCU2 == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_READ_WRONG_STATE);
+						}
+					}
+
 					if(EmulateDCU3)
 						LOGIC_ExtDeviceState.DS_DCU3 = CDS_Ready;
+					else
+					{
+						if(LOGIC_ExtDeviceState.DS_DCU3 == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_READ_WRONG_STATE);
+						}
+					}
 
 					LOGIC_State = LS_READ_RCU;
 				}
@@ -875,10 +930,36 @@ void LOGIC_ReadDataSequence()
 				{
 					if(EmulateRCU1)
 						LOGIC_ExtDeviceState.DS_RCU1 = CDS_Ready;
+					else
+					{
+						if(LOGIC_ExtDeviceState.DS_RCU1 == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_READ_WRONG_STATE);
+						}
+					}
+
 					if(EmulateRCU2)
 						LOGIC_ExtDeviceState.DS_RCU2 = CDS_Ready;
+					else
+					{
+						if(LOGIC_ExtDeviceState.DS_RCU2 == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_READ_WRONG_STATE);
+						}
+					}
+
 					if(EmulateRCU3)
 						LOGIC_ExtDeviceState.DS_RCU3 = CDS_Ready;
+					else
+					{
+						if(LOGIC_ExtDeviceState.DS_RCU3 == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_READ_WRONG_STATE);
+						}
+					}
 
 					LOGIC_State = LS_READ_SCOPE;
 				}
@@ -952,6 +1033,12 @@ void LOGIC_ReadDataSequence()
 									}
 								}
 							}
+						}
+
+						if(LOGIC_ExtDeviceState.DS_SCOPE == CDS_Fault)
+						{
+							LOGIC_State = LS_Error;
+							CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_WRONG_STATE);
 						}
 					}
 					else
