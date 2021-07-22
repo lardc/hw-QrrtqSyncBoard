@@ -379,6 +379,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 		case ACT_STOP:
 			{
 				LOGIC_AbortMeasurement(WARNING_MANUAL_STOP);
+				COMMUTATION_Control(FALSE);
 				CONTROL_SwitchToReady();
 			}
 			break;
