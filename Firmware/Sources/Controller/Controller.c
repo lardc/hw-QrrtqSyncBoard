@@ -25,7 +25,7 @@
 //
 volatile DeviceState CONTROL_State = DS_None;
 volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause, CONTROL_CommutationDelay;
-static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE;
+static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE, CommutationForcedOn = FALSE;
 static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 //
 #pragma DATA_SECTION(CONTROL_Values_1, "data_mem");
@@ -658,7 +658,21 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				ZbGPIO_RCU_Sync(FALSE);
 			}
 			break;
+
+		case ACT_COMMUTATION_FORCED_ON:
+			{
+				COMMUTATION_Control(TRUE);
+				CommutationForcedOn = TRUE;
+			}
+			break;
 			
+		case ACT_COMMUTATION_FORCED_OFF:
+			{
+				CommutationForcedOn = FALSE;
+				COMMUTATION_Control(FALSE);
+			}
+			break;
+
 		default:
 			return FALSE;
 	}
@@ -669,9 +683,12 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 
 void COMMUTATION_Control(Boolean State)
 {
-	ZbGPIO_QCUHCEnable(State);
-	ZbGPIO_SensingBoardEnable(State);
-	ZbGPIO_DUT_ControlEnable(State);
+	if(!CommutationForcedOn)
+	{
+		ZbGPIO_QCUHCEnable(State);
+		ZbGPIO_SensingBoardEnable(State);
+		ZbGPIO_DUT_ControlEnable(State);
+	}
 }
 // ----------------------------------------
 

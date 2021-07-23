@@ -37,6 +37,8 @@
 #define ACT_START					100	// Start measurement
 #define ACT_STOP					101	// Force measurement stop
 #define ACT_SINGLE_START			102	// Start single-pulse measurement
+#define ACT_COMMUTATION_FORCED_ON	110	// Commutation enable
+#define ACT_COMMUTATION_FORCED_OFF	111	// Commutation disable
 //
 #define ACT_SAVE_TO_ROM				200	// Save parameters to EEPROM module
 #define ACT_RESTORE_FROM_ROM		201	// Restore parameters from EEPROM module
@@ -136,7 +138,7 @@
 #define REG_SLAVE_ERR				203	// Slave error
 #define REG_SLAVE_EXTDATA			204	// Slave call extended data
 //
-#define REG_RES_QRR					210	// Reverse recovery charge (in uC x10)
+#define REG_RES_QRR					210	// Reverse recovery charge (in uC x10) (Calculation defined by GOST)
 #define REG_RES_IRR					211	// Reverse recovery current amplitude (in A)
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)
 #define REG_RES_TQ					213	// Turn-off time (in us x10)
