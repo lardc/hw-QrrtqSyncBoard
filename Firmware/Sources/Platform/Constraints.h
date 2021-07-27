@@ -30,6 +30,7 @@ typedef struct __TableItemConstraint
 
 // in ns
 #define MAX_RCU_TRIG_OFFSET			20000
+#define MAX_GATE_DRV_TURN_ON_DELAY	500
 
 // DCU/RCU
 //

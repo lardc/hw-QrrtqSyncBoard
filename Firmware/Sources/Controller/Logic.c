@@ -1307,3 +1307,12 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x10)
 	}
 }
 // ----------------------------------------
+
+void LOGIC_GenerateSyncSequence()
+{
+	ZbGPIO_CSU_Sync(TRUE);
+	ZbGPIO_DCU_Sync(TRUE);
+	DELAY_US(DataTable[REG_GATE_DRV_TURNON_DELAY]);
+	ZbGPIO_DUT_Control(TRUE);
+	ZbGPIO_DUT_Switch(TRUE);
+}

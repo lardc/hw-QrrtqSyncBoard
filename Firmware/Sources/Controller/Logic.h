@@ -157,6 +157,8 @@ void CONTROL_CSU();
 void CSU_VoltageMeasuring(Int16U * const restrict pResults);
 // Safety problem
 void LOGIC_SafetyProblem();
+// Generate sync pulses
+void LOGIC_GenerateSyncSequence();
 
 // Variables
 //

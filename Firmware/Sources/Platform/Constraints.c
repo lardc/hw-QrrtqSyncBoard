@@ -39,7 +39,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, DRCU_CURRENT_MAX, 0},												// 23
 											   {0, 0, 0},																// 24
 											   {0, DCU_I_RISE_RATE_MAX, DCU_I_RISE_RATE_DEF},							// 25
-											   {0, 0, 0},																// 26
+											   {0, MAX_GATE_DRV_TURN_ON_DELAY, 0},										// 26
 											   {0, 0, 0},																// 27
 											   {0, 0, 0},																// 28
 											   {0, 0, 0},																// 29

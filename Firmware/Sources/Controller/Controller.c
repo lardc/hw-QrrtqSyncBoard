@@ -301,12 +301,8 @@ void CONTROL_SubProcessStateMachine()
 		{
 			if(LOGIC_GetState() == LS_None && CONTROL_TimeCounter > CONTROL_PulseToPulsePause)
 			{
+				LOGIC_GenerateSyncSequence();
 				LOGIC_RealTimeCounter = 0;
-				
-				ZbGPIO_CSU_Sync(TRUE);
-				ZbGPIO_DUT_Control(TRUE);
-				ZbGPIO_DUT_Switch(TRUE);
-				ZbGPIO_DCU_Sync(TRUE);
 				
 				LOGIC_StateRealTime = LSRT_DirectPulseStart;
 			}
