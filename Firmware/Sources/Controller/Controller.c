@@ -16,6 +16,7 @@
 #include "Constraints.h"
 #include "HighLevelInterface.h"
 #include "Logic.h"
+#include "CommonDictionary.h"
 
 // Definitions
 //
@@ -301,10 +302,32 @@ void CONTROL_SubProcessStateMachine()
 		{
 			if(LOGIC_GetState() == LS_None && CONTROL_TimeCounter > CONTROL_PulseToPulsePause)
 			{
-				LOGIC_GenerateSyncSequence();
-				LOGIC_RealTimeCounter = 0;
-				
-				LOGIC_StateRealTime = LSRT_DirectPulseStart;
+				if(MeasurementMode == MODE_DVDT_ONLY)
+				{
+					ZbGPIO_FCROVU_Sync(TRUE);
+					DELAY_US(SYNC_WIDTH_CROVU);
+					ZbGPIO_FCROVU_Sync(FALSE);
+
+					DELAY_US(500);
+
+					COMMUTATION_Control(FALSE);
+
+					Int16U Register;
+					if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
+					{
+						DataTable[REG_FINISHED] = Register;
+						CONTROL_SwitchToReady();
+					}
+					else
+						CONTROL_SwitchToFault(FAULT_PROTOCOL, FAULTEX_READ_TIMEOUT);
+				}
+				else
+				{
+					LOGIC_GenerateSyncSequence();
+					LOGIC_RealTimeCounter = 0;
+
+					LOGIC_StateRealTime = LSRT_DirectPulseStart;
+				}
 			}
 		}
 		else if(LOGIC_GetState() == LS_None && LOGIC_StateRealTime == LSRT_None)
@@ -379,7 +402,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				CONTROL_SwitchToReady();
 			}
 			break;
-			
+
 		case ACT_CLR_FAULT:
 			if(CONTROL_State == DS_Fault || CONTROL_State == DS_None)
 			{

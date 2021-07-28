@@ -25,7 +25,7 @@ volatile LogicState LOGIC_State = LS_None;
 static volatile ExternalDeviceState LOGIC_ExtDeviceState;
 //
 static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
-static volatile Int16U ResultsCounter, MeasurementMode;
+volatile Int16U ResultsCounter, MeasurementMode;
 //
 static Boolean EmulateCROVU, EmulateFCROVU, EmulateDCU1, EmulateDCU2, EmulateDCU3, EmulateRCU1, EmulateRCU2,
 		EmulateRCU3, EmulateSCOPE, MuteCROVU, EmulateCSU;
@@ -609,12 +609,21 @@ void LOGIC_ConfigureSequence()
 							if(HLI_CAN_Write16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_I_SHORT_CIRCUIT,
 									FCROVU_IShortCircuit))
 								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_CONFIG))
-									LOGIC_State = LS_CFG_DCU1;
+								{
+									if(MeasurementMode == MODE_DVDT_ONLY)
+										LOGIC_State = LS_None;
+									else
+										LOGIC_State = LS_CFG_DCU1;
+								}
 					}
 					else
 					{
 						LOGIC_ExtDeviceState.DS_FCROVU = CDS_Ready;
-						LOGIC_State = LS_CFG_DCU1;
+
+						if(MeasurementMode == MODE_DVDT_ONLY)
+							LOGIC_State = LS_None;
+						else
+							LOGIC_State = LS_CFG_DCU1;
 					}
 				}
 				break;

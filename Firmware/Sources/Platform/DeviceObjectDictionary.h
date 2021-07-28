@@ -258,6 +258,7 @@
 //
 #define MODE_QRR_ONLY				0	// Measure only reverse recovery (Qrr) parameters
 #define MODE_QRR_TQ					1	// Measure Qrr-tq parameters
+#define MODE_DVDT_ONLY				2	// dVdt process only
 
 // FAULT CODES
 //
