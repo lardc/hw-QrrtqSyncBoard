@@ -95,6 +95,7 @@ void CONTROL_Init(Boolean BadClockDetected)
 	
 	// Init data table
 	DT_Init(EPROMService, BadClockDetected);
+	DT_SaveFirmwareInfo(DEVICE_CAN_ADDRESS, 0);
 	// Fill state variables with default values
 	CONTROL_FillWPPartDefault();
 	
