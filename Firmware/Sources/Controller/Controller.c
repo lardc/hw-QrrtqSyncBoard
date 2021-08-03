@@ -62,6 +62,7 @@ void CONTROL_SwitchToReverseCurrent();
 void CONTROL_SubProcessStateMachine();
 void CONTROL_ReinitRS232();
 void CONTROL_SwitchToReady();
+void CONTROL_SlowEPRead();
 void CONTROL_Commutation(Boolean State);
 void CONTROL_SafetyHandler();
 void CONTROL_PressureHandler();
@@ -482,22 +483,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				DEVPROFILE_ResetEPReadState();
 				DEVPROFILE_ResetScopes(0, BIT10);
 				
-				Boolean ret =
-						(DataTable[REG_DIAG_NID] == 0) ?
-								HLI_RS232_ReadArray16(DataTable[REG_DIAG_IN_1], CONTROL_Values_Slave, VALUES_x_SIZE,
-										(pInt16U)&CONTROL_Values_Slave_Counter) :
-								HLI_CAN_ReadArray16(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1],
-										CONTROL_Values_Slave, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_Slave_Counter);
-				if(ret)
-				{
-					DataTable[REG_DIAG_OUT_1] = ERR_NO_ERROR;
-					DataTable[REG_DIAG_OUT_2] = CONTROL_Values_Slave_Counter;
-				}
-				else
-				{
-					HLIError err = HLI_GetError();
-					DataTable[REG_DIAG_OUT_1] = err.ErrorCode;
-				}
+				CONTROL_RequestDPC(&CONTROL_SlowEPRead);
 			}
 			break;
 			
@@ -695,6 +681,29 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 	}
 	
 	return TRUE;
+}
+// ----------------------------------------
+
+void CONTROL_SlowEPRead()
+{
+	Boolean ret =
+			(DataTable[REG_DIAG_NID] == 0) ?
+					HLI_RS232_ReadArray16(DataTable[REG_DIAG_IN_1], CONTROL_Values_Slave, VALUES_x_SIZE,
+							(pInt16U)&CONTROL_Values_Slave_Counter) :
+					HLI_CAN_ReadArray16(DataTable[REG_DIAG_NID], DataTable[REG_DIAG_IN_1],
+							CONTROL_Values_Slave, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_Slave_Counter);
+	if(ret)
+	{
+		DataTable[REG_DIAG_OUT_1] = ERR_NO_ERROR;
+		DataTable[REG_DIAG_OUT_2] = CONTROL_Values_Slave_Counter;
+	}
+	else
+	{
+		HLIError err = HLI_GetError();
+		DataTable[REG_DIAG_OUT_1] = err.ErrorCode;
+	}
+
+	CONTROL_RequestDPC(NULL);
 }
 // ----------------------------------------
 
