@@ -62,9 +62,9 @@ void CONTROL_SwitchToReverseCurrent();
 void CONTROL_SubProcessStateMachine();
 void CONTROL_ReinitRS232();
 void CONTROL_SwitchToReady();
-void COMMUTATION_Control(Boolean State);
-void SAFETY_Handler();
-void PRESSURE_Handler();
+void CONTROL_Commutation(Boolean State);
+void CONTROL_SafetyHandler();
+void CONTROL_PressureHandler();
 
 // Functions
 //
@@ -170,11 +170,8 @@ void CONTROL_Update()
 	// Process real-time tasks
 	LOGIC_RealTime();
 	
-	// Safety handler
-	SAFETY_Handler();
-	
-	// Pressure handler
-	PRESSURE_Handler();
+	CONTROL_SafetyHandler();
+	CONTROL_PressureHandler();
 }
 // ----------------------------------------
 
@@ -231,7 +228,7 @@ void CONTROL_SwitchToReady()
 
 void CONTROL_SwitchToFault(Int16U FaultReason, Int16U FaultReasonExt)
 {
-	COMMUTATION_Control(FALSE);
+	CONTROL_Commutation(FALSE);
 
 	CONTROL_SetDeviceState(DS_Fault);
 	DataTable[REG_FAULT_REASON] = FaultReason;
@@ -275,7 +272,7 @@ void CONTROL_Start(Boolean SinglePulse)
 	CONTROL_PulseToPulsePause = CONTROL_TimeCounter;
 	LOGIC_CacheUpdateSettings(TRUE, SinglePulse);
 	
-	COMMUTATION_Control(TRUE);
+	CONTROL_Commutation(TRUE);
 	CONTROL_CommutationDelay = CONTROL_TimeCounter + DELAY_COMMUTATION;
 
 	CONTROL_SetDeviceState(DS_InProcess);
@@ -311,7 +308,7 @@ void CONTROL_SubProcessStateMachine()
 
 					DELAY_US(500);
 
-					COMMUTATION_Control(FALSE);
+					CONTROL_Commutation(FALSE);
 
 					Int16U Register;
 					if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
@@ -338,7 +335,7 @@ void CONTROL_SubProcessStateMachine()
 				LOGIC_ResultToDataTable();
 				DataTable[REG_FINISHED] = LOGIC_GetOpResult();
 				CONTROL_SwitchToReady();
-				COMMUTATION_Control(FALSE);
+				CONTROL_Commutation(FALSE);
 			}
 			else
 			{
@@ -399,7 +396,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 		case ACT_STOP:
 			{
 				LOGIC_AbortMeasurement(WARNING_MANUAL_STOP);
-				COMMUTATION_Control(FALSE);
+				CONTROL_Commutation(FALSE);
 				CONTROL_SwitchToReady();
 			}
 			break;
@@ -681,7 +678,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 
 		case ACT_COMMUTATION_FORCED_ON:
 			{
-				COMMUTATION_Control(TRUE);
+				CONTROL_Commutation(TRUE);
 				CommutationForcedOn = TRUE;
 			}
 			break;
@@ -689,7 +686,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 		case ACT_COMMUTATION_FORCED_OFF:
 			{
 				CommutationForcedOn = FALSE;
-				COMMUTATION_Control(FALSE);
+				CONTROL_Commutation(FALSE);
 			}
 			break;
 
@@ -701,7 +698,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 }
 // ----------------------------------------
 
-void COMMUTATION_Control(Boolean State)
+void CONTROL_Commutation(Boolean State)
 {
 	if(!CommutationForcedOn)
 	{
@@ -712,7 +709,7 @@ void COMMUTATION_Control(Boolean State)
 }
 // ----------------------------------------
 
-void SAFETY_Handler()
+void CONTROL_SafetyHandler()
 {
 	if((CONTROL_State == DS_InProcess) && ZbGPIO_SafetyCheck())
 		LOGIC_SafetyProblem();
@@ -722,7 +719,7 @@ void SAFETY_Handler()
 }
 // ----------------------------------------
 
-void PRESSURE_Handler()
+void CONTROL_PressureHandler()
 {
 	static Int16U PressureFaultCounter = 0;
 

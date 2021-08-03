@@ -245,6 +245,7 @@ ISRCALL XInterrupt_ISR(void)
 
 	XINT_ISR_DONE;
 }
+// -----------------------------------------
 
 // timer 0 ISR
 ISRCALL Timer0_ISR(void)
@@ -349,5 +350,3 @@ ISRCALL IllegalInstruction_ISR(void)
 	ZwSystem_ForceDog();
 }
 // -----------------------------------------
-
-// No more.
