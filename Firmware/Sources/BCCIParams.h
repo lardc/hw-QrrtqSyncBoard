@@ -9,8 +9,13 @@
 
 // Constants
 //
-#define DEVICE_CAN_ADDRESS			10
 #define DEV_ADDR_MPY				(1 << 10)
-#define CAN_ACCEPTANCE_MASK			0xFFFFFC00
+
+// Slave params
+#define DEVICE_CAN_ADDRESS			10
+
+// Master params
+#define BCCI_MASTER_ADDRESS			20
+#define BCCIM_ACCEPTANCE_MASK		0xFFFFFC00
 
 #endif // __BCCI_PARAMS_H
