@@ -148,6 +148,9 @@
 #define REG_RES_QRR_INT				216	// Reverse recovery charge (integration mode) (in uC x10)
 #define REG_RES_VD					217	// Actual direct voltage value (in V)
 //
+#define REG_EP_ELEMENT_FRACT		218	// Elementary fraction length (in ns)
+#define REG_EP_STEP_FRACT_CNT		219	// Number of elementary fractions in the EP single step
+//
 #define REG_CANA_BUSOFF_COUNTER		220 // Counter of bus-off states
 #define REG_CANA_STATUS_REG			221	// CAN status register (32 bit)
 #define REG_CANA_STATUS_REG_32		222
@@ -223,6 +226,9 @@
 #define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x10)
 #define REG_SCOPE_RESULT_IDC		207	// Actual value of Idc (in A)
 #define REG_SCOPE_RESULT_VD			208	// Actual value of Vd (in V)
+//
+#define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
+#define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
 //
 // Problems
 #define PROBLEM_SCOPE_NONE			0	// No problem

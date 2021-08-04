@@ -55,7 +55,7 @@ void LOGIC_RealTime()
 	
 	if(LOGIC_StateRealTime != LSRT_None && LOGIC_StateRealTime != LSRT_WaitForConfig)
 	{
-		// Wait for direct current ready pulse from QPU
+		// Wait for direct current ready signal
 		if(LOGIC_StateRealTime == LSRT_DirectPulseStart && (EmulateDCU1 || ZbGPIO_DCU1_Ready())
 				&& (EmulateDCU2 || ZbGPIO_DCU2_Ready()) && (EmulateDCU3 || ZbGPIO_DCU3_Ready()))
 		{
@@ -993,6 +993,8 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IDC, &Results[ResultsCounter].Idc);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VD, &Results[ResultsCounter].Vd);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt);
 
 							if(!Result)
 							{
@@ -1180,6 +1182,9 @@ void LOGIC_ResultToDataTable()
 	DataTable[REG_RES_TQ] = Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
 	DataTable[REG_RES_DIDT] = AvgdIdt / AvgCounter;
 	DataTable[REG_RES_QRR_INT] = (AvgQrr * 10) / AvgCounter;
+
+	DataTable[REG_EP_ELEMENT_FRACT] = Results[ResultsCounter - 1].EPTimeFract;
+	DataTable[REG_EP_STEP_FRACT_CNT] = Results[ResultsCounter - 1].EPTimeFractCnt;
 }
 // ----------------------------------------
 
