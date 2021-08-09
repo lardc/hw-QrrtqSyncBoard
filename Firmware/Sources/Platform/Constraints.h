@@ -32,14 +32,19 @@ typedef struct __TableItemConstraint
 #define MAX_RCU_TRIG_OFFSET			20000
 #define MAX_GATE_DRV_TURN_ON_DELAY	500
 
+// in us
+#define TQ_SINGLE_PULSE_MIN			5
+#define TQ_SINGLE_PULSE_MAX			1000
+#define TQ_SINGLE_PULSE_DEF			100
+
 // DCU/RCU
 //
 #define DCU_I_RISE_RATE_MAX			300		// in A/us x100
 #define DCU_I_RISE_RATE_DEF			66		// in A/us x100
 
 #define DIRECT_CURRENT_MIN			100		// in A
-#define DIRECT_CURRENT_MAX			3200	// in A
-#define DIRECT_CURRENT_DEF			500		// in A
+#define DIRECT_CURRENT_MAX			400		// in A
+#define DIRECT_CURRENT_DEF			100		// in A
 
 #define IDC_PULSE_WIDTH_MIN			500		// in us
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
@@ -51,8 +56,8 @@ typedef struct __TableItemConstraint
 
 // FCROVU
 //
-#define OS_VOLATGE_MIN				200		// in V
-#define OS_VOLATGE_MAX				4500	// in V
+#define OS_VOLATGE_MIN				100		// in V
+#define OS_VOLATGE_MAX				2000	// in V
 #define OS_VOLATGE_DEF				200		// in V
 
 #define OSV_RATE_MIN				10		// in V/us

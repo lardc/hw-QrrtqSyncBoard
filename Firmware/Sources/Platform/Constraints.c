@@ -152,7 +152,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 											   {REVERSE_RATE_MIN, REVERSE_RATE_MAX, REVERSE_RATE_DEF},					// 132
 											   {OS_VOLATGE_MIN, OS_VOLATGE_MAX, OS_VOLATGE_DEF},						// 133
 											   {OSV_RATE_MIN, OSV_RATE_MAX, OSV_RATE_DEF},								// 134
-											   {5, 1000, 100},															// 135
+											   {TQ_SINGLE_PULSE_MIN, TQ_SINGLE_PULSE_MAX, TQ_SINGLE_PULSE_DEF},			// 135
 											   {NO, YES, NO},															// 136
 											   {OSV_CURRENT_MIN, OSV_CURRENT_MAX, OSV_CURRENT_DEF},						// 137
 											   {0, 0, 0},																// 138
