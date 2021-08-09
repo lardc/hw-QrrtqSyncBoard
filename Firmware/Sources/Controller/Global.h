@@ -39,6 +39,19 @@
 #define DELAY_COMMUTATION				500		// in ms
 //--------------------------------------------------------
 
+// Fixed current fall rate values
+#define CURRENT_FALL_DIDT_010			10
+#define CURRENT_FALL_DIDT_015			15
+#define CURRENT_FALL_DIDT_020			20
+#define CURRENT_FALL_DIDT_050			50
+#define CURRENT_FALL_DIDT_100			100
+#define CURRENT_FALL_DIDT_150			150
+#define CURRENT_FALL_DIDT_200			200
+#define CURRENT_FALL_DIDT_300			300
+#define CURRENT_FALL_DIDT_500			500
+#define CURRENT_FALL_DIDT_600			600
+#define CURRENT_FALL_DIDT_1000			1000
+
 // Misc
 //--------------------------------------------------------
 #define UNIT_TQ_MEASURE_PULSES			11		// (in pulses) + 1

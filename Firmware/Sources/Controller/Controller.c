@@ -66,6 +66,7 @@ void CONTROL_SlowEPRead();
 void CONTROL_Commutation(Boolean State);
 void CONTROL_SafetyHandler();
 void CONTROL_PressureHandler();
+Boolean CONTROL_CurrentFallRateOk();
 
 // Functions
 //
@@ -390,13 +391,29 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_START:
 			{
-				(CONTROL_State == DS_Ready) ? CONTROL_Start(FALSE) : (*UserError = ERR_DEVICE_NOT_READY);
+				if(CONTROL_State == DS_Ready)
+				{
+					if(CONTROL_CurrentFallRateOk())
+						CONTROL_Start(FALSE);
+					else
+						*UserError = ERR_OPERATION_BLOCKED;
+				}
+				else
+					*UserError = ERR_DEVICE_NOT_READY;
 			}
 			break;
 			
 		case ACT_SINGLE_START:
 			{
-				(CONTROL_State == DS_Ready) ? CONTROL_Start(TRUE) : (*UserError = ERR_DEVICE_NOT_READY);
+				if(CONTROL_State == DS_Ready)
+				{
+					if(CONTROL_CurrentFallRateOk())
+						CONTROL_Start(TRUE);
+					else
+						*UserError = ERR_OPERATION_BLOCKED;
+				}
+				else
+					*UserError = ERR_DEVICE_NOT_READY;
 			}
 			break;
 			
@@ -687,6 +704,29 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 	}
 	
 	return TRUE;
+}
+// ----------------------------------------
+
+Boolean CONTROL_CurrentFallRateOk()
+{
+	switch(DataTable[REG_CURRENT_FALL_RATE])
+	{
+		case CURRENT_FALL_DIDT_010:
+		case CURRENT_FALL_DIDT_015:
+		case CURRENT_FALL_DIDT_020:
+		case CURRENT_FALL_DIDT_050:
+		case CURRENT_FALL_DIDT_100:
+		case CURRENT_FALL_DIDT_150:
+		case CURRENT_FALL_DIDT_200:
+		case CURRENT_FALL_DIDT_300:
+		case CURRENT_FALL_DIDT_500:
+		case CURRENT_FALL_DIDT_600:
+		case CURRENT_FALL_DIDT_1000:
+			return TRUE;
+
+		default:
+			return FALSE;
+	}
 }
 // ----------------------------------------
 
