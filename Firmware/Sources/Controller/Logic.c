@@ -1174,17 +1174,31 @@ void LOGIC_ResultToDataTable()
 	Trr = AvgTrr / AvgCounter;
 	Irr = AvgIrr / AvgCounter;
 	
-	DataTable[REG_RES_QRR] = (Irr * Trr) >> 1;
-	DataTable[REG_RES_TRR] = Trr;
-	DataTable[REG_RES_IRR] = Irr;
-	DataTable[REG_RES_IDC] = AvgIdc / AvgCounter;
-	DataTable[REG_RES_VD] = Results[ResultsCounter - 1].Vd;
-	DataTable[REG_RES_TQ] = Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
-	DataTable[REG_RES_DIDT] = AvgdIdt / AvgCounter;
-	DataTable[REG_RES_QRR_INT] = (AvgQrr * 10) / AvgCounter;
+	switch(MeasurementMode)
+	{
+		case MODE_QRR_TQ:
+			DataTable[REG_RES_TQ] = Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
+			DataTable[REG_RES_VD] = Results[ResultsCounter - 1].Vd;
 
-	DataTable[REG_EP_ELEMENT_FRACT] = Results[ResultsCounter - 1].EPTimeFract;
-	DataTable[REG_EP_STEP_FRACT_CNT] = Results[ResultsCounter - 1].EPTimeFractCnt;
+		case MODE_QRR_ONLY:
+			DataTable[REG_RES_QRR] = (Irr * Trr) >> 1;
+			DataTable[REG_RES_IRR] = Irr;
+			DataTable[REG_RES_TRR] = Trr;
+			DataTable[REG_RES_IDC] = AvgIdc / AvgCounter;
+			DataTable[REG_RES_DIDT] = AvgdIdt / AvgCounter;
+			DataTable[REG_RES_QRR_INT] = (AvgQrr * 10) / AvgCounter;
+
+			DataTable[REG_EP_ELEMENT_FRACT] = Results[ResultsCounter - 1].EPTimeFract;
+			DataTable[REG_EP_STEP_FRACT_CNT] = Results[ResultsCounter - 1].EPTimeFractCnt;
+			break;
+
+		case MODE_DVDT_ONLY:
+			DataTable[REG_RES_DUT_TRIG] = Results[ResultsCounter - 1].DeviceTriggered ? 1 : 0;
+			break;
+
+		default:
+			break;
+	}
 }
 // ----------------------------------------
 
