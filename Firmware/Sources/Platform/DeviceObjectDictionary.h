@@ -148,9 +148,6 @@
 #define REG_RES_QRR_INT				216	// Reverse recovery charge (integration mode) (in uC x10)
 #define REG_RES_VD					217	// Actual direct voltage value (in V)
 //
-#define REG_EP_ELEMENT_FRACT		218	// Elementary fraction length (in ns)
-#define REG_EP_STEP_FRACT_CNT		219	// Number of elementary fractions in the EP single step
-//
 #define REG_CANA_BUSOFF_COUNTER		220 // Counter of bus-off states
 #define REG_CANA_STATUS_REG			221	// CAN status register (32 bit)
 #define REG_CANA_STATUS_REG_32		222
@@ -166,6 +163,9 @@
 #define REG_DIAG_OUT_1				230	// Output diagnostic register 1
 #define REG_DIAG_OUT_2				231	// Output diagnostic register 2
 #define REG_DIAG_OUT_3				232	// Output diagnostic register 3
+//
+#define REG_EP_ELEMENT_FRACT		235	// Elementary fraction length (in ns)
+#define REG_EP_STEP_FRACT_CNT		236	// Number of elementary fractions in the EP single step
 //
 #define REG_PRESSURE				240	// Pressure flag
 #define REG_CSU_VOLATGE				241	// CSU voltage (V)
