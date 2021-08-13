@@ -25,6 +25,7 @@ void DEVPROFILE_Init(xCCI_FUNC_CallbackAction SpecializedDispatch, volatile Bool
 void DEVPROFILE_InitEPService(pInt16U Indexes, pInt16U Sizes, pInt16U *Counters, pInt16U *Datas);
 // Process user interface requests
 void DEVPROFILE_ProcessRequests();
+void DEVPROFILE_ProcessRequestsBCCI();
 // Reset EP counters
 void DEVPROFILE_ResetEPReadState();
 // Reset user control (WR) section of data table

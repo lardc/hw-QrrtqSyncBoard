@@ -98,9 +98,10 @@ Boolean HLI_RS232_ReadArray16(Int16U Endpoint, pInt16U Data, Int16U DataSize, pI
 	Int16U err;
 
 	HLI_RS232_ClearRX();
-	err = SCCIM_ReadArray16(&DEVICE_RS232_Master_Interface, NODEID_SCCI_SCOPE, Endpoint, DataSize, Data, DataRead);
+	err = SCCIM_ReadArray16Callback(&DEVICE_RS232_Master_Interface, NODEID_SCCI_SCOPE, Endpoint, DataSize, Data,
+			DataRead, &DEVPROFILE_ProcessRequestsBCCI);
 
-	if (err == ERR_NO_ERROR)
+	if(err == ERR_NO_ERROR)
 		return TRUE;
 	else
 	{

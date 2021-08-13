@@ -149,6 +149,13 @@ void DEVPROFILE_ProcessRequests()
 }
 // ----------------------------------------
 
+void DEVPROFILE_ProcessRequestsBCCI()
+{
+	// Handle interface requests
+	BCCI_Process(&DEVICE_CAN_Interface, *MaskChangesFlag);
+}
+// ----------------------------------------
+
 #ifdef BOOT_FROM_FLASH
 	#pragma CODE_SECTION(DEVPROFILE_ResetEPReadState, "ramfuncs");
 #endif
