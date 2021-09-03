@@ -38,4 +38,6 @@ typedef enum __CommonDeviceState
 	CDS_InProcess = 4
 } CommonDeviceState;
 
+#define DS_SCOPE_DUMMY						255
+
 #endif // __COMMON_DICTIONARY_H

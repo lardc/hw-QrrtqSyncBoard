@@ -30,6 +30,7 @@
 //
 #define TIMEOUT_REINIT_RS232			10000	// in ms
 #define TIMEOUT_HL_LOGIC				60000	// in ms
+#define TIMEOUT_HL_LOGIC_POWER_ON		300000	// in ms
 #define TIMEOUT_HL_LOGIC_SHORT			2000	// in ms
 //
 #define UNIT_PULSE_TO_PULSE_FAST		700		// in ms

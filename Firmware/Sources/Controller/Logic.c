@@ -45,6 +45,9 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered);
 void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate_x10,
 		pDRCUConfig Config, Int16U RCUTrigOffset);
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x10);
+Boolean LOGIC_UpdateDeviceState();
+Boolean LOGIC_UpdateDeviceStateErrReset();
+Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error);
 
 // Functions
 //
@@ -301,6 +304,18 @@ void LOGIC_CacheUpdateSettings(Boolean UpdateMainSettings, Boolean SinglePulseMo
 
 Boolean LOGIC_UpdateDeviceState()
 {
+	return LOGIC_UpdateDeviceStateX(FALSE);
+}
+// ----------------------------------------
+
+Boolean LOGIC_UpdateDeviceStateErrReset()
+{
+	return LOGIC_UpdateDeviceStateX(TRUE);
+}
+// ----------------------------------------
+
+Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error)
+{
 	Int16U Register;
 	
 	if(!CMN_UpdateNodeState(REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.CROVU))
@@ -328,10 +343,20 @@ Boolean LOGIC_UpdateDeviceState()
 		return FALSE;
 	
 	if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
+	{
 		if(HLI_RS232_Read16(COMM_REG_DEV_STATE, &Register))
 			LOGIC_ExtDeviceState.SCOPE.State = Register;
 		else
-			return FALSE;
+		{
+			if(ResetRS232Error)
+			{
+				HLI_ResetError();
+				LOGIC_ExtDeviceState.SCOPE.State = DS_SCOPE_DUMMY;
+			}
+			else
+				return FALSE;
+		}
+	}
 	
 	return TRUE;
 }
@@ -426,7 +451,7 @@ void LOGIC_PowerOnSequence()
 			|| LOGIC_State == LS_PON_RCU1 || LOGIC_State == LS_PON_RCU2 || LOGIC_State == LS_PON_RCU3
 			|| LOGIC_State == LS_PON_CSU || LOGIC_State == LS_PON_SCOPE)
 	{
-		if(!LOGIC_UpdateDeviceState())
+		if(!LOGIC_UpdateDeviceStateErrReset())
 		{
 			LOGIC_HandleCommunicationError();
 			return;
@@ -519,7 +544,7 @@ void LOGIC_PowerOnSequence()
 						LOGIC_State = LS_PON_WaitStates;
 					
 					if(LOGIC_State == LS_PON_WaitStates)
-						Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
+						Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC_POWER_ON;
 				}
 				break;
 				
