@@ -801,13 +801,12 @@ void LOGIC_ReadDataSequence()
 		{
 			case LS_READ_CROVU:
 				{
-					if(!EmulateCROVU)
+					if(!LOGIC_ExtDeviceState.CROVU.Emulate && !MuteCROVU)
 					{
-						if(LOGIC_ExtDeviceState.DS_CROVU == CDS_Ready)
+						switch(LOGIC_ExtDeviceState.CROVU.State)
 						{
-							if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
-							{
-								if(MeasurementMode == MODE_QRR_TQ)
+							case CDS_Ready:
+								if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
 								{
 									if(Register == OPRESULT_NONE)
 									{
@@ -816,22 +815,17 @@ void LOGIC_ReadDataSequence()
 									}
 									else
 									{
-										Results[ResultsCounter].DeviceTriggered =
-												(Register == OPRESULT_OK) ? FALSE : TRUE;
 										LOGIC_State = LS_READ_FCROVU;
+										Results[ResultsCounter].DeviceTriggered = (Register == OPRESULT_OK) ? FALSE : TRUE;
 									}
 								}
-								else
-									LOGIC_State = LS_READ_FCROVU;
-							}
-						}
+								break;
 
-						if(LOGIC_ExtDeviceState.DS_CROVU == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_READ_WRONG_STATE);
+							case CDS_Fault:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_READ_WRONG_STATE);
+								break;
 						}
-
 					}
 					else
 						LOGIC_State = LS_READ_FCROVU;
@@ -840,35 +834,14 @@ void LOGIC_ReadDataSequence()
 				
 			case LS_READ_FCROVU:
 				{
-					if(!EmulateFCROVU)
+					if(!LOGIC_ExtDeviceState.FCROVU.Emulate && !MuteCROVU)
 					{
-						if(LOGIC_ExtDeviceState.DS_FCROVU == CDS_Ready)
+						switch(LOGIC_ExtDeviceState.FCROVU.State)
 						{
-							if(HLI_CAN_Read16(DataTable[REG_FCROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
-							{
-								if(MeasurementMode == MODE_QRR_TQ)
-								{
-									if(Register == OPRESULT_NONE)
-									{
-										LOGIC_State = LS_Error;
-										CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_READ_WRONG_STATE);
-									}
-									else
-									{
-										Results[ResultsCounter].DeviceTriggered =
-												(Register == OPRESULT_OK) ? FALSE : TRUE;
-										LOGIC_State = LS_READ_DCU;
-									}
-								}
-								else
-									LOGIC_State = LS_READ_DCU;
-							}
-						}
-
-						if(LOGIC_ExtDeviceState.DS_FCROVU == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_READ_WRONG_STATE);
+							case CDS_Fault:
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_READ_WRONG_STATE);
+								break;
 						}
 					}
 					else
@@ -878,81 +851,57 @@ void LOGIC_ReadDataSequence()
 				
 			case LS_READ_DCU:
 				{
-					if(EmulateDCU1)
-						LOGIC_ExtDeviceState.DS_DCU1 = CDS_Ready;
-					else
+					Boolean FailedDCU1 = !LOGIC_ExtDeviceState.DCU1.Emulate && (LOGIC_ExtDeviceState.DCU1.State == CDS_Fault);
+					Boolean FailedDCU2 = !LOGIC_ExtDeviceState.DCU2.Emulate && (LOGIC_ExtDeviceState.DCU2.State == CDS_Fault);
+					Boolean FailedDCU3 = !LOGIC_ExtDeviceState.DCU3.Emulate && (LOGIC_ExtDeviceState.DCU3.State == CDS_Fault);
+
+					if(FailedDCU1)
 					{
-						if(LOGIC_ExtDeviceState.DS_DCU1 == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_READ_WRONG_STATE);
-						}
+						LOGIC_State = LS_Error;
+						CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, FAULTEX_READ_WRONG_STATE);
+					}
+					else if(FailedDCU2)
+					{
+						LOGIC_State = LS_Error;
+						CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_READ_WRONG_STATE);
+					}
+					else if(FailedDCU3)
+					{
+						LOGIC_State = LS_Error;
+						CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_READ_WRONG_STATE);
 					}
 
-					if(EmulateDCU2)
-						LOGIC_ExtDeviceState.DS_DCU2 = CDS_Ready;
-					else
-					{
-						if(LOGIC_ExtDeviceState.DS_DCU2 == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, FAULTEX_READ_WRONG_STATE);
-						}
-					}
-
-					if(EmulateDCU3)
-						LOGIC_ExtDeviceState.DS_DCU3 = CDS_Ready;
-					else
-					{
-						if(LOGIC_ExtDeviceState.DS_DCU3 == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, FAULTEX_READ_WRONG_STATE);
-						}
-					}
-
-					LOGIC_State = LS_READ_RCU;
+					if(!FailedDCU1 && !FailedDCU2 && !FailedDCU3)
+						LOGIC_State = LS_READ_RCU;
 				}
 				break;
 				
 			case LS_READ_RCU:
 				{
-					if(EmulateRCU1)
-						LOGIC_ExtDeviceState.DS_RCU1 = CDS_Ready;
-					else
+					Boolean FailedRCU1 = !LOGIC_ExtDeviceState.RCU1.Emulate && (LOGIC_ExtDeviceState.RCU1.State == CDS_Fault);
+					Boolean FailedRCU2 = !LOGIC_ExtDeviceState.RCU2.Emulate && (LOGIC_ExtDeviceState.RCU2.State == CDS_Fault);
+					Boolean FailedRCU3 = !LOGIC_ExtDeviceState.RCU3.Emulate && (LOGIC_ExtDeviceState.RCU3.State == CDS_Fault);
+
+					if(FailedRCU1)
 					{
-						if(LOGIC_ExtDeviceState.DS_RCU1 == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_READ_WRONG_STATE);
-						}
+						LOGIC_State = LS_Error;
+						CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, FAULTEX_READ_WRONG_STATE);
+					}
+					else if(FailedRCU2)
+					{
+						LOGIC_State = LS_Error;
+						CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_READ_WRONG_STATE);
+					}
+					else if(FailedRCU3)
+					{
+						LOGIC_State = LS_Error;
+						CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_READ_WRONG_STATE);
 					}
 
-					if(EmulateRCU2)
-						LOGIC_ExtDeviceState.DS_RCU2 = CDS_Ready;
-					else
-					{
-						if(LOGIC_ExtDeviceState.DS_RCU2 == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, FAULTEX_READ_WRONG_STATE);
-						}
-					}
-
-					if(EmulateRCU3)
-						LOGIC_ExtDeviceState.DS_RCU3 = CDS_Ready;
-					else
-					{
-						if(LOGIC_ExtDeviceState.DS_RCU3 == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, FAULTEX_READ_WRONG_STATE);
-						}
-					}
-
-					LOGIC_State = LS_READ_SCOPE;
+					if(!FailedRCU1 && !FailedRCU2 && !FailedRCU3)
+						LOGIC_State = LS_READ_SCOPE;
 				}
-				break;;
+				break;
 
 			case LS_READ_SCOPE:
 				{

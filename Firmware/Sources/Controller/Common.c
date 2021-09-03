@@ -198,23 +198,3 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, volatile ExternalDev
 	}
 }
 //-----------------------------
-
-Boolean CMN_ReadDRCUCurrent(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pInt16U Current)
-{
-	if(!Emulate)
-	{
-		if(*StateStorage == DRCU_DS_InProcess || *StateStorage == CDS_Ready)
-			if(HLI_CAN_Read16(DataTable[NodeIDReg], DRCU_REG_CURRENT, Current))
-				return TRUE;
-	}
-	else
-	{
-		*Current = 0;
-		*StateStorage = CDS_Ready;
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
-//-----------------------------

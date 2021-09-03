@@ -27,6 +27,5 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 		volatile LogicState *CurrentLogicState, LogicState NextLogicState);
 void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState, Boolean NodesConfig);
-Boolean CMN_ReadDRCUCurrent(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pInt16U Current);
 
 #endif // __COMMON_H
