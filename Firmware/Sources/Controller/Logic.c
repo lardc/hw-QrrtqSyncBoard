@@ -723,50 +723,50 @@ void LOGIC_PowerOffSequence()
 		switch(LOGIC_State)
 		{
 			case LS_POFF_CROVU:
-				CMN_NodePowerOff(EmulateCROVU, REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_CROVU, &LOGIC_State,
+				CMN_NodePowerOff(REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.CROVU, &LOGIC_State,
 						FAULT_LOGIC_CROVU, LS_POFF_FCROVU);
 				break;
 				
 			case LS_POFF_FCROVU:
-				CMN_NodePowerOff(EmulateFCROVU, REG_FCROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_FCROVU, &LOGIC_State,
+				CMN_NodePowerOff(REG_FCROVU_NODE_ID, &LOGIC_ExtDeviceState.FCROVU, &LOGIC_State,
 						FAULT_LOGIC_FCROVU, LS_POFF_DCU1);
 				break;
 				
 			case LS_POFF_DCU1:
-				CMN_NodePowerOff(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &LOGIC_State,
+				CMN_NodePowerOff(REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DCU1, &LOGIC_State,
 						FAULT_LOGIC_DCU1, LS_POFF_DCU2);
 				break;
 
 			case LS_POFF_DCU2:
-				CMN_NodePowerOff(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &LOGIC_State,
+				CMN_NodePowerOff(REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DCU2, &LOGIC_State,
 						FAULT_LOGIC_DCU2, LS_POFF_DCU3);
 				break;
 
 			case LS_POFF_DCU3:
-				CMN_NodePowerOff(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &LOGIC_State,
+				CMN_NodePowerOff(REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DCU3, &LOGIC_State,
 						FAULT_LOGIC_DCU3, LS_POFF_RCU1);
 				break;
 
 			case LS_POFF_RCU1:
-				CMN_NodePowerOff(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1, &LOGIC_State,
+				CMN_NodePowerOff(REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.RCU1, &LOGIC_State,
 						FAULT_LOGIC_RCU1, LS_POFF_RCU2);
 				break;
 
 			case LS_POFF_RCU2:
-				CMN_NodePowerOff(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2, &LOGIC_State,
+				CMN_NodePowerOff(REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.RCU2, &LOGIC_State,
 						FAULT_LOGIC_RCU2, LS_POFF_RCU3);
 				break;
 				
 			case LS_POFF_RCU3:
-				CMN_NodePowerOff(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3, &LOGIC_State,
+				CMN_NodePowerOff(REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.RCU3, &LOGIC_State,
 						FAULT_LOGIC_RCU3, LS_POFF_SCOPE);
 				break;
 				
 			case LS_POFF_SCOPE:
 				{
-					if(!EmulateSCOPE)
+					if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
 					{
-						switch(LOGIC_ExtDeviceState.DS_SCOPE)
+						switch(LOGIC_ExtDeviceState.SCOPE.State)
 						{
 							case CDS_InProcess:
 								if(HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST))
@@ -778,10 +778,7 @@ void LOGIC_PowerOffSequence()
 						}
 					}
 					else
-					{
-						LOGIC_ExtDeviceState.DS_SCOPE = CDS_None;
 						LOGIC_State = LS_None;
-					}
 				}
 				break;
 		}

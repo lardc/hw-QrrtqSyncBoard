@@ -72,12 +72,12 @@ void CMN_NodePowerOn(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 }
 //-----------------------------
 
-void CMN_NodePowerOff(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage,
+void CMN_NodePowerOff(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState)
 {
-	if(!Emulate)
+	if(!DevEntity->Emulate)
 	{
-		switch(*StateStorage)
+		switch(DevEntity->State)
 		{
 			case CDS_None:
 				break;
@@ -94,10 +94,7 @@ void CMN_NodePowerOff(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateS
 		}
 	}
 	else
-	{
-		*StateStorage = CDS_None;
 		*CurrentLogicState = NextLogicState;
-	}
 }
 //-----------------------------
 

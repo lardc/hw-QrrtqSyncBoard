@@ -21,7 +21,7 @@ void CMN_ResetNodeFault(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 		LogicState NextLogicState);
 void CMN_NodePowerOn(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState);
-void CMN_NodePowerOff(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage,
+void CMN_NodePowerOff(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState);
 void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pDRCUConfig Config,
 		volatile LogicState *CurrentLogicState, LogicState NextLogicState);
