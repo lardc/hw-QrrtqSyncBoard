@@ -301,7 +301,7 @@
 #define FAULTEX_POFF_TIMEOUT		6	// Timeout during power-off stage
 #define FAULTEX_READ_WRONG_STATE	7	// Wrong state during read data
 #define FAULTEX_READ_TIMEOUT		8	// Timeout during read data
-
+#define FAULTEX_PRECFG_TIMEOUT		9	// Timeout during preconfig stage
 
 // WARNING CODES
 //

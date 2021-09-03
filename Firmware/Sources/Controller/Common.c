@@ -7,6 +7,10 @@
 #include "DeviceObjectDictionary.h"
 #include "Controller.h"
 
+// Forward functions
+void CMN_WaitNodesReadyX(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
+		volatile LogicState *CurrentLogicState, Boolean NodesConfig, Int16U Fault, LogicState NewState);
+
 // Functions
 //
 Boolean CMN_UpdateNodeState(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity)
@@ -113,22 +117,41 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 }
 //-----------------------------
 
-void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
-		volatile LogicState *CurrentLogicState, Boolean NodesConfig)
+void CMN_WaitNodesReadyPowerOn(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
+		volatile LogicState *CurrentLogicState)
 {
-	Int16U DRCUWaitState, ScopeWaitState, Fault;
+	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, FALSE, FAULTEX_PON_TIMEOUT, LS_None);
+}
+//-----------------------------
+
+void CMN_WaitNodesReadyPreConfig(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
+		volatile LogicState *CurrentLogicState, LogicState NewState)
+{
+	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, FALSE, FAULTEX_PRECFG_TIMEOUT, NewState);
+}
+//-----------------------------
+
+void CMN_WaitNodesReadyConfig(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
+		volatile LogicState *CurrentLogicState)
+{
+	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, TRUE, FAULTEX_CFG_TIMEOUT, LS_None);
+}
+//-----------------------------
+
+void CMN_WaitNodesReadyX(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
+		volatile LogicState *CurrentLogicState, Boolean NodesConfig, Int16U Fault, LogicState NewState)
+{
+	Int16U DRCUWaitState, ScopeWaitState;
 
 	if(NodesConfig)
 	{
 		DRCUWaitState = DRCU_DS_ConfigReady;
 		ScopeWaitState = CDS_InProcess;
-		Fault = FAULTEX_CFG_TIMEOUT;
 	}
 	else
 	{
 		DRCUWaitState = CDS_Ready;
 		ScopeWaitState = CDS_None;
-		Fault = FAULTEX_PON_TIMEOUT;
 	}
 
 	Boolean ReadyCROVU	= FullStateStorage->CROVU.Emulate || (FullStateStorage->CROVU.State == CDS_Ready);
@@ -141,7 +164,7 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, volatile ExternalDev
 	Boolean ReadyRCU3	= FullStateStorage->RCU3.Emulate || (FullStateStorage->RCU3.State == DRCUWaitState);
 	Boolean ReadySCOPE	= FullStateStorage->SCOPE.Emulate || (FullStateStorage->SCOPE.State == ScopeWaitState);
 
-	if(*CurrentLogicState != LS_None && *CurrentLogicState != LS_Error)
+	if(*CurrentLogicState != NewState && *CurrentLogicState != LS_Error)
 	{
 		if(Timeout > TimeCounter)
 		{
@@ -149,7 +172,7 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, volatile ExternalDev
 					ReadyDCU1 && ReadyDCU2 && ReadyDCU3 &&
 					ReadyRCU1 && ReadyRCU2 && ReadyRCU3)
 			{
-				*CurrentLogicState = LS_None;
+				*CurrentLogicState = NewState;
 			}
 		}
 		else

@@ -524,7 +524,7 @@ void LOGIC_PowerOnSequence()
 				break;
 				
 			case LS_PON_WaitStates:
-				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
+				CMN_WaitNodesReadyPowerOn(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State);
 				break;
 		}
 		
@@ -538,7 +538,8 @@ void LOGIC_PowerOnSequence()
 void LOGIC_ConfigurePrepare()
 {
 	LOGIC_CacheVariables();
-	LOGIC_State = LS_CFG_CROVU;
+	LOGIC_State = LS_CFG_WaitReady;
+	Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
 
 	CONTROL_RequestDPC(&LOGIC_ConfigureSequence);
 }
@@ -551,7 +552,7 @@ void LOGIC_ConfigureSequence()
 	if(LOGIC_State == LS_CFG_CROVU || LOGIC_State == LS_CFG_FCROVU || LOGIC_State == LS_CFG_SCOPE
 			|| LOGIC_State == LS_CFG_DCU1 || LOGIC_State == LS_CFG_DCU2 || LOGIC_State == LS_CFG_DCU3
 			|| LOGIC_State == LS_CFG_RCU1 || LOGIC_State == LS_CFG_RCU2 || LOGIC_State == LS_CFG_RCU3
-			|| LOGIC_State == LS_CFG_WaitStates)
+			|| LOGIC_State == LS_CFG_WaitStates || LOGIC_State == LS_CFG_WaitReady)
 	{
 		if(!LOGIC_UpdateDeviceState())
 		{
@@ -561,6 +562,10 @@ void LOGIC_ConfigureSequence()
 		
 		switch(LOGIC_State)
 		{
+			case LS_CFG_WaitReady:
+				CMN_WaitNodesReadyPreConfig(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State, LS_CFG_CROVU);
+				break;
+
 			case LS_CFG_CROVU:
 				{
 					if(!LOGIC_ExtDeviceState.CROVU.Emulate && !MuteCROVU)
@@ -666,7 +671,7 @@ void LOGIC_ConfigureSequence()
 				break;
 				
 			case LS_CFG_WaitStates:
-				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State, TRUE);
+				CMN_WaitNodesReadyConfig(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State);
 				break;
 		}
 		
@@ -973,9 +978,6 @@ void LOGIC_ReadDataSequence()
 				}
 				break;
 		}
-
-		if(LOGIC_State == LS_None)
-			Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
 
 		LOGIC_HandleCommunicationError();
 	}

@@ -39,7 +39,8 @@ typedef enum __LogicState
 	LS_PON_SCOPE,
 	LS_PON_WaitStates,
 	//
-	LS_CFG_CROVU		= 300,
+	LS_CFG_WaitReady	= 300,
+	LS_CFG_CROVU,
 	LS_CFG_FCROVU,
 	LS_CFG_DCU1,
 	LS_CFG_DCU2,
