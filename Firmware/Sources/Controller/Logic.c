@@ -1106,9 +1106,6 @@ void LOGIC_ResultToDataTable()
 			break;
 
 		case MODE_DVDT_ONLY:
-			DataTable[REG_RES_DUT_TRIG] = Results[ResultsCounter - 1].DeviceTriggered ? 1 : 0;
-			break;
-
 		default:
 			break;
 	}

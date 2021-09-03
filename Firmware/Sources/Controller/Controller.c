@@ -316,7 +316,6 @@ void CONTROL_SubProcessStateMachine()
 					ZbGPIO_FCROVU_Sync(FALSE);
 
 					DELAY_US(500);
-
 					CONTROL_Commutation(FALSE);
 
 					Int16U Register;
@@ -327,6 +326,8 @@ void CONTROL_SubProcessStateMachine()
 					}
 					else
 						CONTROL_SwitchToFault(FAULT_PROTOCOL, FAULTEX_READ_TIMEOUT);
+
+					LOGIC_StateRealTime == LSRT_None;
 				}
 				else
 				{
