@@ -37,12 +37,12 @@ void CMN_ResetNodeFault(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 }
 //-----------------------------
 
-void CMN_NodePowerOn(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage,
+void CMN_NodePowerOn(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState)
 {
-	if(!Emulate)
+	if(!DevEntity->Emulate)
 	{
-		switch(*StateStorage)
+		switch(DevEntity->State)
 		{
 			case CDS_None:
 				if(HLI_CAN_CallAction(DataTable[NodeIDReg], COMM_ACT_ENABLE_POWER))
@@ -68,10 +68,7 @@ void CMN_NodePowerOn(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateSt
 		}
 	}
 	else
-	{
-		*StateStorage = CDS_Ready;
 		*CurrentLogicState = NextLogicState;
-	}
 }
 //-----------------------------
 

@@ -443,72 +443,68 @@ void LOGIC_PowerOnSequence()
 		switch(LOGIC_State)
 		{
 			case LS_PON_CROVU:
-				CMN_NodePowerOn(EmulateCROVU, REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_CROVU, &LOGIC_State,
+				CMN_NodePowerOn(REG_CROVU_NODE_ID, &LOGIC_ExtDeviceState.CROVU, &LOGIC_State,
 						FAULT_LOGIC_CROVU, LS_PON_FCROVU);
 				break;
 				
 			case LS_PON_FCROVU:
-				CMN_NodePowerOn(EmulateFCROVU, REG_FCROVU_NODE_ID, &LOGIC_ExtDeviceState.DS_FCROVU, &LOGIC_State,
+				CMN_NodePowerOn(REG_FCROVU_NODE_ID, &LOGIC_ExtDeviceState.FCROVU, &LOGIC_State,
 						FAULT_LOGIC_FCROVU, LS_PON_DCU1);
 				break;
 				
 			case LS_PON_DCU1:
-				CMN_NodePowerOn(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &LOGIC_State,
+				CMN_NodePowerOn(REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DCU1, &LOGIC_State,
 						FAULT_LOGIC_DCU1, LS_PON_DCU2);
 				break;
 
 			case LS_PON_DCU2:
-				CMN_NodePowerOn(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &LOGIC_State,
+				CMN_NodePowerOn(REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DCU2, &LOGIC_State,
 						FAULT_LOGIC_DCU2, LS_PON_DCU3);
 				break;
 
 			case LS_PON_DCU3:
-				CMN_NodePowerOn(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &LOGIC_State,
+				CMN_NodePowerOn(REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DCU3, &LOGIC_State,
 						FAULT_LOGIC_DCU3, LS_PON_RCU1);
 				break;
 
 			case LS_PON_RCU1:
-				CMN_NodePowerOn(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1, &LOGIC_State,
+				CMN_NodePowerOn(REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.RCU1, &LOGIC_State,
 						FAULT_LOGIC_RCU1, LS_PON_RCU2);
 				break;
 				
 			case LS_PON_RCU2:
-				CMN_NodePowerOn(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2, &LOGIC_State,
+				CMN_NodePowerOn(REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.RCU2, &LOGIC_State,
 						FAULT_LOGIC_RCU2, LS_PON_RCU3);
 				break;
 				
 			case LS_PON_RCU3:
-				CMN_NodePowerOn(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3, &LOGIC_State,
+				CMN_NodePowerOn(REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.RCU3, &LOGIC_State,
 						FAULT_LOGIC_RCU3, LS_PON_CSU);
 				break;
 
 			case LS_PON_CSU:
 				{
-					if(!EmulateCSU)
+					if(!LOGIC_ExtDeviceState.CSU.Emulate)
 					{
-						LOGIC_ExtDeviceState.DS_CSU = CDS_InProcess;
+						LOGIC_ExtDeviceState.CSU.State = CDS_InProcess;
 
 						ZbGPIO_CSU_PWRCtrl(TRUE);
-
 						if((CSUVoltage <= CSU_VOLTAGE_HIGH) && (CSUVoltage >= CSU_VOLTAGE_LOW))
 						{
-							LOGIC_ExtDeviceState.DS_CSU = CDS_Ready;
+							LOGIC_ExtDeviceState.CSU.State = CDS_Ready;
 							LOGIC_State = LS_PON_SCOPE;
 						}
 					}
 					else
-					{
-						LOGIC_ExtDeviceState.DS_CSU = CDS_Ready;
 						LOGIC_State = LS_PON_SCOPE;
-					}
 				}
 				break;
 				
 			case LS_PON_SCOPE:
 				{
-					if(!EmulateSCOPE)
+					if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
 					{
-						switch(LOGIC_ExtDeviceState.DS_SCOPE)
+						switch(LOGIC_ExtDeviceState.SCOPE.State)
 						{
 							case CDS_Fault:
 								if(HLI_RS232_CallAction(COMM_ACT_FAULT_CLEAR))
@@ -528,10 +524,7 @@ void LOGIC_PowerOnSequence()
 						}
 					}
 					else
-					{
-						LOGIC_ExtDeviceState.DS_SCOPE = CDS_None;
 						LOGIC_State = LS_PON_WaitStates;
-					}
 					
 					if(LOGIC_State == LS_PON_WaitStates)
 						Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
