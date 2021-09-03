@@ -532,7 +532,7 @@ void LOGIC_PowerOnSequence()
 				break;
 				
 			case LS_PON_WaitStates:
-				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
+				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
 				break;
 		}
 		
@@ -674,7 +674,7 @@ void LOGIC_ConfigureSequence()
 				break;
 				
 			case LS_CFG_WaitStates:
-				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State, TRUE);
+				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State, TRUE);
 				break;
 		}
 		
@@ -1042,7 +1042,7 @@ void LOGIC_ReadDataSequence()
 				break;
 
 			case LS_WAIT_READY:
-				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
+				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
 				break;
 		}
 

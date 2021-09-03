@@ -113,7 +113,7 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 }
 //-----------------------------
 
-void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState FullStateStorage,
+void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState, Boolean NodesConfig)
 {
 	Int16U DRCUWaitState, ScopeWaitState, Fault;
@@ -131,58 +131,62 @@ void CMN_WaitNodesReady(Int64U TimeCounter, Int64U Timeout, ExternalDeviceState 
 		Fault = FAULTEX_PON_TIMEOUT;
 	}
 
+	Boolean ReadyCROVU	= FullStateStorage->CROVU.Emulate || (FullStateStorage->CROVU.State == CDS_Ready);
+	Boolean ReadyFCROVU	= FullStateStorage->FCROVU.Emulate || (FullStateStorage->FCROVU.State == CDS_Ready);
+	Boolean ReadyDCU1	= FullStateStorage->DCU1.Emulate || (FullStateStorage->DCU1.State == DRCUWaitState);
+	Boolean ReadyDCU2	= FullStateStorage->DCU2.Emulate || (FullStateStorage->DCU2.State == DRCUWaitState);
+	Boolean ReadyDCU3	= FullStateStorage->DCU3.Emulate || (FullStateStorage->DCU3.State == DRCUWaitState);
+	Boolean ReadyRCU1	= FullStateStorage->RCU1.Emulate || (FullStateStorage->RCU1.State == DRCUWaitState);
+	Boolean ReadyRCU2	= FullStateStorage->RCU2.Emulate || (FullStateStorage->RCU2.State == DRCUWaitState);
+	Boolean ReadyRCU3	= FullStateStorage->RCU3.Emulate || (FullStateStorage->RCU3.State == DRCUWaitState);
+	Boolean ReadySCOPE	= FullStateStorage->SCOPE.Emulate || (FullStateStorage->SCOPE.State == ScopeWaitState);
+
 	if(*CurrentLogicState != LS_None && *CurrentLogicState != LS_Error)
 	{
 		if(Timeout > TimeCounter)
 		{
-			if(FullStateStorage.DS_CROVU == CDS_Ready
-					&& FullStateStorage.DS_FCROVU == CDS_Ready
-					&& FullStateStorage.DS_DCU1 == DRCUWaitState
-					&& FullStateStorage.DS_DCU2 == DRCUWaitState
-					&& FullStateStorage.DS_DCU3 == DRCUWaitState
-					&& FullStateStorage.DS_RCU1 == DRCUWaitState
-					&& FullStateStorage.DS_RCU2 == DRCUWaitState
-					&& FullStateStorage.DS_RCU3 == DRCUWaitState
-					&& FullStateStorage.DS_SCOPE == ScopeWaitState)
+			if(ReadyCROVU && ReadyFCROVU && ReadySCOPE &&
+					ReadyDCU1 && ReadyDCU2 && ReadyDCU3 &&
+					ReadyRCU1 && ReadyRCU2 && ReadyRCU3)
 			{
 				*CurrentLogicState = LS_None;
 			}
 		}
 		else
 		{
-			if(FullStateStorage.DS_CROVU != CDS_Ready)
+			if(!ReadyCROVU)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, Fault);
 			}
-			else if(FullStateStorage.DS_FCROVU != CDS_Ready)
+			else if(!ReadyFCROVU)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, Fault);
 			}
-			else if(FullStateStorage.DS_DCU1 != DRCUWaitState)
+			else if(!ReadyDCU1)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_DCU1, Fault);
 			}
-			else if(FullStateStorage.DS_DCU2 != DRCUWaitState)
+			else if(!ReadyDCU2)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_DCU2, Fault);
 			}
-			else if(FullStateStorage.DS_DCU3 != DRCUWaitState)
+			else if(!ReadyDCU3)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_DCU3, Fault);
 			}
-			else if(FullStateStorage.DS_RCU1 != DRCUWaitState)
+			else if(!ReadyRCU1)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_RCU1, Fault);
 			}
-			else if(FullStateStorage.DS_RCU2 != DRCUWaitState)
+			else if(!ReadyRCU2)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_RCU2, Fault);
 			}
-			else if(FullStateStorage.DS_RCU3 != DRCUWaitState)
+			else if(!ReadyRCU3)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_RCU3, Fault);
 			}
-			else if(FullStateStorage.DS_SCOPE != ScopeWaitState)
+			else if(!ReadySCOPE)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, Fault);
 			}
