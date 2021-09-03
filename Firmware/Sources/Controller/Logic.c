@@ -773,7 +773,6 @@ void LOGIC_PowerOffSequence()
 	}
 	else
 		CONTROL_RequestDPC(NULL);
-	
 }
 // ----------------------------------------
 
@@ -788,8 +787,8 @@ void LOGIC_ReadDataSequence()
 {
 	Int16U Register;
 	
-	if(LOGIC_State == LS_READ_CROVU || LOGIC_State == LS_READ_FCROVU || LOGIC_State == LS_READ_DCU || LOGIC_State == LS_READ_RCU
-			|| LOGIC_State == LS_READ_SCOPE || LOGIC_State == LS_WAIT_READY)
+	if(LOGIC_State == LS_READ_CROVU || LOGIC_State == LS_READ_FCROVU || LOGIC_State == LS_READ_SCOPE ||
+			LOGIC_State == LS_READ_DCU || LOGIC_State == LS_READ_RCU)
 	{
 		if(!LOGIC_UpdateDeviceState())
 		{
@@ -905,12 +904,12 @@ void LOGIC_ReadDataSequence()
 
 			case LS_READ_SCOPE:
 				{
-					if(!EmulateSCOPE)
+					if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
 					{
 						Int16U Problem;
 						Boolean Result = TRUE;
 						
-						if(LOGIC_ExtDeviceState.DS_SCOPE == CDS_None)
+						if(LOGIC_ExtDeviceState.SCOPE.State == CDS_None)
 						{
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_OP_RESULT, &Register);
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_PROBLEM, &Problem);
@@ -960,40 +959,31 @@ void LOGIC_ReadDataSequence()
 												if (MeasurementMode == MODE_QRR_TQ)
 												{
 													if (HLI_RS232_ReadArray16(EP_SCOPE_VD, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
-														LOGIC_State = LS_WAIT_READY;
+														LOGIC_State = LS_None;
 												}
 												else
-													LOGIC_State = LS_WAIT_READY;
+													LOGIC_State = LS_None;
 										}
 										else
-											LOGIC_State = LS_WAIT_READY;
+											LOGIC_State = LS_None;
 
-										Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
 										DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
 									}
 								}
 							}
 						}
-
-						if(LOGIC_ExtDeviceState.DS_SCOPE == CDS_Fault)
-						{
-							LOGIC_State = LS_Error;
-							CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_WRONG_STATE);
-						}
 					}
 					else
 					{
 						++ResultsCounter;
-						Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
-						LOGIC_State = LS_WAIT_READY;
+						LOGIC_State = LS_None;
 					}
 				}
 				break;
-
-			case LS_WAIT_READY:
-				CMN_WaitNodesReady(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State, FALSE);
-				break;
 		}
+
+		if(LOGIC_State == LS_None)
+			Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
 
 		LOGIC_HandleCommunicationError();
 	}
@@ -1273,3 +1263,4 @@ void LOGIC_GenerateSyncSequence()
 	ZbGPIO_DUT_Control(TRUE);
 	ZbGPIO_DUT_Switch(TRUE);
 }
+// ----------------------------------------
