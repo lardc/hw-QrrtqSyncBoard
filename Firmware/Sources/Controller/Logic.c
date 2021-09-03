@@ -808,6 +808,8 @@ void LOGIC_PowerOffSequence()
 void LOGIC_ReadDataPrepare()
 {
 	LOGIC_State = LS_READ_CROVU;
+	Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
+
 	CONTROL_RequestDPC(&LOGIC_ReadDataSequence);
 }
 // ----------------------------------------
@@ -869,6 +871,10 @@ void LOGIC_ReadDataSequence()
 							case CDS_Fault:
 								LOGIC_State = LS_Error;
 								CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_READ_WRONG_STATE);
+								break;
+
+							case CDS_Ready:
+								LOGIC_State = LS_READ_DCU;
 								break;
 						}
 					}
@@ -1009,6 +1015,30 @@ void LOGIC_ReadDataSequence()
 					}
 				}
 				break;
+		}
+
+		if(Timeout < CONTROL_TimeCounter && LOGIC_State != LS_None)
+		{
+			switch(LOGIC_State)
+			{
+				case LS_READ_CROVU:
+					CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, FAULTEX_READ_TIMEOUT);
+					break;
+
+				case LS_READ_FCROVU:
+					CONTROL_SwitchToFault(FAULT_LOGIC_FCROVU, FAULTEX_READ_TIMEOUT);
+					break;
+
+				case LS_READ_SCOPE:
+					CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_TIMEOUT);
+					break;
+
+				default:
+					CONTROL_SwitchToFault(FAULT_LOGIC_GENERAL, FAULTEX_READ_TIMEOUT);
+					break;
+			}
+
+			LOGIC_State = LS_Error;
 		}
 
 		LOGIC_HandleCommunicationError();
