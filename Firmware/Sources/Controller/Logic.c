@@ -344,17 +344,24 @@ Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error)
 	
 	if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
 	{
-		if(HLI_RS232_Read16(COMM_REG_DEV_STATE, &Register))
-			LOGIC_ExtDeviceState.SCOPE.State = Register;
-		else
+		static Int64U TimerNewTry = 0;
+
+		if(TimerNewTry < CONTROL_TimeCounter || !ResetRS232Error)
 		{
-			if(ResetRS232Error)
-			{
-				HLI_ResetError();
-				LOGIC_ExtDeviceState.SCOPE.State = DS_SCOPE_DUMMY;
-			}
+			TimerNewTry = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
+
+			if(HLI_RS232_Read16(COMM_REG_DEV_STATE, &Register))
+				LOGIC_ExtDeviceState.SCOPE.State = Register;
 			else
-				return FALSE;
+			{
+				if(ResetRS232Error)
+				{
+					HLI_ResetError();
+					LOGIC_ExtDeviceState.SCOPE.State = DS_SCOPE_DUMMY;
+				}
+				else
+					return FALSE;
+			}
 		}
 	}
 	
