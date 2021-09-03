@@ -98,10 +98,10 @@ void CMN_NodePowerOff(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 }
 //-----------------------------
 
-void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage, pDRCUConfig Config,
+void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDRCUConfig Config,
 		volatile LogicState *CurrentLogicState, LogicState NextLogicState)
 {
-	if(!Emulate)
+	if(!DevEntity->Emulate)
 	{
 		if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_MAX_VALUE, Config->Current))
 			if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE, Config->CurrentRate_x100))
@@ -109,10 +109,7 @@ void CMN_ConfigDRCU(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateSto
 					*CurrentLogicState = NextLogicState;
 	}
 	else
-	{
-		*StateStorage = DRCU_DS_ConfigReady;
 		*CurrentLogicState = NextLogicState;
-	}
 }
 //-----------------------------
 

@@ -571,7 +571,7 @@ void LOGIC_ConfigureSequence()
 		{
 			case LS_CFG_CROVU:
 				{
-					if(!EmulateCROVU && !MuteCROVU)
+					if(!LOGIC_ExtDeviceState.CROVU.Emulate && !MuteCROVU)
 					{
 						if(CROVU_StrartConfig)
 						{
@@ -582,7 +582,7 @@ void LOGIC_ConfigureSequence()
 						}
 						else
 						{
-							if(LOGIC_ExtDeviceState.DS_CROVU == CDS_Ready)
+							if(LOGIC_ExtDeviceState.CROVU.State == CDS_Ready)
 								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_EXT_SYNC))
 								{
 									CROVU_StrartConfig = TRUE;
@@ -591,16 +591,13 @@ void LOGIC_ConfigureSequence()
 						}
 					}
 					else
-					{
-						LOGIC_ExtDeviceState.DS_CROVU = CDS_Ready;
 						LOGIC_State = LS_CFG_FCROVU;
-					}
 				}
 				break;
 				
 			case LS_CFG_FCROVU:
 				{
-					if(!EmulateFCROVU && !MuteCROVU)
+					if(!LOGIC_ExtDeviceState.FCROVU.Emulate && !MuteCROVU)
 					{
 						if(HLI_CAN_Write16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_V_RATE_VALUE, CROVU_VoltageRate))
 							if(HLI_CAN_Write16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_I_SHORT_CIRCUIT,
@@ -615,8 +612,6 @@ void LOGIC_ConfigureSequence()
 					}
 					else
 					{
-						LOGIC_ExtDeviceState.DS_FCROVU = CDS_Ready;
-
 						if(MeasurementMode == MODE_DVDT_ONLY)
 							LOGIC_State = LS_None;
 						else
@@ -626,40 +621,34 @@ void LOGIC_ConfigureSequence()
 				break;
 				
 			case LS_CFG_DCU1:
-				CMN_ConfigDRCU(EmulateDCU1, REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU1, &DCUConfig, &LOGIC_State,
-						LS_CFG_DCU2);
+				CMN_ConfigDRCU(REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DCU1, &DCUConfig, &LOGIC_State, LS_CFG_DCU2);
 				break;
 
 			case LS_CFG_DCU2:
-				CMN_ConfigDRCU(EmulateDCU2, REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU2, &DCUConfig, &LOGIC_State,
-						LS_CFG_DCU3);
+				CMN_ConfigDRCU(REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DCU2, &DCUConfig, &LOGIC_State, LS_CFG_DCU3);
 				break;
 
 			case LS_CFG_DCU3:
-				CMN_ConfigDRCU(EmulateDCU3, REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_DCU3, &DCUConfig, &LOGIC_State,
-						LS_CFG_RCU1);
+				CMN_ConfigDRCU(REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DCU3, &DCUConfig, &LOGIC_State, LS_CFG_RCU1);
 				break;
 
 			case LS_CFG_RCU1:
-				CMN_ConfigDRCU(EmulateRCU1, REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU1, &RCUConfig, &LOGIC_State,
-						LS_CFG_RCU2);
+				CMN_ConfigDRCU(REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.RCU1, &RCUConfig, &LOGIC_State, LS_CFG_RCU2);
 				break;
 
 			case LS_CFG_RCU2:
-				CMN_ConfigDRCU(EmulateRCU2, REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU2, &RCUConfig, &LOGIC_State,
-						LS_CFG_RCU3);
+				CMN_ConfigDRCU(REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.RCU2, &RCUConfig, &LOGIC_State, LS_CFG_RCU3);
 				break;
 				
 			case LS_CFG_RCU3:
-				CMN_ConfigDRCU(EmulateRCU3, REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.DS_RCU3, &RCUConfig, &LOGIC_State,
-						LS_CFG_SCOPE);
+				CMN_ConfigDRCU(REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.RCU3, &RCUConfig, &LOGIC_State, LS_CFG_SCOPE);
 				break;
 				
 			case LS_CFG_SCOPE:
 				{
-					if(!EmulateSCOPE)
+					if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
 					{
-						switch(LOGIC_ExtDeviceState.DS_SCOPE)
+						switch(LOGIC_ExtDeviceState.SCOPE.State)
 						{
 							case CDS_InProcess:
 								HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
@@ -677,10 +666,7 @@ void LOGIC_ConfigureSequence()
 						}
 					}
 					else
-					{
-						LOGIC_ExtDeviceState.DS_SCOPE = CDS_None;
 						LOGIC_State = LS_CFG_WaitStates;
-					}
 					
 					if(LOGIC_State == LS_CFG_WaitStates)
 						Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
