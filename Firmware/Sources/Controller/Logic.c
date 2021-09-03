@@ -27,8 +27,7 @@ static volatile ExternalDeviceState LOGIC_ExtDeviceState;
 static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 volatile Int16U ResultsCounter, MeasurementMode;
 //
-static Boolean EmulateCROVU, EmulateFCROVU, EmulateDCU1, EmulateDCU2, EmulateDCU3, EmulateRCU1, EmulateRCU2,
-		EmulateRCU3, EmulateSCOPE, MuteCROVU, EmulateCSU;
+static Boolean MuteCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static Int16U DC_Current, DC_CurrentRiseRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
@@ -56,8 +55,10 @@ void LOGIC_RealTime()
 	if(LOGIC_StateRealTime != LSRT_None && LOGIC_StateRealTime != LSRT_WaitForConfig)
 	{
 		// Wait for direct current ready signal
-		if(LOGIC_StateRealTime == LSRT_DirectPulseStart && (EmulateDCU1 || ZbGPIO_DCU1_Ready())
-				&& (EmulateDCU2 || ZbGPIO_DCU2_Ready()) && (EmulateDCU3 || ZbGPIO_DCU3_Ready()))
+		if(LOGIC_StateRealTime == LSRT_DirectPulseStart &&
+				(LOGIC_ExtDeviceState.DCU1.Emulate || ZbGPIO_DCU1_Ready()) &&
+				(LOGIC_ExtDeviceState.DCU2.Emulate || ZbGPIO_DCU2_Ready()) &&
+				(LOGIC_ExtDeviceState.DCU3.Emulate || ZbGPIO_DCU3_Ready()))
 		{
 			TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
 			LOGIC_StateRealTime = LSRT_DirectPulseReady;
@@ -222,17 +223,6 @@ void LOGIC_CacheVariables()
 {
 	DCPulseFormed = FALSE;
 
-	EmulateCROVU = DataTable[REG_EMULATE_CROVU];
-	EmulateFCROVU = DataTable[REG_EMULATE_FCROVU];
-	EmulateDCU1 = DataTable[REG_EMULATE_DCU1];
-	EmulateDCU2 = DataTable[REG_EMULATE_DCU2];
-	EmulateDCU3 = DataTable[REG_EMULATE_DCU3];
-	EmulateRCU1 = DataTable[REG_EMULATE_RCU1];
-	EmulateRCU2 = DataTable[REG_EMULATE_RCU2];
-	EmulateRCU3 = DataTable[REG_EMULATE_RCU3];
-	EmulateCSU = DataTable[REG_EMULATE_CSU];
-	EmulateSCOPE = DataTable[REG_EMULATE_SCOPE];
-	
 	LOGIC_ExtDeviceState.CROVU.Emulate	= DataTable[REG_EMULATE_CROVU];
 	LOGIC_ExtDeviceState.FCROVU.Emulate	= DataTable[REG_EMULATE_FCROVU];
 	LOGIC_ExtDeviceState.DCU1.Emulate	= DataTable[REG_EMULATE_DCU1];
@@ -261,10 +251,12 @@ void LOGIC_CacheVariables()
 
 		// Подготовка конфигурации DCU и RCU
 		Int16U SplittedFallRate = DC_CurrentFallRate * 10 / 2;
-		LOGIC_PrepareDRCUConfig(EmulateDCU1, EmulateDCU2, EmulateDCU3, DC_Current, SplittedFallRate, &DCUConfig, 0);
+		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate,
+				LOGIC_ExtDeviceState.DCU3.Emulate, DC_Current, SplittedFallRate, &DCUConfig, 0);
 
 		Int16U TrigOffset = LOGIC_FindRCUTrigOffset(DC_CurrentFallRate);
-		LOGIC_PrepareDRCUConfig(EmulateRCU1, EmulateRCU2, EmulateRCU3, DC_Current, SplittedFallRate, &RCUConfig, TrigOffset);
+		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate,
+				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, SplittedFallRate, &RCUConfig, TrigOffset);
 
 		DC_CurrentZeroPoint = DC_Current * 10 / DC_CurrentFallRate;
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
