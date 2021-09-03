@@ -81,6 +81,12 @@ typedef enum __DeviceSubState
 	LSRT_ReadDataPause			= 5
 } DeviceSubState;
 //
+typedef struct __DeviceStateEntity
+{
+	Int16U State;
+	Boolean Emulate;
+} DeviceStateEntity;
+//
 typedef struct __ExternalDeviceState
 {
 	Int16U DS_CROVU;
@@ -93,6 +99,17 @@ typedef struct __ExternalDeviceState
 	Int16U DS_RCU3;
 	Int16U DS_CSU;
 	Int16U DS_SCOPE;
+
+	DeviceStateEntity CROVU;
+	DeviceStateEntity FCROVU;
+	DeviceStateEntity DCU1;
+	DeviceStateEntity DCU2;
+	DeviceStateEntity DCU3;
+	DeviceStateEntity RCU1;
+	DeviceStateEntity RCU2;
+	DeviceStateEntity RCU3;
+	DeviceStateEntity CSU;
+	DeviceStateEntity SCOPE;
 } ExternalDeviceState;
 //
 typedef struct __MeasurementResult

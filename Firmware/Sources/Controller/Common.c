@@ -9,27 +9,25 @@
 
 // Functions
 //
-Boolean CMN_UpdateNodeState(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage)
+Boolean CMN_UpdateNodeState(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity)
 {
-	Int16U Register;
-	Boolean Result = TRUE;
-	
-	if(!Emulate)
+	if(!DevEntity->Emulate)
 	{
+		Int16U Register;
 		if(HLI_CAN_Read16(DataTable[NodeIDReg], COMM_REG_DEV_STATE, &Register))
-			*StateStorage = Register;
+			DevEntity->State = Register;
 		else
-			Result = FALSE;
+			return FALSE;
 	}
 	
-	return Result;
+	return TRUE;
 }
 //-----------------------------
 
-void CMN_ResetNodeFault(Boolean Emulate, Int16U NodeIDReg, Int16U StateStorage, volatile LogicState *CurrentLogicState,
+void CMN_ResetNodeFault(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, volatile LogicState *CurrentLogicState,
 		LogicState NextLogicState)
 {
-	if(!Emulate && StateStorage == CDS_Fault)
+	if(!DevEntity->Emulate && DevEntity->State == CDS_Fault)
 	{
 		if(HLI_CAN_CallAction(DataTable[NodeIDReg], COMM_ACT_FAULT_CLEAR))
 			*CurrentLogicState = NextLogicState;

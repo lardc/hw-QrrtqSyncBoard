@@ -16,8 +16,8 @@ typedef struct __DRCUConfig
 } DRCUConfig, *pDRCUConfig;
 
 // Functions
-Boolean CMN_UpdateNodeState(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage);
-void CMN_ResetNodeFault(Boolean Emulate, Int16U NodeIDReg, Int16U StateStorage, volatile LogicState *CurrentLogicState,
+Boolean CMN_UpdateNodeState(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity);
+void CMN_ResetNodeFault(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, volatile LogicState *CurrentLogicState,
 		LogicState NextLogicState);
 void CMN_NodePowerOn(Boolean Emulate, Int16U NodeIDReg, volatile Int16U *StateStorage,
 		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState);
