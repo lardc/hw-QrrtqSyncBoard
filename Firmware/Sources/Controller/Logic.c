@@ -990,10 +990,10 @@ void LOGIC_ReadDataSequence()
 										// Read data plots
 										if (LOGIC_PulseNumRemain == 0 && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
 										{
-											if (HLI_RS232_ReadArray16(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
+											if (HLI_RS232_ReadArray16CB(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
 												if (MeasurementMode == MODE_QRR_TQ)
 												{
-													if (HLI_RS232_ReadArray16(EP_SCOPE_VD, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
+													if (HLI_RS232_ReadArray16CB(EP_SCOPE_VD, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
 														LOGIC_State = LS_None;
 												}
 												else

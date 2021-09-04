@@ -24,6 +24,7 @@ Boolean HLI_RS232_Read16(Int16U Register, pInt16U Value);
 Boolean HLI_RS232_Write16(Int16U Register, Int16U Value);
 Boolean HLI_RS232_CallAction(Int16U ActionID);
 Boolean HLI_RS232_ReadArray16(Int16U Endpoint, pInt16U Data, Int16U DataSize, pInt16U DataRead);
+Boolean HLI_RS232_ReadArray16CB(Int16U Endpoint, pInt16U Data, Int16U DataSize, pInt16U DataRead);
 //
 Boolean HLI_CAN_Read16(Int16U Node, Int16U Register, pInt16U Value);
 Boolean HLI_CAN_Write16(Int16U Node, Int16U Register, Int16U Value);

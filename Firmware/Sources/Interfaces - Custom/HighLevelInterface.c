@@ -15,6 +15,10 @@
 //
 static HLIError HLI_Error = {ERR_NO_ERROR, 0, 0};
 
+// Forward functions
+//
+Boolean HLI_RS232_ReadArray16X(Int16U Endpoint, pInt16U Data, Int16U DataSize, pInt16U DataRead, Boolean UseCallback);
+
 // Functions
 //
 void HLI_LoadError(Int16U Code, Int16U NodeID, Int16U Func, Int16U ExtData)
@@ -95,11 +99,23 @@ Boolean HLI_RS232_CallAction(Int16U ActionID)
 
 Boolean HLI_RS232_ReadArray16(Int16U Endpoint, pInt16U Data, Int16U DataSize, pInt16U DataRead)
 {
+	return HLI_RS232_ReadArray16X(Endpoint, Data, DataSize, DataRead, FALSE);
+}
+// ----------------------------------------
+
+Boolean HLI_RS232_ReadArray16CB(Int16U Endpoint, pInt16U Data, Int16U DataSize, pInt16U DataRead)
+{
+	return HLI_RS232_ReadArray16X(Endpoint, Data, DataSize, DataRead, TRUE);
+}
+// ----------------------------------------
+
+Boolean HLI_RS232_ReadArray16X(Int16U Endpoint, pInt16U Data, Int16U DataSize, pInt16U DataRead, Boolean UseCallback)
+{
 	Int16U err;
 
 	HLI_RS232_ClearRX();
 	err = SCCIM_ReadArray16Callback(&DEVICE_RS232_Master_Interface, NODEID_SCCI_SCOPE, Endpoint, DataSize, Data,
-			DataRead, &DEVPROFILE_ProcessRequestsBCCI);
+			DataRead, UseCallback ? &DEVPROFILE_ProcessRequestsBCCI : NULL);
 
 	if(err == ERR_NO_ERROR)
 		return TRUE;
