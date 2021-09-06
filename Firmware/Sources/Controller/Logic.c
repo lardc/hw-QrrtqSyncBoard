@@ -972,38 +972,36 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
 								}
-
-								if(Register == OPRESULT_OK)
+								else if(Results[ResultsCounter].Irr > DC_Current)
 								{
-									if(Results[ResultsCounter].Irr > DC_Current)
-										LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
-									else
+									LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
+								}
+								else
+								{
+									// Save results
+									Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
+									LOGIC_LogData(Results[ResultsCounter]);
+
+									// Apply extended Tq logic
+									if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
+										LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
+
+									// Read data plots
+									if (LOGIC_PulseNumRemain == 0 && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
 									{
-										// Save results
-										Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
-										LOGIC_LogData(Results[ResultsCounter]);
-
-										// Apply extended Tq logic
-										if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
-											LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
-
-										// Read data plots
-										if (LOGIC_PulseNumRemain == 0 && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
-										{
-											if (HLI_RS232_ReadArray16CB(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
-												if (MeasurementMode == MODE_QRR_TQ)
-												{
-													if (HLI_RS232_ReadArray16CB(EP_SCOPE_VD, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
-														LOGIC_State = LS_None;
-												}
-												else
+										if (HLI_RS232_ReadArray16CB(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
+											if (MeasurementMode == MODE_QRR_TQ)
+											{
+												if (HLI_RS232_ReadArray16CB(EP_SCOPE_VD, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
 													LOGIC_State = LS_None;
-										}
-										else
-											LOGIC_State = LS_None;
-
-										DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
+											}
+											else
+												LOGIC_State = LS_None;
 									}
+									else
+										LOGIC_State = LS_None;
+
+									DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
 								}
 							}
 						}
