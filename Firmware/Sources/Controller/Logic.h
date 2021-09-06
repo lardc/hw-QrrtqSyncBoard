@@ -159,9 +159,9 @@ void LOGIC_LogData(MeasurementResult Result);
 // Unexpected abortion of measurement
 void LOGIC_AbortMeasurement(Int16U WarningCode);
 // Control CSU
-void CONTROL_CSU();
+void LOGIC_FanAndVoltageControlCSU();
 // CSU voltage measuring
-void CSU_VoltageMeasuring(Int16U * const restrict pResults);
+void LOGIC_VoltageMeasuringCSU(Int16U * const restrict pResults);
 // Safety problem
 void LOGIC_SafetyProblem();
 // Generate sync pulses

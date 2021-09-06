@@ -121,7 +121,7 @@ void CONTROL_Init(Boolean BadClockDetected)
 		CONTROL_SetDeviceState(DS_Disabled);
 	}
 	
-	ZwADC_SubscribeToResults1(&CSU_VoltageMeasuring);
+	ZwADC_SubscribeToResults1(&LOGIC_VoltageMeasuringCSU);
 }
 // ----------------------------------------
 
@@ -149,7 +149,7 @@ void CONTROL_Idle()
 	CONTROL_SubProcessStateMachine();
 	
 	// Control CSU
-	CONTROL_CSU();
+	LOGIC_FanAndVoltageControlCSU();
 	
 	// Update high-level logic state
 	DataTable[REG_LOGIC_STATE] = LOGIC_GetState();

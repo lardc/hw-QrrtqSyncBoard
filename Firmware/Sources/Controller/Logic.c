@@ -1188,7 +1188,7 @@ void LOGIC_SafetyProblem()
 }
 // ----------------------------------------
 
-void CONTROL_CSU()
+void LOGIC_FanAndVoltageControlCSU()
 {
 	// Control voltage
 	ZwADC_StartSEQ1();
@@ -1233,7 +1233,7 @@ void CONTROL_CSU()
 }
 // ----------------------------------------
 
-void CSU_VoltageMeasuring(Int16U * const restrict pResults)
+void LOGIC_VoltageMeasuringCSU(Int16U * const restrict pResults)
 {
 	Int32U Voltage = *(Int16U *)pResults;
 	Voltage = Voltage * DataTable[REG_CSU_VOLTAGE_K] / 1000;
