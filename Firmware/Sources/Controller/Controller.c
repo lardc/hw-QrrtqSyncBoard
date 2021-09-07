@@ -222,7 +222,6 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_RES_DIDT] = 0;
 	DataTable[REG_RES_QRR_INT] = 0;
 	DataTable[REG_RES_VD] = 0;
-	DataTable[REG_RES_DUT_TRIG] = 0;
 
 	DataTable[REG_EP_ELEMENT_FRACT] = 0;
 	DataTable[REG_EP_STEP_FRACT_CNT] = 0;
