@@ -168,7 +168,7 @@
 #define REG_EP_STEP_FRACT_CNT		236	// Number of elementary fractions in the EP single step
 //
 #define REG_PRESSURE				240	// Pressure flag
-#define REG_CSU_VOLATGE				241	// CSU voltage (V)
+#define REG_CSU_VOLATGE				241	// CSU voltage (in V x10)
 //
 #define REG_SP__3					255
 //
