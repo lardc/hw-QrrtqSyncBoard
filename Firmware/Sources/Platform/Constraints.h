@@ -74,9 +74,9 @@ typedef struct __TableItemConstraint
 #define CSU_VOLTAGE_MAX				1000	// in V x10
 #define CSU_VOLTAGE_DEF				500		// in V x10
 
-#define CSU_VOLTAGE_HYST_MIN		10		// in V x10
-#define CSU_VOLTAGE_HYST_MAX		100		// in V x10
-#define CSU_VOLTAGE_HYST_DEF		50		// in V x10
+#define CSU_VOLTAGE_HYST_MIN		1		// in V x10
+#define CSU_VOLTAGE_HYST_MAX		50		// in V x10
+#define CSU_VOLTAGE_HYST_DEF		5		// in V x10
 
 // Variables
 //
