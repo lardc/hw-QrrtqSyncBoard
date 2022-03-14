@@ -104,7 +104,7 @@
 #define REG_TRIG_TIME				135	// Time to apply on-state voltage in single-pulse mode (in us)
 #define REG_TRR_DETECTION_MODE		136	// Select trr detection mode (0 - 90%-25%; 1 - 90%-50%)
 #define REG_FCROVU_I_SHORT			137	// FCROVU short circuit current
-#define REG_CSU_VOLTAGE				138	// CSU voltage set (in V x10)
+#define REG_CSU_VOLTAGE_THRE		138	// CSU voltage set (in V x10)
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
@@ -170,7 +170,7 @@
 #define REG_EP_STEP_FRACT_CNT		236	// Number of elementary fractions in the EP single step
 //
 #define REG_PRESSURE				240	// Pressure flag
-#define REG_CSU_VOLATGE				241	// CSU voltage (V)
+#define REG_CSU_VOLTAGE				241	// CSU voltage (V)
 //
 #define REG_SP__3					255
 //

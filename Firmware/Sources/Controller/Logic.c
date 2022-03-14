@@ -226,8 +226,8 @@ void LOGIC_CacheVariables()
 {
 	DCPulseFormed = FALSE;
 
-	CSUVoltageHigh = DataTable[REG_CSU_VOLTAGE] + DataTable[REG_CSU_VOLTAGE_HYST] / 2;
-	CSUVoltageLow = DataTable[REG_CSU_VOLTAGE] - DataTable[REG_CSU_VOLTAGE_HYST] / 2;
+	CSUVoltageHigh = DataTable[REG_CSU_VOLTAGE_THRE] + DataTable[REG_CSU_VOLTAGE_HYST] / 2;
+	CSUVoltageLow = DataTable[REG_CSU_VOLTAGE_THRE] - DataTable[REG_CSU_VOLTAGE_HYST] / 2;
 
 	LOGIC_ExtDeviceState.CROVU.Emulate	= DataTable[REG_EMULATE_CROVU];
 	LOGIC_ExtDeviceState.FCROVU.Emulate	= DataTable[REG_EMULATE_FCROVU];
@@ -1232,7 +1232,7 @@ void LOGIC_FanAndVoltageControlCSU()
 	if(CONTROL_TimeCounter > CSU_FanTimeout + CSU_FAN_TIMEOUT)
 		ZbGPIO_CSU_FAN(FALSE);
 
-	DataTable[REG_CSU_VOLATGE] = CSUVoltage;
+	DataTable[REG_CSU_VOLTAGE] = CSUVoltage;
 }
 // ----------------------------------------
 
