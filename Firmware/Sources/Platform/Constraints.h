@@ -68,6 +68,16 @@ typedef struct __TableItemConstraint
 #define OSV_CURRENT_MAX				1600	// in A
 #define OSV_CURRENT_DEF				1600	// in A
 
+// CSU
+//
+#define CSU_VOLTAGE_MIN				100		// in V x10
+#define CSU_VOLTAGE_MAX				1000	// in V x10
+#define CSU_VOLTAGE_DEF				500		// in V x10
+
+#define CSU_VOLTAGE_HYST_MIN		10		// in V x10
+#define CSU_VOLTAGE_HYST_MAX		100		// in V x10
+#define CSU_VOLTAGE_HYST_DEF		50		// in V x10
+
 // Variables
 //
 extern const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE];

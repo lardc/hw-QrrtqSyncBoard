@@ -34,7 +34,7 @@ static Int16U DC_Current, DC_CurrentRiseRate, DC_CurrentFallRate, DC_CurrentPlat
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
-static Int16U CSUVoltage = 0;
+static Int16U CSUVoltage = 0, CSUVoltageHigh = 0, CSUVoltageLow = 0;
 static DRCUConfig DCUConfig, RCUConfig;
 
 // Forward functions
@@ -225,6 +225,9 @@ void LOGIC_ResetState()
 void LOGIC_CacheVariables()
 {
 	DCPulseFormed = FALSE;
+
+	CSUVoltageHigh = DataTable[REG_CSU_VOLTAGE] + DataTable[REG_CSU_VOLTAGE_HYST] / 2;
+	CSUVoltageLow = DataTable[REG_CSU_VOLTAGE] - DataTable[REG_CSU_VOLTAGE_HYST] / 2;
 
 	LOGIC_ExtDeviceState.CROVU.Emulate	= DataTable[REG_EMULATE_CROVU];
 	LOGIC_ExtDeviceState.FCROVU.Emulate	= DataTable[REG_EMULATE_FCROVU];
@@ -513,7 +516,7 @@ void LOGIC_PowerOnSequence()
 						LOGIC_ExtDeviceState.CSU.State = CDS_InProcess;
 
 						ZbGPIO_CSU_PWRCtrl(TRUE);
-						if((CSUVoltage <= CSU_VOLTAGE_HIGH) && (CSUVoltage >= CSU_VOLTAGE_LOW))
+						if((CSUVoltage <= CSUVoltageHigh + CSU_ROUGH_VOLTAGE_HYST) && (CSUVoltage >= CSUVoltageLow - CSU_ROUGH_VOLTAGE_HYST))
 						{
 							LOGIC_ExtDeviceState.CSU.State = CDS_Ready;
 							LOGIC_State = LS_PON_SCOPE;
@@ -1195,19 +1198,19 @@ void LOGIC_FanAndVoltageControlCSU()
 
 	if(CONTROL_State == DS_PowerOn || CONTROL_State == DS_Ready || CONTROL_State == DS_InProcess)
 	{
-		if(CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
+		if(CSUVoltage > CSUVoltageHigh)
 		{
 			ZbGPIO_CSU_PWRCtrl(FALSE);
 			ZbGPIO_CSU_Disch(TRUE);
 		}
 
-		if(CSUVoltage < CSU_VOLTAGE_LOW - CSU_VOLTAGE_HYST)
+		if(CSUVoltage < CSUVoltageLow)
 		{
 			ZbGPIO_CSU_PWRCtrl(TRUE);
 			ZbGPIO_CSU_Disch(FALSE);
 		}
 
-		if((CSUVoltage <= CSU_VOLTAGE_HIGH) && (CSUVoltage >= CSU_VOLTAGE_LOW))
+		if((CSUVoltage <= CSUVoltageHigh) && (CSUVoltage >= CSUVoltageLow))
 		{
 			ZbGPIO_CSU_PWRCtrl(FALSE);
 			ZbGPIO_CSU_Disch(FALSE);

@@ -155,8 +155,8 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 											   {TQ_SINGLE_PULSE_MIN, TQ_SINGLE_PULSE_MAX, TQ_SINGLE_PULSE_DEF},			// 135
 											   {NO, YES, NO},															// 136
 											   {OSV_CURRENT_MIN, OSV_CURRENT_MAX, OSV_CURRENT_DEF},						// 137
-											   {0, 0, 0},																// 138
-											   {0, 0, 0},																// 139
+											   {CSU_VOLTAGE_MIN, CSU_VOLTAGE_MAX, CSU_VOLTAGE_DEF},						// 138
+											   {CSU_VOLTAGE_HYST_MIN, CSU_VOLTAGE_HYST_MAX, CSU_VOLTAGE_HYST_DEF},		// 139
                                     		   {0, 0, 0},																// 140
                                     		   {0, 0, 0},																// 141
                                     		   {0, 0, 0},																// 142

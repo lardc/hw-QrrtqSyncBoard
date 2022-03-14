@@ -74,9 +74,7 @@
 #define RT_DATA_READ_DELAY_TICK			(RT_DATA_READ_DELAY / TIMER2_PERIOD)
 //
 #define DRCU_CURRENT_MAX				1100	// in A
-#define CSU_VOLTAGE_HIGH				1005	// in V x10
-#define CSU_VOLTAGE_LOW					995		// in V x10
-#define CSU_VOLTAGE_HYST				1		// in V
+#define CSU_ROUGH_VOLTAGE_HYST			10		// in V x10
 #define CSU_FAN_TIMEOUT					30000	// in ms
 //
 #define SYNC_WIDTH_CROVU				300		// in us
