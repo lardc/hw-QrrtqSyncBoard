@@ -79,6 +79,7 @@
 #define REG_RCU_DEF_FALL_RATE		24	// Скорость спада тока RCU на блок (в А/мкс х10)
 #define REG_DCU_I_RISE_RATE			25	// Скорость нарастания тока в DCU (в А/мкс x10)
 #define REG_GATE_DRV_TURNON_DELAY	26	// Задержка формирования импульса управления (в мкс)
+#define REG_CSU_VOLTAGE_OFFSET		27	// Оффсет при пересчете напряжения CSU
 
 #define REG_RCU_TOFFS_R010			30	// Сдвиг срабатывания синхронизации RCU при 1.00 А/мкс (в нс x10)
 #define REG_RCU_TOFFS_R015			31	// Сдвиг срабатывания синхронизации RCU при 1.50 А/мкс (в нс x10)

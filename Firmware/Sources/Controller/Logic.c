@@ -1239,7 +1239,7 @@ void LOGIC_FanAndVoltageControlCSU()
 void LOGIC_VoltageMeasuringCSU(Int16U * const restrict pResults)
 {
 	Int32U Voltage = *(Int16U *)pResults;
-	Voltage = Voltage * DataTable[REG_CSU_VOLTAGE_K] / 1000;
+	Voltage = Voltage * DataTable[REG_CSU_VOLTAGE_K] / 1000 + DataTable[REG_CSU_VOLTAGE_OFFSET];
 	CSUVoltage = Voltage;
 }
 // ----------------------------------------
