@@ -63,8 +63,8 @@
 #define REG_EMULATE_SCOPE			8	// Enable SCOPE emulation
 #define REG_EMULATE_CSU				9	// Enable CSU emulation
 
-#define REG_CROVU_NODE_ID			10	// DCU1 CAN node ID
-#define REG_FCROVU_NODE_ID			11	// DCU1 CAN node ID
+#define REG_CROVU_NODE_ID			10	// CROVU CAN node ID
+#define REG_FCROVU_NODE_ID			11	// FCROVU CAN node ID
 #define REG_DCU1_NODE_ID			12	// DCU1 CAN node ID
 #define REG_DCU2_NODE_ID			13	// DCU2 CAN node ID
 #define REG_DCU3_NODE_ID			14	// DCU3 CAN node ID
