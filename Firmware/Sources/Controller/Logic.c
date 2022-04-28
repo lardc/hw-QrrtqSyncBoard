@@ -972,7 +972,7 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
 								}
-								else if(Results[ResultsCounter].Irr > DC_Current)
+								else if(Results[ResultsCounter].Irr > DC_Current * 10)
 								{
 									LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
 								}
