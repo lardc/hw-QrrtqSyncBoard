@@ -140,7 +140,7 @@
 #define REG_SLAVE_EXTDATA			204	// Slave call extended data
 //
 #define REG_RES_QRR					210	// Reverse recovery charge (in uC x10) (Calculation defined by GOST)
-#define REG_RES_IRR					211	// Reverse recovery current amplitude (in A)
+#define REG_RES_IRR					211	// Reverse recovery current amplitude (in A x10)
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)
 #define REG_RES_TQ					213	// Turn-off time (in us x10)
 #define REG_RES_IDC					214	// Actual DC current value (in A)
