@@ -576,8 +576,11 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DIAG_PULSE_CSU_PS:
 			{
-				if(DataTable[REG_DBG])
+				if(DataTable[REG_DBG]){
+
 					ZbGPIO_CSU_PWRCtrl(TRUE);
+					DELAY_US(5000);
+				}
 				else
 					ZbGPIO_CSU_PWRCtrl(FALSE);
 			}
@@ -585,8 +588,10 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DIAG_PULSE_CSU_DISCH:
 			{
-				if(DataTable[REG_DBG])
+				if(DataTable[REG_DBG]){
 					ZbGPIO_CSU_Disch(TRUE);
+					DELAY_US(25000);
+				}
 				else
 					ZbGPIO_CSU_Disch(FALSE);
 			}
