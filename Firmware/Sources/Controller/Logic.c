@@ -1193,7 +1193,7 @@ void LOGIC_FanAndVoltageControlCSU()
 	// Control voltage
 	ZwADC_StartSEQ1();
 
-	if(CONTROL_State == DS_PowerOn || CONTROL_State == DS_Ready || CONTROL_State == DS_InProcess)
+	if(CONTROL_State == DS_PowerOn || CONTROL_State == DS_Ready)
 	{
 		if(CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
 		{
@@ -1214,6 +1214,32 @@ void LOGIC_FanAndVoltageControlCSU()
 		}
 	}
 	else
+
+		if(CONTROL_State == DS_InProcess){
+			if(CSUVoltage > CSU_VOLTAGE_HIGH + CSU_VOLTAGE_HYST)
+					{
+						ZbGPIO_CSU_PWRCtrl(FALSE);
+						ZbGPIO_CSU_Disch(TRUE);
+					}
+
+			if(CSUVoltage < CSU_VOLTAGE_LOW - CSU_VOLTAGE_HYST)
+					{
+						ZbGPIO_CSU_Disch(FALSE);
+						if(CSUVoltage < CSU_VOLTAGE_LOW - CSU_VOLTAGE_PULSE_HYST){
+						ZbGPIO_CSU_PWRCtrl(TRUE);
+						}
+						else {
+							ZbGPIO_CSU_PWRCtrl(FALSE);
+						}
+					}
+
+			if((CSUVoltage <= CSU_VOLTAGE_HIGH) && (CSUVoltage >= CSU_VOLTAGE_LOW))
+					{
+						ZbGPIO_CSU_PWRCtrl(FALSE);
+						ZbGPIO_CSU_Disch(FALSE);
+					}
+					}
+		else
 	{
 		ZbGPIO_CSU_PWRCtrl(FALSE);
 		ZbGPIO_CSU_Disch(FALSE);
