@@ -77,7 +77,7 @@
 #define CSU_VOLTAGE_HIGH				1005	// in V x10
 #define CSU_VOLTAGE_LOW					990		// in V x10
 #define CSU_VOLTAGE_HYST				2		// in V
-#define CSU_VOLTAGE_PULSE_HYST				20		// in V
+#define CSU_VOLTAGE_PULSE_HYST			100		// in V
 #define CSU_FAN_TIMEOUT					30000	// in ms
 //
 #define SYNC_WIDTH_CROVU				300		// in us
