@@ -776,7 +776,7 @@ void CONTROL_Commutation(Boolean State)
 
 void CONTROL_SafetyHandler()
 {
-	if((CONTROL_State == DS_InProcess)||(CONTROL_State == DS_PowerOn) && ZbGPIO_SafetyCheck())
+	if( ((CONTROL_State == DS_InProcess)||(CONTROL_State == DS_PowerOn)) && ZbGPIO_SafetyCheck() )
 		LOGIC_SafetyProblem();
 	
 	// Safety system enable
@@ -788,7 +788,7 @@ void CONTROL_PressureHandler()
 {
 	static Int16U PressureFaultCounter = 0;
 
-	if(((CONTROL_State == DS_InProcess) || (CONTROL_State == DS_PowerOn)|| (CONTROL_State == DS_Ready)) && !ZbGPIO_PressureCheck())
+	if( ((CONTROL_State == DS_InProcess) || (CONTROL_State == DS_PowerOn) || (CONTROL_State == DS_Ready)) && !ZbGPIO_PressureCheck() )
 	{
 		PressureFaultCounter++;
 
