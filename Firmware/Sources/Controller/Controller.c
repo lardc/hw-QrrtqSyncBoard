@@ -290,10 +290,14 @@ void CONTROL_Start(Boolean SinglePulse)
 
 void CONTROL_SubProcessStateMachine()
 {
-	if(CONTROL_State == DS_PowerOn)
-	{
-		if(LOGIC_GetState() == LS_None)
+	if(CONTROL_State == DS_PowerOn){
+		CONTROL_PressureHandler();
+		CONTROL_SafetyHandler();
+		if (CONTROL_State != DS_Fault){
+		if (LOGIC_GetState() == LS_None){
 			CONTROL_SetDeviceState(DS_Ready);
+		}
+		}
 	}
 	
 	if(CONTROL_State == DS_InProcess)
@@ -772,7 +776,7 @@ void CONTROL_Commutation(Boolean State)
 
 void CONTROL_SafetyHandler()
 {
-	if((CONTROL_State == DS_InProcess) && ZbGPIO_SafetyCheck())
+	if((CONTROL_State == DS_InProcess)||(CONTROL_State == DS_PowerOn) && ZbGPIO_SafetyCheck())
 		LOGIC_SafetyProblem();
 	
 	// Safety system enable
@@ -784,7 +788,7 @@ void CONTROL_PressureHandler()
 {
 	static Int16U PressureFaultCounter = 0;
 
-	if(((CONTROL_State == DS_InProcess) || (CONTROL_State == DS_Ready)) && !ZbGPIO_PressureCheck())
+	if(((CONTROL_State == DS_InProcess) || (CONTROL_State == DS_PowerOn)) && !ZbGPIO_PressureCheck())
 	{
 		PressureFaultCounter++;
 
