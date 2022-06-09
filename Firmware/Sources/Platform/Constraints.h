@@ -43,7 +43,7 @@ typedef struct __TableItemConstraint
 #define DCU_I_RISE_RATE_DEF			66		// in A/us x100
 
 #define DIRECT_CURRENT_MIN			100		// in A
-#define DIRECT_CURRENT_MAX			500		// in A
+#define DIRECT_CURRENT_MAX			520		// in A
 #define DIRECT_CURRENT_DEF			100		// in A
 
 #define IDC_PULSE_WIDTH_MIN			500		// in us
