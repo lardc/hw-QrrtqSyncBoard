@@ -112,6 +112,7 @@ void InitializeBoard()
 	ZwGPIO_WritePin(PIN_SWITCH_DUT, FALSE);
 	ZwGPIO_WritePin(PIN_CONTROL_DUT, FALSE);
 	ZwGPIO_WritePin(PIN_LED, FALSE);
+	ZwGPIO_WritePin(PIN_LED2, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_RCU, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_DCU, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_FCROVU, FALSE);
@@ -119,18 +120,16 @@ void InitializeBoard()
 	ZwGPIO_WritePin(PIN_CSU_SYNC, FALSE);
 	ZwGPIO_WritePin(PIN_CSU_DISCH, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_SCOPE, FALSE);
+	ZwGPIO_WritePin(PIN_SYNC_SCOPE2, FALSE);
 	ZwGPIO_WritePin(PIN_PC_PWR, FALSE);
 	ZwGPIO_WritePin(PIN_DBG, FALSE);
-	ZwGPIO_WritePin(PIN_SAFETY_EN, FALSE);
-	ZwGPIO_WritePin(PIN_GATE_RELAY, FALSE);
-	ZwGPIO_WritePin(PIN_SB_EN, FALSE);
-	ZwGPIO_WritePin(PIN_QCUHC_CTRL, FALSE);
 
    	// Configure pins
 	ZwGPIO_PinToOutput(PIN_CSU_PS);
 	ZwGPIO_PinToOutput(PIN_SWITCH_DUT);
 	ZwGPIO_PinToOutput(PIN_CONTROL_DUT);
 	ZwGPIO_PinToOutput(PIN_LED);
+	ZwGPIO_PinToOutput(PIN_LED2);
 	ZwGPIO_PinToOutput(PIN_SYNC_RCU);
 	ZwGPIO_PinToOutput(PIN_SYNC_DCU);
 	ZwGPIO_PinToOutput(PIN_SYNC_FCROVU);
@@ -138,12 +137,9 @@ void InitializeBoard()
 	ZwGPIO_PinToOutput(PIN_CSU_SYNC);
 	ZwGPIO_PinToOutput(PIN_CSU_DISCH);
 	ZwGPIO_PinToOutput(PIN_SYNC_SCOPE);
+	ZwGPIO_PinToOutput(PIN_SYNC_SCOPE2);
 	ZwGPIO_PinToOutput(PIN_PC_PWR);
 	ZwGPIO_PinToOutput(PIN_DBG);
-	ZwGPIO_PinToOutput(PIN_SAFETY_EN);
-	ZwGPIO_PinToOutput(PIN_GATE_RELAY);
-	ZwGPIO_PinToOutput(PIN_SB_EN);
-	ZwGPIO_PinToOutput(PIN_QCUHC_CTRL);
 }
 // -----------------------------------------
 
