@@ -14,7 +14,6 @@ void ZbGPIO_Init()
 	ZwGPIO_PinToInput(PIN_DCU1_READY, TRUE, GPIO_NSAMPLE);
 	ZwGPIO_PinToInput(PIN_DCU2_READY, TRUE, GPIO_NSAMPLE);
 	ZwGPIO_PinToInput(PIN_DCU3_READY, TRUE, GPIO_NSAMPLE);
-	ZwGPIO_PinToInput(PIN_SAFETY, TRUE, GPIO_NSAMPLE);
 	ZwGPIO_PinToInput(PIN_PRESSURE, TRUE, GPIO_NSAMPLE);
 
 	// Reset to default state
@@ -31,7 +30,6 @@ void ZbGPIO_Init()
 	ZwGPIO_WritePin(PIN_SYNC_SCOPE, FALSE);
 	ZwGPIO_WritePin(PIN_PC_PWR, FALSE);
 	ZwGPIO_WritePin(PIN_DBG, FALSE);
-	ZwGPIO_WritePin(PIN_SAFETY_EN, FALSE);
 	ZwGPIO_WritePin(PIN_GATE_RELAY, FALSE);
 	ZwGPIO_WritePin(PIN_SB_EN, FALSE);
 	ZwGPIO_WritePin(PIN_QCUHC_CTRL, FALSE);
@@ -50,7 +48,6 @@ void ZbGPIO_Init()
 	ZwGPIO_PinToOutput(PIN_SYNC_SCOPE);
 	ZwGPIO_PinToOutput(PIN_PC_PWR);
 	ZwGPIO_PinToOutput(PIN_DBG);
-	ZwGPIO_PinToOutput(PIN_SAFETY_EN);
 	ZwGPIO_PinToOutput(PIN_GATE_RELAY);
 	ZwGPIO_PinToOutput(PIN_SB_EN);
 	ZwGPIO_PinToOutput(PIN_QCUHC_CTRL);
@@ -161,13 +158,12 @@ void ZbGPIO_LED_Toggle()
 
 void ZbGPIO_SafetyEnable(Boolean Set)
 {
-	ZwGPIO_WritePin(PIN_SAFETY_EN, Set);
 }
 // ----------------------------------------
 
 Boolean ZbGPIO_SafetyCheck()
 {
-	return !ZwGPIO_ReadPin(PIN_SAFETY);
+	return FALSE;
 }
 // ----------------------------------------
 

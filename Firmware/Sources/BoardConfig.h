@@ -66,8 +66,6 @@
 #define PIN_DCU2_READY		2
 #define PIN_DCU3_READY		0
 #define PIN_CSU_ITRIG		26
-#define PIN_SAFETY_EN		27
-#define PIN_SAFETY			33
 #define PIN_PRESSURE		9
 #define PIN_GATE_RELAY		8
 #define PIN_SB_EN			11
