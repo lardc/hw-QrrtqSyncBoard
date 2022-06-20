@@ -57,7 +57,7 @@
 #define PIN_SYNC_RCU		16
 #define PIN_SYNC_DCU		6
 #define PIN_SYNC_FCROVU		4
-#define PIN_CSU_FAN			25
+#define PIN_CSU_FAN			17
 #define PIN_CSU_SYNC		10
 #define PIN_CSU_DISCH		32
 #define PIN_SYNC_SCOPE		22
@@ -66,7 +66,7 @@
 #define PIN_DCU1_READY		15
 #define PIN_DCU2_READY		2
 #define PIN_DCU3_READY		0
-#define PIN_CSU_ITRIG		26
+#define PIN_CSU_ITRIG		25
 #define PIN_PRESSURE		9
 #define PIN_GATE_RELAY		8
 #define PIN_SB_EN			11

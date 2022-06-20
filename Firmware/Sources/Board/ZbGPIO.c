@@ -33,7 +33,6 @@ void ZbGPIO_Init()
 	ZwGPIO_WritePin(PIN_DBG, FALSE);
 	ZwGPIO_WritePin(PIN_GATE_RELAY, FALSE);
 	ZwGPIO_WritePin(PIN_SB_EN, FALSE);
-	ZwGPIO_WritePin(PIN_QCUHC_CTRL, FALSE);
 
    	// Configure pins
 	ZwGPIO_PinToOutput(PIN_CSU_PS);
@@ -52,7 +51,6 @@ void ZbGPIO_Init()
 	ZwGPIO_PinToOutput(PIN_DBG);
 	ZwGPIO_PinToOutput(PIN_GATE_RELAY);
 	ZwGPIO_PinToOutput(PIN_SB_EN);
-	ZwGPIO_PinToOutput(PIN_QCUHC_CTRL);
 
 	// Configure external interrupt
 	ZwGPIO_PinToInput(PIN_CSU_ITRIG, TRUE, GPIO_NSAMPLE);
@@ -182,7 +180,6 @@ void ZbGPIO_SensingBoardEnable(Boolean Set)
 
 void ZbGPIO_QCUHCEnable(Boolean Set)
 {
-	ZwGPIO_WritePin(PIN_QCUHC_CTRL, Set);
 }
 // ----------------------------------------
 
