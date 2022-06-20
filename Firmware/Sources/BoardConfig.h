@@ -53,14 +53,15 @@
 #define PIN_SWITCH_DUT		23
 #define PIN_CONTROL_DUT		12
 #define PIN_LED				34
+#define PIN_LED2			33
 #define PIN_SYNC_RCU		16
 #define PIN_SYNC_DCU		6
 #define PIN_SYNC_FCROVU		4
 #define PIN_CSU_FAN			25
 #define PIN_CSU_SYNC		10
-#define PIN_CSU_DISCH		13
+#define PIN_CSU_DISCH		32
 #define PIN_SYNC_SCOPE		22
-#define PIN_PC_PWR			32
+#define PIN_PC_PWR			11
 #define PIN_DBG				14
 #define PIN_DCU1_READY		15
 #define PIN_DCU2_READY		2

@@ -21,6 +21,7 @@ void ZbGPIO_Init()
 	ZwGPIO_WritePin(PIN_SWITCH_DUT, FALSE);
 	ZwGPIO_WritePin(PIN_CONTROL_DUT, FALSE);
 	ZwGPIO_WritePin(PIN_LED, FALSE);
+	ZwGPIO_WritePin(PIN_LED2, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_RCU, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_DCU, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_FCROVU, FALSE);
@@ -39,6 +40,7 @@ void ZbGPIO_Init()
 	ZwGPIO_PinToOutput(PIN_SWITCH_DUT);
 	ZwGPIO_PinToOutput(PIN_CONTROL_DUT);
 	ZwGPIO_PinToOutput(PIN_LED);
+	ZwGPIO_PinToOutput(PIN_LED2);
 	ZwGPIO_PinToOutput(PIN_SYNC_RCU);
 	ZwGPIO_PinToOutput(PIN_SYNC_DCU);
 	ZwGPIO_PinToOutput(PIN_SYNC_FCROVU);
@@ -175,7 +177,6 @@ Boolean ZbGPIO_PressureCheck()
 
 void ZbGPIO_SensingBoardEnable(Boolean Set)
 {
-	ZwGPIO_WritePin(PIN_SB_EN, Set);
 }
 // ----------------------------------------
 
