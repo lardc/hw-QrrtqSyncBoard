@@ -29,11 +29,8 @@ volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause, CONTROL_Comm
 static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE, CommutationForcedOn = FALSE;
 static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 //
-#pragma DATA_SECTION(CONTROL_Values_1, "data_mem");
 Int16U CONTROL_Values_1[VALUES_x_SIZE];
-#pragma DATA_SECTION(CONTROL_Values_2, "data_mem");
 Int16U CONTROL_Values_2[VALUES_x_SIZE];
-#pragma DATA_SECTION(CONTROL_Values_Slave, "data_mem");
 Int16U CONTROL_Values_Slave[VALUES_x_SIZE];
 volatile Int16U CONTROL_Values_1_Counter = 0, CONTROL_Values_2_Counter = 0, CONTROL_Values_Slave_Counter = 0;
 //
