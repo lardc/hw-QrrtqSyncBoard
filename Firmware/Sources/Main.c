@@ -34,8 +34,6 @@ ISRCALL Timer0_ISR();
 ISRCALL Timer1_ISR();
 // CPU Timer 2 ISR
 ISRCALL Timer2_ISR();
-// CANa Line 0 ISR
-ISRCALL CAN0A_ISR();
 // CANb Line 0 ISR
 ISRCALL CAN0B_ISR();
 // ADC SEQ1 ISR
@@ -74,7 +72,6 @@ void main()
 		ADD_ISR(TINT0, Timer0_ISR);
 		ADD_ISR(TINT1_XINT13, Timer1_ISR);
 		ADD_ISR(TINT2, Timer2_ISR);
-		ADD_ISR(ECAN0INTA, CAN0A_ISR);
 		ADD_ISR(ECAN0INTB, CAN0B_ISR);
 		ADD_ISR(XINT1, XInterrupt_ISR);
 		ADD_ISR(SEQ1INT, SEQ1_ISR);
@@ -178,18 +175,12 @@ void InitializeSPI()
 void InitializeCAN()
 {
 	// Init CAN
-	ZwCANa_Init(CANA_BR, CANA_BRP, CANA_TSEG1, CANA_TSEG2, CANA_SJW);
 	ZwCANb_Init(CANB_BR, CANB_BRP, CANB_TSEG1, CANB_TSEG2, CANB_SJW);
 
 	// Register system handler
-	ZwCANa_RegisterSysEventHandler(&CONTROL_NotifyCANaFault);
 	ZwCANb_RegisterSysEventHandler(&CONTROL_NotifyCANbFault);
 
-    // Allow interrupts for CANa (internal interface)
-    ZwCANa_InitInterrupts(TRUE);
-    ZwCANa_EnableInterrupts(TRUE);
-
-    // Allow interrupts for CANb (CANopen interface)
+    // Allow interrupts on CAN interface
 	ZwCANb_InitInterrupts(TRUE);
 	ZwCANb_EnableInterrupts(TRUE);
 }
@@ -230,7 +221,6 @@ void InitializeController(Boolean GoodClock)
 	#pragma CODE_SECTION(Timer0_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer1_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer2_ISR, "ramfuncs");
-	#pragma CODE_SECTION(CAN0A_ISR, "ramfuncs");
 	#pragma CODE_SECTION(CAN0B_ISR, "ramfuncs");
 	#pragma CODE_SECTION(IllegalInstruction_ISR, "ramfuncs");
 #endif
@@ -302,17 +292,6 @@ ISRCALL Timer2_ISR(void)
 
 	// no PIE
 	TIMER2_ISR_DONE;
-}
-// -----------------------------------------
-
-// Line 0 CANa ISR
-ISRCALL CAN0A_ISR(void)
-{
-    // handle CAN system events
-	ZwCANa_DispatchSysEvent();
-
-	// allow other interrupts from group 9
-	CAN_ISR_DONE;
 }
 // -----------------------------------------
 

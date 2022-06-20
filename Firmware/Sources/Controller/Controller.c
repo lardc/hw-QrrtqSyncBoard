@@ -174,12 +174,6 @@ void CONTROL_Update()
 }
 // ----------------------------------------
 
-void CONTROL_NotifyCANaFault(ZwCAN_SysFlags Flag)
-{
-	DEVPROFILE_NotifyCANaFault(Flag);
-}
-// ----------------------------------------
-
 void CONTROL_NotifyCANbFault(ZwCAN_SysFlags Flag)
 {
 	DEVPROFILE_NotifyCANbFault(Flag);

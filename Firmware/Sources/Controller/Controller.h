@@ -59,7 +59,6 @@ void CONTROL_Idle();
 // Main control cycle
 void CONTROL_Update();
 // Notify that CAN system fault occurs
-void CONTROL_NotifyCANaFault(ZwCAN_SysFlags Flag);
 void CONTROL_NotifyCANbFault(ZwCAN_SysFlags Flag);
 // Switch device to fault state
 void CONTROL_SwitchToFault(Int16U FaultReason, Int16U FaultReasonExt);

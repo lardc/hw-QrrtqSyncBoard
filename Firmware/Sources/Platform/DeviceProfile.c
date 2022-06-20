@@ -78,11 +78,11 @@ void DEVPROFILE_Init(xCCI_FUNC_CallbackAction SpecializedDispatch, volatile Bool
 	RS232_IOConfig.IO_GetBytesToReceive = &ZwSCIa_GetBytesToReceive;
 	RS232_IOConfig.IO_ReceiveByte = &ZwSCIa_ReceiveChar;
 	//
-	CAN_IOConfig.IO_SendMessage = &ZwCANa_SendMessage;
-	CAN_IOConfig.IO_SendMessageEx = &ZwCANa_SendMessageEx;
-	CAN_IOConfig.IO_GetMessage = &ZwCANa_GetMessage;
-	CAN_IOConfig.IO_IsMessageReceived = &ZwCANa_IsMessageReceived;
-	CAN_IOConfig.IO_ConfigMailbox = &ZwCANa_ConfigMailbox;
+	CAN_IOConfig.IO_SendMessage = &ZwCANb_SendMessage;
+	CAN_IOConfig.IO_SendMessageEx = &ZwCANb_SendMessageEx;
+	CAN_IOConfig.IO_GetMessage = &ZwCANb_GetMessage;
+	CAN_IOConfig.IO_IsMessageReceived = &ZwCANb_IsMessageReceived;
+	CAN_IOConfig.IO_ConfigMailbox = &ZwCANb_ConfigMailbox;
 	//
 	RS232_Master_IOConfig.IO_SendArray16 = &ZwSCIb_SendArray16;
 	RS232_Master_IOConfig.IO_ReceiveArray16 = &ZwSCIb_ReceiveArray16;
@@ -194,18 +194,6 @@ void DEVPROFILE_ResetScopes(Int16U ResetPosition, Int16U ScopeMask)
 			MemZero16(CAN_EPState.EPs[i].Data, CAN_EPState.EPs[i].Size);
 		}
 	}
-}
-// ----------------------------------------
-
-void DEVPROFILE_NotifyCANaFault(ZwCAN_SysFlags Flag)
-{
-	// Update error counter
-	if(Flag & BOIM)
-		DataTable[REG_CANA_BUSOFF_COUNTER]++;
-
-	// Cancel messages in the case of bus fault
-	if(Flag & (EPIM | BOIM))
-		ZwCANa_CancelAllMessages();
 }
 // ----------------------------------------
 

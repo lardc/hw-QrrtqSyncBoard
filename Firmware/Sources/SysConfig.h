@@ -25,7 +25,7 @@
 //--------------------------------------------------------
 #define SYS_PUMOD			ZW_POWER_ADC_CLK | ZW_POWER_SPID_CLK | \
 							ZW_POWER_SCIA_CLK | ZW_POWER_SCIB_CLK | \
-							ZW_POWER_CANA_CLK | ZW_POWER_CANB_CLK
+							ZW_POWER_CANB_CLK
 
 #define SYS_WD_PRESCALER	0x07
 //--------------------------------------------------------
@@ -83,15 +83,6 @@
 #define SCIB_DB				8			// 8 bit
 #define SCIB_SB				FALSE		// 1 stop bit
 #define SCIB_PARITY			ZW_PAR_NONE	// No parity
-//--------------------------------------------------------
-
-// CAN-A
-//--------------------------------------------------------
-#define CANA_BR				1000000L
-#define CANA_BRP			9
-#define CANA_TSEG1			6
-#define CANA_TSEG2			1
-#define CANA_SJW			1
 //--------------------------------------------------------
 
 // CAN-B

@@ -20,15 +20,15 @@
 #define CAN_ID_CALL					50
 #define CAN_ID_ERR					61
 //
-#define MBOX_W_16					1
-#define MBOX_W_16_A					2
-#define MBOX_R_16					7
-#define MBOX_R_16_A					8
-#define MBOX_C						13
-#define MBOX_C_A					14
-#define MBOX_ERR_A					15
-#define MBOX_RB_16					16
-#define MBOX_RB_16_A				17
+#define MBOX_W_16					21
+#define MBOX_W_16_A					22
+#define MBOX_R_16					23
+#define MBOX_R_16_A					24
+#define MBOX_C						25
+#define MBOX_C_A					26
+#define MBOX_ERR_A					27
+#define MBOX_RB_16					28
+#define MBOX_RB_16_A				29
 //
 #define READ_BLOCK_16_BUFFER_SIZE	2000
 
