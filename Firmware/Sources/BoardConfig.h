@@ -50,25 +50,22 @@
 #define SCI_B_MUX_SELECTOR	2
 //
 #define PIN_CSU_PS			0
-#define PIN_SWITCH_DUT		23
-#define PIN_CONTROL_DUT		12
+#define PIN_SWITCH_DUT		13
+#define PIN_CONTROL_DUT		9
 #define PIN_LED				34
 #define PIN_LED2			33
-#define PIN_SYNC_RCU		16
+#define PIN_SYNC_RCU		2
 #define PIN_SYNC_DCU		6
-#define PIN_SYNC_FCROVU		4
+#define PIN_SYNC_FCROVU		12
 #define PIN_CSU_FAN			17
 #define PIN_CSU_SYNC		10
 #define PIN_CSU_DISCH		32
 #define PIN_SYNC_SCOPE		22
+#define PIN_SYNC_SCOPE2		23
 #define PIN_PC_PWR			11
 #define PIN_DBG				14
 #define PIN_DCU_READY		15
 #define PIN_CSU_ITRIG		25
-#define PIN_PRESSURE		9
-#define PIN_GATE_RELAY		8
-#define PIN_SB_EN			11
-#define PIN_QCUHC_CTRL		17
 
 // ADC placement
 #define AIN_V_CSU			0x00	// INA 0

@@ -12,7 +12,6 @@ void ZbGPIO_Init()
 {
 	// Configure input pin
 	ZwGPIO_PinToInput(PIN_DCU_READY, TRUE, GPIO_NSAMPLE);
-	ZwGPIO_PinToInput(PIN_PRESSURE, TRUE, GPIO_NSAMPLE);
 
 	// Reset to default state
 	ZwGPIO_WritePin(PIN_CSU_PS, TRUE);
@@ -27,10 +26,9 @@ void ZbGPIO_Init()
 	ZwGPIO_WritePin(PIN_CSU_SYNC, FALSE);
 	ZwGPIO_WritePin(PIN_CSU_DISCH, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_SCOPE, FALSE);
+	ZwGPIO_WritePin(PIN_SYNC_SCOPE2, FALSE);
 	ZwGPIO_WritePin(PIN_PC_PWR, FALSE);
 	ZwGPIO_WritePin(PIN_DBG, FALSE);
-	ZwGPIO_WritePin(PIN_GATE_RELAY, FALSE);
-	ZwGPIO_WritePin(PIN_SB_EN, FALSE);
 
    	// Configure pins
 	ZwGPIO_PinToOutput(PIN_CSU_PS);
@@ -45,10 +43,9 @@ void ZbGPIO_Init()
 	ZwGPIO_PinToOutput(PIN_CSU_SYNC);
 	ZwGPIO_PinToOutput(PIN_CSU_DISCH);
 	ZwGPIO_PinToOutput(PIN_SYNC_SCOPE);
+	ZwGPIO_PinToOutput(PIN_SYNC_SCOPE2);
 	ZwGPIO_PinToOutput(PIN_PC_PWR);
 	ZwGPIO_PinToOutput(PIN_DBG);
-	ZwGPIO_PinToOutput(PIN_GATE_RELAY);
-	ZwGPIO_PinToOutput(PIN_SB_EN);
 
 	// Configure external interrupt
 	ZwGPIO_PinToInput(PIN_CSU_ITRIG, TRUE, GPIO_NSAMPLE);
@@ -89,6 +86,7 @@ void ZbGPIO_CSU_Sync(Boolean Set)
 void ZbGPIO_SCOPE_Sync(Boolean Set)
 {
 	ZwGPIO_WritePin(PIN_SYNC_SCOPE, Set);
+	ZwGPIO_WritePin(PIN_SYNC_SCOPE2, Set);
 }
 // ----------------------------------------
 
@@ -118,7 +116,6 @@ void ZbGPIO_DUT_Switch(Boolean Set)
 
 void ZbGPIO_DUT_ControlEnable(Boolean Set)
 {
-	ZwGPIO_WritePin(PIN_GATE_RELAY, Set);
 }
 // ----------------------------------------
 
@@ -155,7 +152,7 @@ Boolean ZbGPIO_SafetyCheck()
 
 Boolean ZbGPIO_PressureCheck()
 {
-	return !ZwGPIO_ReadPin(PIN_PRESSURE);
+	return TRUE;
 }
 // ----------------------------------------
 
