@@ -49,7 +49,7 @@
 #define SCI_B_RX			GPIO19
 #define SCI_B_MUX_SELECTOR	2
 //
-#define PIN_CSU_PS			24
+#define PIN_CSU_PS			0
 #define PIN_SWITCH_DUT		23
 #define PIN_CONTROL_DUT		12
 #define PIN_LED				34
@@ -63,9 +63,7 @@
 #define PIN_SYNC_SCOPE		22
 #define PIN_PC_PWR			11
 #define PIN_DBG				14
-#define PIN_DCU1_READY		15
-#define PIN_DCU2_READY		2
-#define PIN_DCU3_READY		0
+#define PIN_DCU_READY		15
 #define PIN_CSU_ITRIG		25
 #define PIN_PRESSURE		9
 #define PIN_GATE_RELAY		8

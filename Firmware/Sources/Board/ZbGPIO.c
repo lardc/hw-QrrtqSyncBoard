@@ -11,9 +11,7 @@
 void ZbGPIO_Init()
 {
 	// Configure input pin
-	ZwGPIO_PinToInput(PIN_DCU1_READY, TRUE, GPIO_NSAMPLE);
-	ZwGPIO_PinToInput(PIN_DCU2_READY, TRUE, GPIO_NSAMPLE);
-	ZwGPIO_PinToInput(PIN_DCU3_READY, TRUE, GPIO_NSAMPLE);
+	ZwGPIO_PinToInput(PIN_DCU_READY, TRUE, GPIO_NSAMPLE);
 	ZwGPIO_PinToInput(PIN_PRESSURE, TRUE, GPIO_NSAMPLE);
 
 	// Reset to default state
@@ -58,21 +56,9 @@ void ZbGPIO_Init()
 }
 // ----------------------------------------
 
-Boolean ZbGPIO_DCU1_Ready()
+Boolean ZbGPIO_DCU_Ready()
 {
-	return ZwGPIO_ReadPin(PIN_DCU1_READY);
-}
-// ----------------------------------------
-
-Boolean ZbGPIO_DCU2_Ready()
-{
-	return ZwGPIO_ReadPin(PIN_DCU2_READY);
-}
-// ----------------------------------------
-
-Boolean ZbGPIO_DCU3_Ready()
-{
-	return ZwGPIO_ReadPin(PIN_DCU3_READY);
+	return ZwGPIO_ReadPin(PIN_DCU_READY);
 }
 // ----------------------------------------
 

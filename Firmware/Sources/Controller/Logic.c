@@ -58,10 +58,8 @@ void LOGIC_RealTime()
 	if(LOGIC_StateRealTime != LSRT_None && LOGIC_StateRealTime != LSRT_WaitForConfig)
 	{
 		// Wait for direct current ready signal
-		if(LOGIC_StateRealTime == LSRT_DirectPulseStart &&
-				(LOGIC_ExtDeviceState.DCU1.Emulate || ZbGPIO_DCU1_Ready()) &&
-				(LOGIC_ExtDeviceState.DCU2.Emulate || ZbGPIO_DCU2_Ready()) &&
-				(LOGIC_ExtDeviceState.DCU3.Emulate || ZbGPIO_DCU3_Ready()))
+		if(LOGIC_StateRealTime == LSRT_DirectPulseStart && (ZbGPIO_DCU_Ready() || \
+				(LOGIC_ExtDeviceState.DCU1.Emulate && LOGIC_ExtDeviceState.DCU2.Emulate && LOGIC_ExtDeviceState.DCU3.Emulate)))
 		{
 			TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
 			LOGIC_StateRealTime = LSRT_DirectPulseReady;

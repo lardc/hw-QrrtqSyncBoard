@@ -13,9 +13,7 @@
 //
 void ZbGPIO_Init();
 //
-Boolean ZbGPIO_DCU1_Ready();
-Boolean ZbGPIO_DCU2_Ready();
-Boolean ZbGPIO_DCU3_Ready();
+Boolean ZbGPIO_DCU_Ready();
 //
 void ZbGPIO_CSU_PWRCtrl(Boolean Set);
 void ZbGPIO_CSU_Disch(Boolean Set);
