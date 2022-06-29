@@ -37,7 +37,7 @@
 #define UNIT_PULSE_TO_PULSE_PAUSE		1500	// in ms
 #define UNIT_PULSE_TO_PULSE_LONG		5000	// in ms
 //
-#define DELAY_COMMUTATION				500		// in ms
+#define DELAY_COMMUTATION				1000		// in ms
 //--------------------------------------------------------
 
 // Fixed current fall rate values
