@@ -281,6 +281,7 @@ void CONTROL_Start(Boolean SinglePulse)
 	LOGIC_CacheUpdateSettings(TRUE, SinglePulse);
 	
 	CONTROL_Commutation(TRUE);
+
 	CONTROL_CommutationDelay = CONTROL_TimeCounter + DELAY_COMMUTATION;
 
 	CONTROL_SetDeviceState(DS_InProcess);
@@ -760,7 +761,7 @@ void CONTROL_Commutation(Boolean State)
 	{
 		ZbGPIO_QCUHCEnable(State);
 		ZbGPIO_SensingBoardEnable(State);
-		ZbGPIO_DUT_ControlEnable(State);
+		(DataTable[REG_MODE] == MODE_DVDT_ONLY) ? ZbGPIO_DUT_ControlEnable(FALSE) : ZbGPIO_DUT_ControlEnable(State);
 	}
 }
 // ----------------------------------------
