@@ -254,7 +254,7 @@ void LOGIC_CacheVariables()
 		DC_CurrentFallRate = DataTable[REG_CURRENT_FALL_RATE];
 
 		// Подготовка конфигурации DCU и RCU
-		Int16U SplittedFallRate = DC_CurrentFallRate * 10 / 2;
+		Int16U SplittedFallRate = DC_CurrentFallRate;
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate,
 				LOGIC_ExtDeviceState.DCU3.Emulate, DC_Current, SplittedFallRate, &DCUConfig, 0);
 
@@ -1268,41 +1268,41 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x10)
 {
 	switch(FallRate_x10)
 	{
+		case 0:
+			return DataTable[REG_RCU_TOFFS_R0];
+
+		case 1:
+			return DataTable[REG_RCU_TOFFS_R1];
+
+		case 2:
+			return DataTable[REG_RCU_TOFFS_R2];
+
+		case 3:
+			return DataTable[REG_RCU_TOFFS_R3];
+
+		case 4:
+			return DataTable[REG_RCU_TOFFS_R4];
+
+		case 5:
+			return DataTable[REG_RCU_TOFFS_R5];
+
+		case 6:
+			return DataTable[REG_RCU_TOFFS_R6];
+
+		case 7:
+			return DataTable[REG_RCU_TOFFS_R7];
+
+		case 8:
+			return DataTable[REG_RCU_TOFFS_R8];
+
+		case 9:
+			return DataTable[REG_RCU_TOFFS_R9];
+
 		case 10:
-			return DataTable[REG_RCU_TOFFS_R010];
-
-		case 15:
-			return DataTable[REG_RCU_TOFFS_R015];
-
-		case 20:
-			return DataTable[REG_RCU_TOFFS_R020];
-
-		case 50:
-			return DataTable[REG_RCU_TOFFS_R050];
-
-		case 100:
-			return DataTable[REG_RCU_TOFFS_R100];
-
-		case 150:
-			return DataTable[REG_RCU_TOFFS_R150];
-
-		case 200:
-			return DataTable[REG_RCU_TOFFS_R200];
-
-		case 300:
-			return DataTable[REG_RCU_TOFFS_R300];
-
-		case 500:
-			return DataTable[REG_RCU_TOFFS_R500];
-
-		case 600:
-			return DataTable[REG_RCU_TOFFS_R600];
-
-		case 1000:
-			return DataTable[REG_RCU_TOFFS_R1000];
+			return DataTable[REG_RCU_TOFFS_R10];
 
 		default:
-			return DataTable[REG_RCU_TOFFS_R1000];
+			return DataTable[REG_RCU_TOFFS_R10];
 	}
 }
 // ----------------------------------------

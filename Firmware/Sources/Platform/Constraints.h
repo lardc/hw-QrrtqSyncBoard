@@ -43,16 +43,16 @@ typedef struct __TableItemConstraint
 #define DCU_I_RISE_RATE_DEF			66		// in A/us x100
 
 #define DIRECT_CURRENT_MIN			100		// in A
-#define DIRECT_CURRENT_MAX			400		// in A
+#define DIRECT_CURRENT_MAX			1100	// in A
 #define DIRECT_CURRENT_DEF			100		// in A
 
 #define IDC_PULSE_WIDTH_MIN			500		// in us
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
 #define IDC_PULSE_WIDTH_DEF			2000	// in us
 
-#define REVERSE_RATE_MIN			10		// in A/us x10
-#define REVERSE_RATE_MAX			1000	// in A/us x10
-#define REVERSE_RATE_DEF			100		// in A/us x10
+#define REVERSE_RATE_MIN			0		// in A/us x10
+#define REVERSE_RATE_MAX			10		// in A/us x10
+#define REVERSE_RATE_DEF			4		// in A/us x10
 
 // FCROVU
 //

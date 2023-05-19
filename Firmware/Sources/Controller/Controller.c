@@ -552,7 +552,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 		case ACT_DIAG_PULSE_DC_SYNC:
 			{
 				ZbGPIO_DCU_Sync(TRUE);
-				DELAY_US(1000);
+				DELAY_US(DataTable[REG_DBG]);
 				ZbGPIO_DCU_Sync(FALSE);
 			}
 			break;
@@ -560,7 +560,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 		case ACT_DIAG_PULSE_RC_SYNC:
 			{
 				ZbGPIO_RCU_Sync(TRUE);
-				DELAY_US(1000);
+				DELAY_US(DataTable[REG_DBG2]);
 				ZbGPIO_RCU_Sync(FALSE);
 			}
 			break;
@@ -703,17 +703,17 @@ Boolean CONTROL_CurrentFallRateOk()
 {
 	switch(DataTable[REG_CURRENT_FALL_RATE])
 	{
-		case CURRENT_FALL_DIDT_010:
-		case CURRENT_FALL_DIDT_015:
-		case CURRENT_FALL_DIDT_020:
-		case CURRENT_FALL_DIDT_050:
-		case CURRENT_FALL_DIDT_100:
-		case CURRENT_FALL_DIDT_150:
-		case CURRENT_FALL_DIDT_200:
-		case CURRENT_FALL_DIDT_300:
-		case CURRENT_FALL_DIDT_500:
-		case CURRENT_FALL_DIDT_600:
-		case CURRENT_FALL_DIDT_1000:
+		case CURRENT_FALL_DIDT_R0:
+		case CURRENT_FALL_DIDT_R1:
+		case CURRENT_FALL_DIDT_R2:
+		case CURRENT_FALL_DIDT_R3:
+		case CURRENT_FALL_DIDT_R4:
+		case CURRENT_FALL_DIDT_R5:
+		case CURRENT_FALL_DIDT_R6:
+		case CURRENT_FALL_DIDT_R7:
+		case CURRENT_FALL_DIDT_R8:
+		case CURRENT_FALL_DIDT_R9:
+		case CURRENT_FALL_DIDT_R10:
 			return TRUE;
 
 		default:

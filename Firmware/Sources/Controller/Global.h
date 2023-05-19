@@ -41,17 +41,17 @@
 //--------------------------------------------------------
 
 // Fixed current fall rate values
-#define CURRENT_FALL_DIDT_010			10
-#define CURRENT_FALL_DIDT_015			15
-#define CURRENT_FALL_DIDT_020			20
-#define CURRENT_FALL_DIDT_050			50
-#define CURRENT_FALL_DIDT_100			100
-#define CURRENT_FALL_DIDT_150			150
-#define CURRENT_FALL_DIDT_200			200
-#define CURRENT_FALL_DIDT_300			300
-#define CURRENT_FALL_DIDT_500			500
-#define CURRENT_FALL_DIDT_600			600
-#define CURRENT_FALL_DIDT_1000			1000
+#define CURRENT_FALL_DIDT_R0			0
+#define CURRENT_FALL_DIDT_R1			1
+#define CURRENT_FALL_DIDT_R2			2
+#define CURRENT_FALL_DIDT_R3			3
+#define CURRENT_FALL_DIDT_R4			4
+#define CURRENT_FALL_DIDT_R5			5
+#define CURRENT_FALL_DIDT_R6			6
+#define CURRENT_FALL_DIDT_R7			7
+#define CURRENT_FALL_DIDT_R8			8
+#define CURRENT_FALL_DIDT_R9			9
+#define CURRENT_FALL_DIDT_R10			10
 
 // Misc
 //--------------------------------------------------------
