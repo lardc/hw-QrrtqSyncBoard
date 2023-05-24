@@ -42,9 +42,9 @@ static DRCUConfig DCUConfig, RCUConfig;
 void LOGIC_PreciseEventInit(Int16U usTime);
 void LOGIC_PreciseEventStart();
 void LOGIC_TqExtraLogic(Boolean DeviceTriggered);
-void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate_x10,
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset);
-Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x10);
+Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
 Boolean LOGIC_UpdateDeviceState();
 Boolean LOGIC_UpdateDeviceStateErrReset();
 Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error);
@@ -185,7 +185,7 @@ void LOGIC_PreciseEventStart()
 	// Avoid interrupts
 	ZwTimer_StopT0();
 	ZwTimer_StopT2();
-	
+
 	ZwTimer_StartT1();
 }
 // ----------------------------------------
@@ -1242,7 +1242,7 @@ void LOGIC_VoltageMeasuringCSU(Int16U * const restrict pResults)
 }
 // ----------------------------------------
 
-void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate_x100,
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset)
 {
 	Int16U BlockCounter = 0;
@@ -1254,7 +1254,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 	if(BlockCounter)
 	{
 		Config->Current = Current / BlockCounter;
-		Config->CurrentRate_x100 = FallRate_x100 / BlockCounter;
+		Config->CurrentRate = FallRate;
 
 		Int32S Ticks = ((Int32S)RCUTrigOffset * 10 * CPU_FRQ_MHZ / 1000 - 9) / 5;
 		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
@@ -1264,9 +1264,9 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 }
 // ----------------------------------------
 
-Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate_x10)
+Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate)
 {
-	switch(FallRate_x10)
+	switch(FallRate)
 	{
 		case 0:
 			return DataTable[REG_RCU_TOFFS_R0];

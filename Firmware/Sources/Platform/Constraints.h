@@ -29,7 +29,7 @@ typedef struct __TableItemConstraint
 #define X_D_DEF3					10000
 
 // in ns
-#define MAX_RCU_TRIG_OFFSET			20000
+#define MAX_RCU_TRIG_OFFSET			27000
 #define MAX_GATE_DRV_TURN_ON_DELAY	500
 
 // in us
@@ -49,6 +49,10 @@ typedef struct __TableItemConstraint
 #define IDC_PULSE_WIDTH_MIN			500		// in us
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
 #define IDC_PULSE_WIDTH_DEF			2000	// in us
+
+#define IRC_SYNC_WIDTH_MIN			500		// in us
+#define IRC_SYNC_WIDTH_MAX 			2000	// in us
+#define IRC_SYNC_WIDTH_DEF			500		// in us
 
 #define REVERSE_RATE_MIN			0		// in A/us x10
 #define REVERSE_RATE_MAX			10		// in A/us x10

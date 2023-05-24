@@ -63,10 +63,10 @@
 #define TQ_FIRST_PROBE					100		// in us
 #define TQ_ZERO_OFFSET					3		// in us
 //
-#define OSV_ON_TIME						500		// in us
+#define OSV_ON_TIME						400		// in us
 #define OSV_ON_TIME_TICK				(OSV_ON_TIME / TIMER2_PERIOD)
 //
-#define DC_READY_TIMEOUT_DELAY			10000	// in us
+#define DC_READY_TIMEOUT_DELAY			5000	// in us
 #define DC_READY_TIMEOUT_TICK			(DC_READY_TIMEOUT_DELAY / TIMER2_PERIOD)
 #define DC_DRIVER_OFF_DELAY_MIN			200		// in us
 //

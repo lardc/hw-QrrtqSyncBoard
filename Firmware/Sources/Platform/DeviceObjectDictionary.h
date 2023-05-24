@@ -63,8 +63,8 @@
 #define REG_EMULATE_SCOPE			8	// Enable SCOPE emulation
 #define REG_EMULATE_CSU				9	// Enable CSU emulation
 
-#define REG_CROVU_NODE_ID			10	// DCU1 CAN node ID
-#define REG_FCROVU_NODE_ID			11	// DCU1 CAN node ID
+#define REG_CROVU_NODE_ID			10	// CROVU CAN node ID
+#define REG_FCROVU_NODE_ID			11	// FCROVU CAN node ID
 #define REG_DCU1_NODE_ID			12	// DCU1 CAN node ID
 #define REG_DCU2_NODE_ID			13	// DCU2 CAN node ID
 #define REG_DCU3_NODE_ID			14	// DCU3 CAN node ID
@@ -98,7 +98,7 @@
 #define REG_MODE					128	// Measurement mode
 #define REG_DIRECT_CURRENT			129	// Direct current amplitude (in A)
 #define REG_DCU_PULSE_WIDTH			130	// Direct current pulse duration (in us)
-// 131
+#define REG_RCU_SYNC_WIDTH			131	// Длина импульса синхронизации RCU
 #define REG_CURRENT_FALL_RATE		132 // Direct current fall rate (in A/us x10)
 #define REG_OFF_STATE_VOLTAGE		133 // Off-state voltage (in V)
 #define REG_OSV_RATE				134 // Off-state voltage rise rate (in V/us)

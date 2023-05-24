@@ -148,7 +148,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
                                     		   {MODE_QRR_ONLY, MODE_DVDT_ONLY, MODE_QRR_ONLY},							// 128
 											   {DIRECT_CURRENT_MIN, DIRECT_CURRENT_MAX, DIRECT_CURRENT_DEF},			// 129
 											   {IDC_PULSE_WIDTH_MIN, IDC_PULSE_WIDTH_MAX, IDC_PULSE_WIDTH_DEF},			// 130
-											   {0, 0, 0},																// 131
+											   {IRC_SYNC_WIDTH_MIN, IRC_SYNC_WIDTH_MAX, IRC_SYNC_WIDTH_DEF},			// 131
 											   {REVERSE_RATE_MIN, REVERSE_RATE_MAX, REVERSE_RATE_DEF},					// 132
 											   {OS_VOLATGE_MIN, OS_VOLATGE_MAX, OS_VOLATGE_DEF},						// 133
 											   {OSV_RATE_MIN, OSV_RATE_MAX, OSV_RATE_DEF},								// 134
