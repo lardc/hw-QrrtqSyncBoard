@@ -39,6 +39,10 @@ typedef struct __TableItemConstraint
 
 // DCU/RCU
 //
+
+#define MAX_UNIT_DRCU				6
+#define DEF_UNIT_DRCU				6
+
 #define DCU_I_RISE_RATE_MAX			300		// in A/us x100
 #define DCU_I_RISE_RATE_DEF			66		// in A/us x100
 
@@ -58,6 +62,18 @@ typedef struct __TableItemConstraint
 #define REVERSE_RATE_MAX			10		// in A/us x10
 #define REVERSE_RATE_DEF			4		// in A/us x10
 
+#define MAX_FALL_RATE				1000	// A/мкс x10
+#define DEF_FALL_RATE_R0			10		// A/мкс x10
+#define DEF_FALL_RATE_R1			15		// A/мкс x10
+#define DEF_FALL_RATE_R2			20		// A/мкс x10
+#define DEF_FALL_RATE_R3			50		// A/мкс x10
+#define DEF_FALL_RATE_R4			100		// A/мкс x10
+#define DEF_FALL_RATE_R5			150		// A/мкс x10
+#define DEF_FALL_RATE_R6			200		// A/мкс x10
+#define DEF_FALL_RATE_R7			300		// A/мкс x10
+#define DEF_FALL_RATE_R8			500		// A/мкс x10
+#define DEF_FALL_RATE_R9			600		// A/мкс x10
+#define DEF_FALL_RATE_R10			1000	// A/мкс x10
 // FCROVU
 //
 #define OS_VOLATGE_MIN				100		// in V

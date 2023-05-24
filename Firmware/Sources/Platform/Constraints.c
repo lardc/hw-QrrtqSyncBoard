@@ -41,7 +41,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, DCU_I_RISE_RATE_MAX, DCU_I_RISE_RATE_DEF},							// 25
 											   {0, MAX_GATE_DRV_TURN_ON_DELAY, 0},										// 26
 											   {0, INT16U_MAX, 0},														// 27
-											   {0, 0, 0},																// 28
+											   {0, MAX_UNIT_DRCU, DEF_UNIT_DRCU},										// 28
 											   {0, 0, 0},																// 29
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 30
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 31
@@ -63,17 +63,17 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, 0, 0},																// 47
 											   {0, 0, 0},																// 48
 											   {0, 0, 0},																// 49
-											   {0, 0, 0},																// 50
-											   {0, 0, 0},																// 51
-											   {0, 0, 0},																// 52
-											   {0, 0, 0},																// 53
-											   {0, 0, 0},																// 54
-											   {0, 0, 0},																// 55
-											   {0, 0, 0},																// 56
-											   {0, 0, 0},																// 57
-											   {0, 0, 0},																// 58
-											   {0, 0, 0},																// 59
-											   {0, 0, 0},																// 60
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R0},									// 50
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R1},									// 51
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R2},									// 52
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R3},									// 53
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R4},									// 54
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R5},									// 55
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R6},									// 56
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R7},									// 57
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R8},									// 58
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R9},									// 59
+											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R10},									// 60
 											   {0, 0, 0},																// 61
 											   {0, 0, 0},																// 62
 											   {0, 0, 0},																// 63
@@ -189,7 +189,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 											   {0, 0, 0},																// 169
 											   {0, INT16U_MAX, 0},														// 170
 											   {0, INT16U_MAX, 0},														// 171
-											   {0, 0, 0},																// 172
+											   {0, INT16U_MAX, 0},														// 172
 											   {0, 0, 0},																// 173
 											   {0, 0, 0},																// 174
 											   {0, 0, 0},																// 175

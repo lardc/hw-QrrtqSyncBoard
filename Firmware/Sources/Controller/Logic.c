@@ -30,7 +30,7 @@ volatile Int16U ResultsCounter, MeasurementMode;
 static Boolean MuteCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
-static Int16U DC_Current, DC_CurrentRiseRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
+static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
@@ -42,9 +42,12 @@ static DRCUConfig DCUConfig, RCUConfig;
 void LOGIC_PreciseEventInit(Int16U usTime);
 void LOGIC_PreciseEventStart();
 void LOGIC_TqExtraLogic(Boolean DeviceTriggered);
-void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate,
+Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Boolean Emulation4, Boolean Emulation5,
+		Boolean Emulation6);
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset);
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
+Int16U LOGIC_FindFallRate(Int16U FallRate);
 Boolean LOGIC_UpdateDeviceState();
 Boolean LOGIC_UpdateDeviceStateErrReset();
 Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error);
@@ -100,6 +103,7 @@ void LOGIC_RealTime()
 		// Stop process
 		if(LOGIC_StateRealTime == LSRT_ReversePulseStart && LOGIC_RealTimeCounter >= TimeReverseStop)
 		{
+			DataTable[REG_RCU_SYNC_WIDTH] = TimeReverseStop;
 			ZbGPIO_FCROVU_Sync(FALSE);
 			ZbGPIO_SCOPE_Sync(FALSE);
 			//
@@ -251,18 +255,23 @@ void LOGIC_CacheVariables()
 		DC_Current = DataTable[REG_DIRECT_CURRENT];
 		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] / TIMER2_PERIOD;
 		DC_CurrentRiseRate = DataTable[REG_DCU_I_RISE_RATE];
-		DC_CurrentFallRate = DataTable[REG_CURRENT_FALL_RATE];
+		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
+		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
 
 		// Подготовка конфигурации DCU и RCU
-		Int16U SplittedFallRate = DC_CurrentFallRate;
+
+		K_Unit = LOGIC_EnableUnit(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate, LOGIC_ExtDeviceState.DCU3.Emulate,
+				LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate, LOGIC_ExtDeviceState.RCU3.Emulate);
+
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate,
-				LOGIC_ExtDeviceState.DCU3.Emulate, DC_Current, SplittedFallRate, &DCUConfig, 0);
+				LOGIC_ExtDeviceState.DCU3.Emulate, DC_Current, DC_NamberFallRate, &DCUConfig, 0);
 
-		Int16U TrigOffset = LOGIC_FindRCUTrigOffset(DC_CurrentFallRate);
+		Int16U TrigOffset = LOGIC_FindRCUTrigOffset(DC_NamberFallRate);
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate,
-				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, SplittedFallRate, &RCUConfig, TrigOffset);
+				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset);
 
-		DC_CurrentZeroPoint = DC_Current * 10 / DC_CurrentFallRate;
+
+		DC_CurrentZeroPoint = DC_Current * 10 / ( DC_CurrentFallRate * K_Unit * 100);
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 		
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
@@ -1242,7 +1251,26 @@ void LOGIC_VoltageMeasuringCSU(Int16U * const restrict pResults)
 }
 // ----------------------------------------
 
-void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U FallRate,
+Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Boolean Emulation4, Boolean Emulation5, Boolean Emulation6)
+{
+	Int16U EnableUnit = 0;
+
+	EnableUnit += Emulation1 ? 0 : 1;
+	EnableUnit += Emulation2 ? 0 : 1;
+	EnableUnit += Emulation3 ? 0 : 1;
+	EnableUnit += Emulation4 ? 0 : 1;
+	EnableUnit += Emulation5 ? 0 : 1;
+	EnableUnit += Emulation6 ? 0 : 1;
+
+
+	K_Unit = EnableUnit * 100 / DataTable[REG_UNIT_DRCU] ;
+	DataTable[REG_DBG3] = K_Unit;
+	return K_Unit;
+}
+
+// ----------------------------------------
+
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset)
 {
 	Int16U BlockCounter = 0;
@@ -1254,7 +1282,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 	if(BlockCounter)
 	{
 		Config->Current = Current / BlockCounter;
-		Config->CurrentRate = FallRate;
+		Config->CurrentRate = NamberFallRate;
 
 		Int32S Ticks = ((Int32S)RCUTrigOffset * 10 * CPU_FRQ_MHZ / 1000 - 9) / 5;
 		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
@@ -1264,9 +1292,9 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 }
 // ----------------------------------------
 
-Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate)
+Int16U LOGIC_FindRCUTrigOffset(Int16U NamberFallRate)
 {
-	switch(FallRate)
+	switch(NamberFallRate)
 	{
 		case 0:
 			return DataTable[REG_RCU_TOFFS_R0];
@@ -1305,6 +1333,51 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate)
 			return DataTable[REG_RCU_TOFFS_R10];
 	}
 }
+
+// ----------------------------------------
+
+Int16U LOGIC_FindFallRate(Int16U NamberFallRate)
+{
+	switch(NamberFallRate)
+	{
+		case 0:
+			return DataTable[REG_FALL_RATE_R0];
+
+		case 1:
+			return DataTable[REG_FALL_RATE_R1];
+
+		case 2:
+			return DataTable[REG_FALL_RATE_R2];
+
+		case 3:
+			return DataTable[REG_FALL_RATE_R3];
+
+		case 4:
+			return DataTable[REG_FALL_RATE_R4];
+
+		case 5:
+			return DataTable[REG_FALL_RATE_R5];
+
+		case 6:
+			return DataTable[REG_FALL_RATE_R6];
+
+		case 7:
+			return DataTable[REG_FALL_RATE_R7];
+
+		case 8:
+			return DataTable[REG_FALL_RATE_R8];
+
+		case 9:
+			return DataTable[REG_FALL_RATE_R9];
+
+		case 10:
+			return DataTable[REG_FALL_RATE_R10];
+
+		default:
+			return DataTable[REG_FALL_RATE_R10];
+	}
+}
+
 // ----------------------------------------
 
 void LOGIC_GenerateSyncSequence()
