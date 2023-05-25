@@ -42,7 +42,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, MAX_GATE_DRV_TURN_ON_DELAY, 0},										// 26
 											   {0, INT16U_MAX, 0},														// 27
 											   {0, MAX_UNIT_DRCU, DEF_UNIT_DRCU},										// 28
-											   {0, 0, 0},																// 29
+											   {0, MAX_RCU_SYNC, DEF_RCU_SYNC},											// 29
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 30
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 31
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 32

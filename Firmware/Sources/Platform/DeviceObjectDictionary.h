@@ -62,7 +62,7 @@
 #define REG_EMULATE_RCU3			7	// Enable RCU3 emulation
 #define REG_EMULATE_SCOPE			8	// Enable SCOPE emulation
 #define REG_EMULATE_CSU				9	// Enable CSU emulation
-
+//
 #define REG_CROVU_NODE_ID			10	// CROVU CAN node ID
 #define REG_FCROVU_NODE_ID			11	// FCROVU CAN node ID
 #define REG_DCU1_NODE_ID			12	// DCU1 CAN node ID
@@ -71,7 +71,7 @@
 #define REG_RCU1_NODE_ID			15	// RCU1 CAN node ID
 #define REG_RCU2_NODE_ID			16	// RCU2 CAN node ID
 #define REG_RCU3_NODE_ID			17	// RCU3 CAN node ID
-
+//
 #define REG_SAFETY_EN				20	// Safety enable
 #define REG_CSU_VOLTAGE_K			21 	// CSU voltage coefficient
 #define REG_DCU_CURRENT_PER_UNIT	22	// Максимальный ток DCU на блок (в А)
@@ -81,7 +81,8 @@
 #define REG_GATE_DRV_TURNON_DELAY	26	// Задержка формирования импульса управления (в мкс)
 #define REG_CSU_VOLTAGE_OFFSET		27	// Оффсет при пересчете напряжения CSU
 #define REG_UNIT_DRCU				28  // Количество блоков в комплексе
-
+#define REG_RCU_SYNC_MAX			29	// Максимальная длительности синхросигнала RCU
+//
 #define REG_RCU_TOFFS_R0			30	// Сдвиг срабатывания синхронизации RCU при 0 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R1			31	// Сдвиг срабатывания синхронизации RCU при 1 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R2			32	// Сдвиг срабатывания синхронизации RCU при 2 скорости спада (в нс x10)
@@ -130,7 +131,7 @@
 //
 #define REG_DBG						170	// Отладочный регистр
 #define REG_DBG2					171	// Отладочный регистр 2
-#define REG_DBG3					172	// Отладочный регистр 3(K_Unit)
+#define REG_DBG3					172	// Отладочный регистр 3(DC_CurrentZeroPoint)
 //
 #define REG_PWD_1					180	// Unlock password location 1
 #define REG_PWD_2					181	// Unlock password location 2

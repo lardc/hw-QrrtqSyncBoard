@@ -43,6 +43,9 @@ typedef struct __TableItemConstraint
 #define MAX_UNIT_DRCU				6
 #define DEF_UNIT_DRCU				6
 
+#define MAX_RCU_SYNC				7000	// в мкс
+#define DEF_RCU_SYNC				2000	// в мкс
+
 #define DCU_I_RISE_RATE_MAX			300		// in A/us x100
 #define DCU_I_RISE_RATE_DEF			66		// in A/us x100
 
