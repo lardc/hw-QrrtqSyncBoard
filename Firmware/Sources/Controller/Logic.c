@@ -31,6 +31,7 @@ static Boolean MuteCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
+static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset,	Ctrl1_K;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
@@ -45,7 +46,7 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered);
 Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Boolean Emulation4, Boolean Emulation5,
 		Boolean Emulation6);
 void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
-		pDRCUConfig Config, Int16U RCUTrigOffset);
+		pDRCUConfig Config, Int16U RCUTrigOffset, Int16S I_To_V_Offset, Int16S I_To_V_K, Int16S I_To_V_K2, Int16S Ctrl1_Offset, Int16S Ctrl1_K);
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
 Int16U LOGIC_FindFallRate(Int16U FallRate);
 Boolean LOGIC_UpdateDeviceState();
@@ -258,17 +259,23 @@ void LOGIC_CacheVariables()
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
 
+		I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET];
+		I_To_V_K = DataTable[REG_I_TO_V_K];
+		I_To_V_K2 = DataTable[REG_I_TO_V_K2];
+		Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET];
+		Ctrl1_K = DataTable[REG_CTRL1_K];
+
 		// Подготовка конфигурации DCU и RCU
 
 		K_Unit = LOGIC_EnableUnit(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate, LOGIC_ExtDeviceState.DCU3.Emulate,
 				LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate, LOGIC_ExtDeviceState.RCU3.Emulate);
 
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate,
-				LOGIC_ExtDeviceState.DCU3.Emulate, DC_Current, DC_NamberFallRate, &DCUConfig, 0);
+				LOGIC_ExtDeviceState.DCU3.Emulate, DC_Current, DC_NamberFallRate, &DCUConfig, 0, I_To_V_Offset, I_To_V_K, I_To_V_K2, 0, 0);
 
 		Int16U TrigOffset = LOGIC_FindRCUTrigOffset(DC_NamberFallRate);
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate,
-				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset);
+				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset, Ctrl1_K);
 
 
 		DC_CurrentZeroPoint = DC_Current * 10 / ( DC_CurrentFallRate * K_Unit / 100);
@@ -1277,7 +1284,7 @@ Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulatio
 // ----------------------------------------
 
 void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
-		pDRCUConfig Config, Int16U RCUTrigOffset)
+		pDRCUConfig Config, Int16U RCUTrigOffset, Int16S I_To_V_Offset, Int16S I_To_V_K, Int16S I_To_V_K2, Int16S Ctrl1_Offset, Int16S Ctrl1_K)
 {
 	Int16U BlockCounter = 0;
 
@@ -1290,7 +1297,13 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 		Config->Current = Current / BlockCounter;
 		Config->CurrentRate = NamberFallRate;
 
-		Int32S Ticks = ((Int32S)RCUTrigOffset * 10 * CPU_FRQ_MHZ / 1000 - 9) / 5;
+		Config->V_Offset = I_To_V_Offset;
+		Config->V_K = I_To_V_K;
+		Config->V_K2 = I_To_V_K2;
+		Config->I_Offset = Ctrl1_Offset;
+		Config->I_K = Ctrl1_K;
+
+		Int32S Ticks = ((Int32S)RCUTrigOffset * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
 		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
 	}
 	else

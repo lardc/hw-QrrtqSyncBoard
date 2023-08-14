@@ -83,11 +83,11 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, 0, 0},																// 67
 											   {0, 0, 0},																// 68
 											   {0, 0, 0},																// 69
-											   {0, 0, 0},																// 70
-											   {0, 0, 0},																// 71
-											   {0, 0, 0},																// 72
-											   {0, 0, 0},																// 73
-											   {0, 0, 0},																// 74
+											   {0, INT16U_MAX, DEF_I_TO_V_OFFSET},										// 70
+											   {0, INT16U_MAX, DEF_I_TO_V_K},											// 71
+											   {0, INT16U_MAX, DEF_I_TO_V_K2},											// 72
+											   {0, INT16U_MAX, DEF_CTRL1_OFFSET},										// 73
+											   {0, INT16U_MAX, DEF_CTRL1_K},											// 74
 											   {0, 0, 0},																// 75
 											   {0, 0, 0},																// 76
 											   {0, 0, 0},																// 77

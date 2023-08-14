@@ -13,6 +13,12 @@ typedef struct __DRCUConfig
 	Int16U Current;
 	Int16U CurrentRate;
 	Int32U RCUTrigOffsetTicks;
+	Int16S V_Offset;
+	Int16S V_K;
+	Int16S V_K2;
+	Int16S I_Offset;
+	Int16S I_K;
+
 } DRCUConfig, *pDRCUConfig;
 
 // Functions

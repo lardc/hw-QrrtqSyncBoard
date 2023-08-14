@@ -109,8 +109,13 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 	{
 		if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_MAX_VALUE, Config->Current))
 			if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE, Config->CurrentRate))
-				if(HLI_CAN_CallAction(DataTable[NodeIDReg], DCRU_ACT_CONFIG))
-					*CurrentLogicState = NextLogicState;
+				if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_OFFSET, Config->V_Offset))
+					if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K, Config->V_K))
+						if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K2, Config->V_K2))
+							if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL1_EXT_OFFSET, Config->I_Offset))
+								if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL1_EXT_K, Config->I_K))
+									if(HLI_CAN_CallAction(DataTable[NodeIDReg], DCRU_ACT_CONFIG))
+										*CurrentLogicState = NextLogicState;
 	}
 	else
 		*CurrentLogicState = NextLogicState;

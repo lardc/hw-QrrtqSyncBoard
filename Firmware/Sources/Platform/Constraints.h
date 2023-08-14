@@ -50,8 +50,8 @@ typedef struct __TableItemConstraint
 #define DCU_I_RISE_RATE_DEF			66		// in A/us x100
 
 #define DIRECT_CURRENT_MIN			100		// in A
-#define DIRECT_CURRENT_MAX			1100	// in A
-#define DIRECT_CURRENT_DEF			100		// in A
+#define DIRECT_CURRENT_MAX			3300	// in A
+#define DIRECT_CURRENT_DEF			300		// in A
 
 #define IDC_PULSE_WIDTH_MIN			500		// in us
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
@@ -77,6 +77,12 @@ typedef struct __TableItemConstraint
 #define DEF_FALL_RATE_R8			500		// A/ìêñ x10
 #define DEF_FALL_RATE_R9			600		// A/ìêñ x10
 #define DEF_FALL_RATE_R10			1000	// A/ìêñ x10
+//
+#define DEF_I_TO_V_OFFSET			0
+#define DEF_I_TO_V_K				1000
+#define DEF_I_TO_V_K2				0
+#define DEF_CTRL1_OFFSET			0
+#define DEF_CTRL1_K					1000
 // FCROVU
 //
 #define OS_VOLATGE_MIN				100		// in V
