@@ -94,6 +94,7 @@
 #define REG_RCU_TOFFS_R8			38	// Сдвиг срабатывания синхронизации RCU при 8 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R9   			39	// Сдвиг срабатывания синхронизации RCU при 9 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R10			40	// Сдвиг срабатывания синхронизации RCU при 10 скорости спада (в нс x10)
+#define REG_RCU_TOFFS_K4			41	// коэффицент сдвига
 //
 #define REG_FALL_RATE_R0			50 	// Фактическая скорость спада при 0 скорости спада комплекса (в А/мкс)
 #define REG_FALL_RATE_R1			51 	// Фактическая скорость спада при 0 скорости спада комплекса (в А/мкс)
@@ -192,7 +193,7 @@
 #define REG_EP_STEP_FRACT_CNT		236	// Number of elementary fractions in the EP single step
 //
 #define REG_PRESSURE				240	// Pressure flag
-#define REG_CSU_VOLTAGE				241	// CSU voltage (V)
+#define REG_CSU_VOLTAGE				241	// CSU voltage (V*10)
 //
 #define REG_SP__3					255
 //
