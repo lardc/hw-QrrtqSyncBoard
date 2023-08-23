@@ -27,7 +27,8 @@ static volatile ExternalDeviceState LOGIC_ExtDeviceState;
 static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 volatile Int16U ResultsCounter, MeasurementMode;
 //
-static Boolean MuteCROVU;
+static Boolean MuteCROVU, RRStopEnable;
+static Int16U RRTicks, RRTicksMaxCount;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
@@ -102,17 +103,27 @@ void LOGIC_RealTime()
 		}
 		
 		// Stop process
-		if(LOGIC_StateRealTime == LSRT_ReversePulseStart && LOGIC_RealTimeCounter >= TimeReverseStop)
+		if(LOGIC_StateRealTime == LSRT_ReversePulseStart)
 		{
-			DataTable[REG_RCU_SYNC_WIDTH] = TimeReverseStop;
-			ZbGPIO_FCROVU_Sync(FALSE);
-			ZbGPIO_SCOPE_Sync(FALSE);
-			//
-			ZbGPIO_RCU_Sync(FALSE);
-			ZbGPIO_CSU_Sync(FALSE);
-			
-			TimeBeforeDataRead = LOGIC_RealTimeCounter + RT_DATA_READ_DELAY_TICK;
-			LOGIC_StateRealTime = LSRT_ReadDataPause;
+			if(LOGIC_RealTimeCounter >= TimeReverseStop)
+			{
+				DataTable[REG_RCU_SYNC_WIDTH] = TimeReverseStop;
+				ZbGPIO_FCROVU_Sync(FALSE);
+				ZbGPIO_SCOPE_Sync(FALSE);
+				//
+				ZbGPIO_RCU_Sync(FALSE);
+				ZbGPIO_CSU_Sync(FALSE);
+
+				TimeBeforeDataRead = LOGIC_RealTimeCounter + RT_DATA_READ_DELAY_TICK;
+				LOGIC_StateRealTime = LSRT_ReadDataPause;
+			}
+
+			// ќстановка RCU по сигналу обратного восстановлени€
+			else if(RRStopEnable && ZbGPIO_CSU_Itrig())
+			{
+				if(RRTicks++ >= RRTicksMaxCount)
+					ZbGPIO_RCU_Sync(FALSE);
+			}
 		}
 		
 		if(LOGIC_StateRealTime == LSRT_ReadDataPause && LOGIC_RealTimeCounter >= TimeBeforeDataRead)
@@ -242,6 +253,10 @@ void LOGIC_CacheVariables()
 	LOGIC_ExtDeviceState.RCU3.Emulate	= DataTable[REG_EMULATE_RCU3];
 	LOGIC_ExtDeviceState.CSU.Emulate	= DataTable[REG_EMULATE_CSU];
 	LOGIC_ExtDeviceState.SCOPE.Emulate	= DataTable[REG_EMULATE_SCOPE];
+
+	RRStopEnable = DataTable[REG_RR_STOP_RCU_EN];
+	RRTicksMaxCount = DataTable[REG_RR_STOP_RCU_TICKS];
+	RRTicks = 0;
 
 	if(CacheUpdate)
 	{

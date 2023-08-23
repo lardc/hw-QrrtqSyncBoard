@@ -26,8 +26,6 @@ void InitializeController(Boolean GoodClock);
 
 // FORWARD ISRs
 // -----------------------------------------
-// CPU External interrupt ISR
-ISRCALL XInterrupt_ISR();
 // CPU Timer 0 ISR
 ISRCALL Timer0_ISR();
 // CPU Timer 1 ISR
@@ -73,7 +71,6 @@ void main()
 		ADD_ISR(TINT1_XINT13, Timer1_ISR);
 		ADD_ISR(TINT2, Timer2_ISR);
 		ADD_ISR(ECAN0INTB, CAN0B_ISR);
-		ADD_ISR(XINT1, XInterrupt_ISR);
 		ADD_ISR(SEQ1INT, SEQ1_ISR);
 	END_ISR_MAP
 
@@ -217,7 +214,6 @@ void InitializeController(Boolean GoodClock)
 // ISRs
 // -----------------------------------------
 #ifdef BOOT_FROM_FLASH
-	#pragma CODE_SECTION(XInterrupt_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer0_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer1_ISR, "ramfuncs");
 	#pragma CODE_SECTION(Timer2_ISR, "ramfuncs");
@@ -227,15 +223,6 @@ void InitializeController(Boolean GoodClock)
 //
 #pragma INTERRUPT(Timer0_ISR, HPI);
 #pragma INTERRUPT(SEQ1_ISR, HPI);
-
-// External interrupt ISR
-ISRCALL XInterrupt_ISR(void)
-{
-	ZbGPIO_FCROVU_Sync(FALSE);
-
-	XINT_ISR_DONE;
-}
-// -----------------------------------------
 
 // timer 0 ISR
 ISRCALL Timer0_ISR(void)

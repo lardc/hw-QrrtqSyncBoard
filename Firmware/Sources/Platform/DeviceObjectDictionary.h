@@ -71,7 +71,10 @@
 #define REG_RCU1_NODE_ID			15	// RCU1 CAN node ID
 #define REG_RCU2_NODE_ID			16	// RCU2 CAN node ID
 #define REG_RCU3_NODE_ID			17	// RCU3 CAN node ID
-//
+
+#define REG_RR_STOP_RCU_EN			18	// Разрешить остановку RCU в точке обратного восстановления
+#define REG_RR_STOP_RCU_TICKS		19	// Задержка до остановки в тиках таймера 2
+
 #define REG_SAFETY_EN				20	// Safety enable
 #define REG_CSU_VOLTAGE_K			21 	// CSU voltage coefficient
 #define REG_DCU_CURRENT_PER_UNIT	22	// Максимальный ток DCU на блок (в А)

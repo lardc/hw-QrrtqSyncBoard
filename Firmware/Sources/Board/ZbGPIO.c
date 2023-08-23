@@ -12,6 +12,7 @@ void ZbGPIO_Init()
 {
 	// Configure input pin
 	ZwGPIO_PinToInput(PIN_DCU_READY, TRUE, GPIO_NSAMPLE);
+	ZwGPIO_PinToInput(PIN_CSU_ITRIG, TRUE, GPIO_NSAMPLE);
 
 	// Reset to default state
 	ZwGPIO_WritePin(PIN_CSU_PS, TRUE);
@@ -46,10 +47,12 @@ void ZbGPIO_Init()
 	ZwGPIO_PinToOutput(PIN_SYNC_SCOPE2);
 	ZwGPIO_PinToOutput(PIN_PC_PWR);
 	ZwGPIO_PinToOutput(PIN_DBG);
+}
+// ----------------------------------------
 
-	// Configure external interrupt
-	ZwGPIO_PinToInput(PIN_CSU_ITRIG, TRUE, GPIO_NSAMPLE);
-	ZwXINT1_Init(PIN_CSU_ITRIG, TRIG_RISE_EDGE);
+Boolean ZbGPIO_CSU_Itrig()
+{
+	return ZwGPIO_ReadPin(PIN_CSU_ITRIG);
 }
 // ----------------------------------------
 
