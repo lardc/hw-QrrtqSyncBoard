@@ -130,31 +130,40 @@ void CONTROL_RequestDPC(FUNC_AsyncDelegate Action)
 
 void CONTROL_Idle()
 {
-	// Handle RS232 to PC interface re-init
-	CONTROL_ReinitRS232();
-	
-	// Process external interface requests
-	DEVPROFILE_ProcessRequests();
-	
-	// Update CAN bus status
-	DEVPROFILE_UpdateCANDiagStatus();
-	
-	// Check high-level interface status
-	CONTROL_StatusHLI();
-	
-	// Check long-execution process
-	CONTROL_SubProcessStateMachine();
-	
-	// Control CSU
-	LOGIC_FanAndVoltageControlCSU();
-	
-	// Update high-level logic state
-	DataTable[REG_LOGIC_STATE] = LOGIC_GetState();
-	
-	// Process deferred procedures
-	FUNC_AsyncDelegate DPCDelegateCopy = DPCDelegate;
-	if(DPCDelegateCopy)
-		DPCDelegateCopy();
+	if(LOGIC_StateRealTime == LSRT_ReversePulseStart)
+	{
+		// Скоростной обработчик поиска обратного восстановления
+		if(DataTable[REG_RR_STOP_RCU_EN] && ZbGPIO_CSU_Itrig())
+			ZbGPIO_RCU_Sync(FALSE);
+	}
+	else
+	{
+		// Handle RS232 to PC interface re-init
+		CONTROL_ReinitRS232();
+
+		// Process external interface requests
+		DEVPROFILE_ProcessRequests();
+
+		// Update CAN bus status
+		DEVPROFILE_UpdateCANDiagStatus();
+
+		// Check high-level interface status
+		CONTROL_StatusHLI();
+
+		// Check long-execution process
+		CONTROL_SubProcessStateMachine();
+
+		// Control CSU
+		LOGIC_FanAndVoltageControlCSU();
+
+		// Update high-level logic state
+		DataTable[REG_LOGIC_STATE] = LOGIC_GetState();
+
+		// Process deferred procedures
+		FUNC_AsyncDelegate DPCDelegateCopy = DPCDelegate;
+		if(DPCDelegateCopy)
+			DPCDelegateCopy();
+	}
 }
 // ----------------------------------------
 

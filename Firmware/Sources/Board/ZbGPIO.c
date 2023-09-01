@@ -52,7 +52,7 @@ void ZbGPIO_Init()
 
 Boolean ZbGPIO_CSU_Itrig()
 {
-	return ZwGPIO_ReadPin(PIN_CSU_ITRIG);
+	return !ZwGPIO_ReadPin(PIN_CSU_ITRIG);
 }
 // ----------------------------------------
 
