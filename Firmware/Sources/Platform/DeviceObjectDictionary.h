@@ -73,7 +73,7 @@
 #define REG_RCU3_NODE_ID			17	// RCU3 CAN node ID
 
 #define REG_RR_STOP_RCU_EN			18	// Разрешить остановку RCU в точке обратного восстановления
-#define REG_RR_STOP_RCU_DELAY		19	// Задержка до остановки
+#define REG_RR_STOP_RCU_DELAY		19	// Задержка перед остановкой (в мкс)
 
 #define REG_SAFETY_EN				20	// Safety enable
 #define REG_CSU_VOLTAGE_K			21 	// CSU voltage coefficient
