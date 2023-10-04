@@ -108,6 +108,7 @@ void LOGIC_RealTime()
 			ZbGPIO_FCROVU_Sync(FALSE);
 			ZbGPIO_SCOPE_Sync(FALSE);
 			//
+			ZbGPIO_DCU_Sync(FALSE);
 			ZbGPIO_RCU_Sync(FALSE);
 			ZbGPIO_CSU_Sync(FALSE);
 			

@@ -135,7 +135,7 @@ void CONTROL_Idle()
 		// Скоростной обработчик поиска обратного восстановления
 		if(DataTable[REG_RR_STOP_RCU_EN] && ZbGPIO_CSU_Itrig())
 		{
-			DELAY_US(DataTable[REG_RR_STOP_RCU_DELAY]);
+			//DELAY_US(DataTable[REG_RR_STOP_RCU_DELAY]);
 			ZbGPIO_RCU_Sync(FALSE);
 		}
 	}
