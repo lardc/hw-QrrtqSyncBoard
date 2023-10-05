@@ -98,6 +98,7 @@ void LOGIC_RealTime()
 			
 			LOGIC_StateRealTime = LSRT_ReversePulseStart;
 			TimeReverseStop = LOGIC_RealTimeCounter + OSV_ON_TIME_TICK;
+
 			LOGIC_PreciseEventStart();
 		}
 		
@@ -108,7 +109,7 @@ void LOGIC_RealTime()
 			ZbGPIO_FCROVU_Sync(FALSE);
 			ZbGPIO_SCOPE_Sync(FALSE);
 			//
-			ZbGPIO_DCU_Sync(FALSE);
+			ZbGPIO_DCU_Sync(TRUE);
 			ZbGPIO_RCU_Sync(FALSE);
 			ZbGPIO_CSU_Sync(FALSE);
 			
@@ -118,6 +119,7 @@ void LOGIC_RealTime()
 		
 		if(LOGIC_StateRealTime == LSRT_ReadDataPause && LOGIC_RealTimeCounter >= TimeBeforeDataRead)
 		{
+			ZbGPIO_DCU_Sync(FALSE);
 			Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC_SHORT;
 			
 			if(LOGIC_PulseNumRemain > 0)
@@ -188,11 +190,14 @@ void LOGIC_PreciseEventInit(Int16U usTime)
 
 void LOGIC_PreciseEventStart()
 {
+	if(MeasurementMode != MODE_QRR_ONLY)
+	{
 	// Avoid interrupts
 	ZwTimer_StopT0();
 	ZwTimer_StopT2();
 
 	ZwTimer_StartT1();
+	}
 }
 // ----------------------------------------
 
@@ -296,26 +301,45 @@ void LOGIC_CacheVariables()
 		
 		if(MeasurementMode == MODE_QRR_ONLY)
 		{
-			LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
-			CROVU_TrigTime = DC_CurrentZeroPoint + TQ_MAX_TIME;
+			if(CacheSinglePulse)
+			{
+				LOGIC_PulseNumRemain = 1;
+				CROVU_TrigTime = 0;
+			}
+			else
+			{
+				LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
+				CROVU_TrigTime = 0;
+			}
+		CacheUpdate = FALSE;
 		}
-		else if(CacheSinglePulse)
+
+		if(MeasurementMode == MODE_QRR_TQ)
 		{
-			LOGIC_PulseNumRemain = 1;
-			CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
+			if(CacheSinglePulse)
+			{
+				LOGIC_PulseNumRemain = 1;
+				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
+			}
+			else
+			{
+				LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
+				CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
+			}
+
 		}
 		else
-		{
-			LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
-			CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
-		}
+			{
+				LOGIC_PulseNumRemain = 1;
+				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
+			}
 		
 		if (CROVU_TrigTime > DataTable[REG_RCU_SYNC_MAX] )
 		{
 			CROVU_TrigTime = DataTable[REG_RCU_SYNC_MAX];
 		}
-
 		LOGIC_PreciseEventInit(CROVU_TrigTime);
+
 		CacheUpdate = FALSE;
 	}
 }
