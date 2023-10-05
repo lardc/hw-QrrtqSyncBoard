@@ -327,9 +327,11 @@ void CONTROL_SubProcessStateMachine()
 						CONTROL_SwitchToReady();
 					}
 					else
+					{
 						CONTROL_SwitchToFault(FAULT_PROTOCOL, FAULTEX_READ_TIMEOUT);
 
-					LOGIC_StateRealTime == LSRT_None;
+						LOGIC_StateRealTime == LSRT_None;
+					}
 				}
 				else
 				{
