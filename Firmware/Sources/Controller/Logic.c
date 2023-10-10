@@ -30,7 +30,7 @@ volatile Int16U ResultsCounter, MeasurementMode;
 static Boolean MuteCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
-static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint, DC_ENFallRate;
+static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset,	Ctrl1_K, Trig_K;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
@@ -281,12 +281,11 @@ void LOGIC_CacheVariables()
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate,
 				LOGIC_ExtDeviceState.DCU3.Emulate, DC_Current, DC_NamberFallRate, &DCUConfig, 0, I_To_V_Offset, I_To_V_K, I_To_V_K2, 0, 0);
 
-		Int16U TrigOffset = (LOGIC_FindRCUTrigOffset(DC_NamberFallRate) - (Trig_K * 1000/ DC_Current));
+		Int16U TrigOffset = (LOGIC_FindRCUTrigOffset(DC_NamberFallRate) - ((Int32S)Trig_K * 1000/ DC_Current));
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate,
 				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset, Ctrl1_K);
 
-		DC_ENFallRate = (DC_CurrentFallRate * K_Unit / 10) ;
-		DC_CurrentZeroPoint = ((DC_Current * 100 / DC_ENFallRate)/2);
+		DC_CurrentZeroPoint = (((Int32U)DC_Current * 100 / (DC_CurrentFallRate * K_Unit / 10))/2);
 		DataTable[REG_DBG3] = DC_CurrentZeroPoint;
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 		
