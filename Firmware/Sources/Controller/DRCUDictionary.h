@@ -1,4 +1,4 @@
-#ifndef __DRCU_DICTIONARY_H
+﻿#ifndef __DRCU_DICTIONARY_H
 #define __DRCU_DICTIONARY_H
 
 // Commands

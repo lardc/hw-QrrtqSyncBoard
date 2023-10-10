@@ -1,4 +1,4 @@
-#ifndef __COMMON_H
+﻿#ifndef __COMMON_H
 #define __COMMON_H
 
 // Include

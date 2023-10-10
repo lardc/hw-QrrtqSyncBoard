@@ -1,4 +1,4 @@
-// -----------------------------------------
+Ôªø// -----------------------------------------
 // Constraints for tunable parameters
 // ----------------------------------------
 
@@ -43,8 +43,8 @@ typedef struct __TableItemConstraint
 #define MAX_UNIT_DRCU				6
 #define DEF_UNIT_DRCU				6
 
-#define MAX_RCU_SYNC				7000	// ‚ ÏÍÒ
-#define DEF_RCU_SYNC				2000	// ‚ ÏÍÒ
+#define MAX_RCU_SYNC				7000	// –≤ –º–∫—Å
+#define DEF_RCU_SYNC				2000	// –≤ –º–∫—Å
 
 #define DCU_I_RISE_RATE_MAX			300		// in A/us x100
 #define DCU_I_RISE_RATE_DEF			66		// in A/us x100
@@ -65,18 +65,18 @@ typedef struct __TableItemConstraint
 #define REVERSE_RATE_MAX			10		// in A/us x10
 #define REVERSE_RATE_DEF			4		// in A/us x10
 
-#define MAX_FALL_RATE				1000	// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R0			10		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R1			15		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R2			20		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R3			50		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R4			100		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R5			150		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R6			200		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R7			300		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R8			500		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R9			600		// A/ÏÍÒ x10
-#define DEF_FALL_RATE_R10			1000	// A/ÏÍÒ x10
+#define MAX_FALL_RATE				1000	// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R0			10		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R1			15		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R2			20		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R3			50		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R4			100		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R5			150		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R6			200		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R7			300		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R8			500		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R9			600		// A/–º–∫—Å x10
+#define DEF_FALL_RATE_R10			1000	// A/–º–∫—Å x10
 //
 #define DEF_I_TO_V_OFFSET			0
 #define DEF_I_TO_V_K				1000

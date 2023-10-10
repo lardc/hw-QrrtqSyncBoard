@@ -1,4 +1,4 @@
-// -----------------------------------------
+п»ї// -----------------------------------------
 // Main logic library
 // ----------------------------------------
 
@@ -273,7 +273,7 @@ void LOGIC_CacheVariables()
 		Ctrl1_K = DataTable[REG_CTRL1_K];
 		Trig_K = DataTable[REG_RCU_TOFFS_K4];
 
-		// Подготовка конфигурации DCU и RCU
+		// РџРѕРґРіРѕС‚РѕРІРєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё DCU Рё RCU
 
 		K_Unit = LOGIC_EnableUnit(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate, LOGIC_ExtDeviceState.DCU3.Emulate,
 				LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate, LOGIC_ExtDeviceState.RCU3.Emulate);

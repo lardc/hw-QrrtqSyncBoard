@@ -1,4 +1,4 @@
-// Header
+﻿// Header
 #include "Common.h"
 
 // Includes
