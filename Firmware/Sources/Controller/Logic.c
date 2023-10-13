@@ -30,7 +30,8 @@ volatile Int16U ResultsCounter, MeasurementMode;
 static Boolean MuteCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
-static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, DC_CurrentPlateTicks, DC_CurrentZeroPoint;
+static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
+static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset,	Ctrl1_K, Trig_K;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
@@ -97,7 +98,7 @@ void LOGIC_RealTime()
 			ZbGPIO_DUT_Switch(FALSE);
 			
 			LOGIC_StateRealTime = LSRT_ReversePulseStart;
-			TimeReverseStop = LOGIC_RealTimeCounter + (DC_CurrentZeroPoint / 100) + OSV_ON_TIME_TICK;
+			TimeReverseStop = LOGIC_RealTimeCounter + (RC_CurrentMaxPoint / TIMER2_PERIOD) + OSV_ON_TIME_TICK;
 			DataTable[REG_DBG2] = TimeReverseStop;
 
 			LOGIC_PreciseEventStart();
@@ -282,13 +283,23 @@ void LOGIC_CacheVariables()
 				LOGIC_ExtDeviceState.DCU3.Emulate, DC_Current, DC_NamberFallRate, &DCUConfig, 0, I_To_V_Offset, I_To_V_K, I_To_V_K2, 0, 0);
 
 		Int16U TrigOffset = (LOGIC_FindRCUTrigOffset(DC_NamberFallRate) - ((Int32S)Trig_K * 1000/ DC_Current));
+		DataTable[REG_DBG] = TrigOffset;
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate,
 				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset, Ctrl1_K);
 
-		DC_CurrentZeroPoint = (((Int32U)DC_Current * 100 / (DC_CurrentFallRate * K_Unit / 10))/2);
+		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / (DC_CurrentFallRate * 10 * K_Unit) + ( TrigOffset / 10 ));
 		DataTable[REG_DBG3] = DC_CurrentZeroPoint;
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
+
+		RC_CurrentMaxPoint = (((Int32U)DC_Current * 2 * 10000 / (DC_CurrentFallRate * 10 * K_Unit)) + (TrigOffset / 10 ));
+		if (RC_CurrentMaxPoint > (DataTable[REG_RCU_SYNC_MAX]) )
+		{
+			RC_CurrentMaxPoint = (DataTable[REG_RCU_SYNC_MAX] ) ;
+		}
+		DataTable[REG_DBG4] = RC_CurrentMaxPoint;
+
 		
+
 
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
@@ -334,9 +345,9 @@ void LOGIC_CacheVariables()
 				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 			}
 		
-		if (CROVU_TrigTime > DataTable[REG_RCU_SYNC_MAX] )
+		if (CROVU_TrigTime > RC_CurrentMaxPoint)
 		{
-			CROVU_TrigTime = DataTable[REG_RCU_SYNC_MAX];
+			CROVU_TrigTime = RC_CurrentMaxPoint;
 		}
 		LOGIC_PreciseEventInit(CROVU_TrigTime);
 
@@ -1304,6 +1315,10 @@ Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulatio
 
 
 	K_Unit = EnableUnit * 100 / DataTable[REG_UNIT_DRCU];
+	if (K_Unit == 0)
+	{
+		K_Unit = 100;
+	}
 	return K_Unit;
 }
 

@@ -190,7 +190,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 											   {0, INT16U_MAX, 0},														// 170
 											   {0, INT16U_MAX, 0},														// 171
 											   {0, INT16U_MAX, 0},														// 172
-											   {0, 0, 0},																// 173
+											   {0, INT16U_MAX, 0},														// 173
 											   {0, 0, 0},																// 174
 											   {0, 0, 0},																// 175
 											   {0, 0, 0},																// 176

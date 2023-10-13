@@ -142,6 +142,7 @@
 #define REG_DBG						170	// Отладочный регистр
 #define REG_DBG2					171	// Отладочный регистр 2
 #define REG_DBG3					172	// Отладочный регистр 3(DC_CurrentZeroPoint)
+#define REG_DBG4					173 // Отладочный регистр 4(RC_CurrentMaxPoint)
 //
 #define REG_PWD_1					180	// Unlock password location 1
 #define REG_PWD_2					181	// Unlock password location 2
