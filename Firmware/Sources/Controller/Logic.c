@@ -287,11 +287,11 @@ void LOGIC_CacheVariables()
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate,
 				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset, Ctrl1_K);
 
-		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / (DC_CurrentFallRate * 10 * K_Unit) + ( TrigOffset / 10 ));
+		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit));
 		DataTable[REG_DBG3] = DC_CurrentZeroPoint;
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 
-		RC_CurrentMaxPoint = (((Int32U)DC_Current * 2 * 10000 / (DC_CurrentFallRate * 10 * K_Unit)) + (TrigOffset / 10 ));
+		RC_CurrentMaxPoint = (((Int32U)DC_Current * 2 * 10000 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit)) + (TrigOffset / 10 ));
 		if (RC_CurrentMaxPoint > (DataTable[REG_RCU_SYNC_MAX]) )
 		{
 			RC_CurrentMaxPoint = (DataTable[REG_RCU_SYNC_MAX] ) ;
