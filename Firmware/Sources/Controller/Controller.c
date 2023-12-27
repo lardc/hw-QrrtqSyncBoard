@@ -21,7 +21,6 @@
 // Definitions
 //
 #define PRESSURE_FAULT_COUNTER_MAX			1000
-
 // Variables
 //
 volatile DeviceState CONTROL_State = DS_None;
@@ -32,7 +31,7 @@ static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 Int16U CONTROL_Values_1[VALUES_x_SIZE];
 Int16U CONTROL_Values_2[VALUES_x_SIZE];
 Int16U CONTROL_Values_Slave[VALUES_x_SIZE];
-volatile Int16U CONTROL_Values_1_Counter = 0, CONTROL_Values_2_Counter = 0, CONTROL_Values_Slave_Counter = 0;
+volatile Int16U CONTROL_Values_1_Counter = 0, CONTROL_Values_2_Counter = 0, CONTROL_Values_Slave_Counter = 0, Test = 0;
 //
 Int16U CONTROL_ValDiag1[UNIT_MAX_NUM_OF_PULSES];
 Int16U CONTROL_ValDiag2[UNIT_MAX_NUM_OF_PULSES];
@@ -140,6 +139,10 @@ void CONTROL_Idle()
 				DELAY_US(DataTable[REG_RR_STOP_RCU_DELAY]);
 			}
 			ZbGPIO_RCU_Sync(FALSE);
+			ZbGPIO_DCU_Sync(TRUE);
+			ZbGPIO_CSU_Sync(FALSE);
+			Test = Test + 1;
+			DataTable[REG_DBG] = Test ;
 		}
 	}
 	else

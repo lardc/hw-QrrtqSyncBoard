@@ -78,6 +78,7 @@ typedef enum __DeviceSubState
 	LSRT_DirectPulseReady		= 3,
 	LSRT_ReversePulseStart		= 4,
 	LSRT_ReadDataPause			= 5
+
 } DeviceSubState;
 //
 typedef struct __DeviceStateEntity

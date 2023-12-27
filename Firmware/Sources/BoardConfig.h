@@ -68,6 +68,6 @@
 #define PIN_CSU_ITRIG		25
 
 // ADC placement
-#define AIN_V_CSU			0x00	// INA 0
+#define AIN_PRESSURE		0x00	// INA 0
 
 #endif // __BOARD_CONFIG_H

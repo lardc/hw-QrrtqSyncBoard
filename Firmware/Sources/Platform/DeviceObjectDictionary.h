@@ -84,7 +84,7 @@
 #define REG_GATE_DRV_TURNON_DELAY	26	// Задержка формирования импульса управления (в мкс)
 #define REG_CSU_VOLTAGE_OFFSET		27	// Оффсет при пересчете напряжения CSU
 #define REG_UNIT_DRCU				28  // Количество блоков в комплексе
-#define REG_RCU_SYNC_MAX			29	// Максимальная длительности синхросигнала RCU
+#define REG_RCU_SYNC_MAX			29	// Максимальная длительность формирования RCU (в мс /10)
 //
 #define REG_RCU_TOFFS_R0			30	// Сдвиг срабатывания синхронизации RCU при 0 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R1			31	// Сдвиг срабатывания синхронизации RCU при 1 скорости спада (в нс x10)
@@ -130,6 +130,7 @@
 #define REG_FCROVU_I_SHORT			137	// FCROVU short circuit current
 #define REG_CSU_VOLTAGE_THRE		138	// CSU voltage set (in V x10)
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
+#define REG_CALIBRATION_PROCESS		140 // Калибровка 2 RCU
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1
