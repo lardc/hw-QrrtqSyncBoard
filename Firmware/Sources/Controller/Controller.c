@@ -20,7 +20,7 @@
 
 // Definitions
 //
-#define PRESSURE_FAULT_COUNTER_MAX			1000
+#define PRESSURE_FAULT_COUNTER_MAX			2000
 
 // Variables
 //
