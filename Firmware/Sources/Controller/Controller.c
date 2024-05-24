@@ -200,6 +200,9 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_RES_TRR] = 0;
 	DataTable[REG_RES_TQ] = 0;
 	DataTable[REG_RES_IDC] = 0;
+
+	DataTable[REG_EP_ELEMENT_FRACT] = 0;
+	DataTable[REG_EP_STEP_FRACT_CNT] = 0;
 }
 // ----------------------------------------
 

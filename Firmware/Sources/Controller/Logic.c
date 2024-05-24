@@ -864,49 +864,51 @@ void LOGIC_ReadDataSequence()
 												if (HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO, &Results[ResultsCounter].ZeroI))
 													if (HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV))
 														if (HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt))
-														{
-															if (Register == OPRESULT_NONE)
-															{
-																LOGIC_State = LS_Error;
-																CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_WRONG_STATE);
-															}
-															else if ((Register == OPRESULT_FAIL && Problem != PROBLEM_SCOPE_CALC_VZ) ||
-																	 (Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ && !Results[ResultsCounter].DeviceTriggered))
-															{
-																LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
-															}
-															else if (Results[ResultsCounter].Irr > QPU_Current)
-															{
-																LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
-															}
-															else
-															{
-																// Save results
-																Results[ResultsCounter].OSVApplyTime = FCROVU_TrigTime;
-																LOGIC_LogData(Results[ResultsCounter]);
-
-																// Apply extended Tq logic
-																if (MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
-																	LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
-
-																// Read data plots
-																if (LOGIC_PulseNumRemain == 0 && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
+															if (HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract))
+																if (HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt))
 																{
-																	if (HLI_RS232_ReadArray16(EP_QPU_READ_I, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
-																		if (MeasurementMode == MODE_QRR_TQ)
+																	if (Register == OPRESULT_NONE)
+																	{
+																		LOGIC_State = LS_Error;
+																		CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_WRONG_STATE);
+																	}
+																	else if ((Register == OPRESULT_FAIL && Problem != PROBLEM_SCOPE_CALC_VZ) ||
+																			(Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ && !Results[ResultsCounter].DeviceTriggered))
+																	{
+																		LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
+																	}
+																	else if (Results[ResultsCounter].Irr > QPU_Current)
+																	{
+																		LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
+																	}
+																	else
+																	{
+																		// Save results
+																		Results[ResultsCounter].OSVApplyTime = FCROVU_TrigTime;
+																		LOGIC_LogData(Results[ResultsCounter]);
+
+																		// Apply extended Tq logic
+																		if (MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
+																			LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
+
+																		// Read data plots
+																		if (LOGIC_PulseNumRemain == 0 && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
 																		{
-																			if (HLI_RS232_ReadArray16(EP_QPU_READ_V, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
-																				LOGIC_State = LS_None;
+																			if (HLI_RS232_ReadArray16(EP_QPU_READ_I, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
+																				if (MeasurementMode == MODE_QRR_TQ)
+																				{
+																					if (HLI_RS232_ReadArray16(EP_QPU_READ_V, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
+																						LOGIC_State = LS_None;
+																				}
+																				else
+																					LOGIC_State = LS_None;
 																		}
 																		else
 																			LOGIC_State = LS_None;
-																}
-																else
-																	LOGIC_State = LS_None;
 
-																DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
-															}
-														}
+																		DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
+																	}
+																}		
 					}
 					else
 					{
@@ -1055,6 +1057,9 @@ void LOGIC_ResultToDataTable()
 	DataTable[REG_RES_TQ]		= Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
 	DataTable[REG_RES_DIDT]		= AvgdIdt / AvgCounter;
 	DataTable[REG_RES_QRR_INT]	= (AvgQrr * 10) / AvgCounter;
+
+	DataTable[REG_EP_ELEMENT_FRACT] = Results[ResultsCounter - 1].EPTimeFract;
+	DataTable[REG_EP_STEP_FRACT_CNT] = Results[ResultsCounter - 1].EPTimeFractCnt;
 
 	DataTable[REG_DC_READY_RETRIES] = LOGIC_DCReadyRetries;
 }
