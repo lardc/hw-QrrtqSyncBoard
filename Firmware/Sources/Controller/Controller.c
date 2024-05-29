@@ -24,11 +24,8 @@ volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause;
 static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE;
 static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 //
-#pragma DATA_SECTION(CONTROL_Values_1, "data_mem");
 Int16U CONTROL_Values_1[VALUES_x_SIZE];
-#pragma DATA_SECTION(CONTROL_Values_2, "data_mem");
 Int16U CONTROL_Values_2[VALUES_x_SIZE];
-#pragma DATA_SECTION(CONTROL_Values_Slave, "data_mem");
 Int16U CONTROL_Values_Slave[VALUES_x_SIZE];
 volatile Int16U CONTROL_Values_1_Counter = 0, CONTROL_Values_2_Counter = 0, CONTROL_Values_Slave_Counter = 0;
 //
@@ -200,6 +197,9 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_RES_TRR] = 0;
 	DataTable[REG_RES_TQ] = 0;
 	DataTable[REG_RES_IDC] = 0;
+
+	DataTable[REG_EP_ELEMENT_FRACT] = 0;
+	DataTable[REG_EP_STEP_FRACT_CNT] = 0;
 }
 // ----------------------------------------
 

@@ -115,6 +115,9 @@
 #define REG_DIAG_OUT_2				231	// Output diagnostic register 2
 #define REG_DIAG_OUT_3				232	// Output diagnostic register 3
 //
+#define REG_EP_ELEMENT_FRACT		235	// Elementary fraction length (in ns)
+#define REG_EP_STEP_FRACT_CNT		236	// Number of elementary fractions in the EP single step
+//
 #define REG_SP__3					255
 //
 // ----------------------------------------
@@ -253,6 +256,9 @@
 #define REG_SCOPE_RESULT_ZERO		204	// Zero-cross time (in us x10)
 #define REG_SCOPE_RESULT_ZERO_V		205	// Zero-cross time for on-state voltage (in us x10)
 #define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x10)
+//
+#define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
+#define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
 //
 // States
 #define DS_SCOPE_NONE				0
