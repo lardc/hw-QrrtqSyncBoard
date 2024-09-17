@@ -311,7 +311,7 @@ void LOGIC_CacheVariables()
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		
-		FCROVU_IShortCircuit = DataTable[REG_FCROVU_I_SHORT];
+		FCROVU_IShortCircuit = DC_Current * 0,5;
 
 		LOGIC_DriverOffTicks = (
 				((DC_Current / DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
