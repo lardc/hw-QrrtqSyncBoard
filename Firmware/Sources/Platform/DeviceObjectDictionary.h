@@ -33,6 +33,7 @@
 #define ACT_DIAG_PULSE_QCUHC		31	// Generate control pulse for QCUHC
 #define ACT_DIAG_PULSE_GATE_RELAY	32	// Generate control pulse for Gate relay (QCUHV)
 #define ACT_DIAG_QRR_PULSE			33
+#define ACT_DIAG_QRR_DCU_PULSE		34
 //
 #define ACT_START					100	// Start measurement
 #define ACT_STOP					101	// Force measurement stop
@@ -139,6 +140,7 @@
 //
 #define REG_DCU_SYNC_DELAY			160
 #define REG_RCU_SYNC_DELAY			161
+#define REG_DCU_SYNC_STOP			162
 //
 #define REG_DBG						170	// Отладочный регистр
 #define REG_DBG2					171	// Отладочный регистр 2
@@ -240,10 +242,10 @@
 // FCROVU SLAVE COMMANDS, REGISTERS, STATES
 //
 // Commands
-#define ACT_FCROVU_CONFIG			101	// Aply settings
+#define ACT_FCROVU_CONFIG			10	// Aply settings
 
 // Registers
-#define REG_FCROVU_V_RATE_VALUE		128	// dV/dt rate [V/us]
+#define REG_FCROVU_V_RATE_VALUE		129	// dV/dt rate [V/us]
 #define REG_FCROVU_I_SHORT_CIRCUIT	130	// Short circiut current (400, 800, 1200, 1600)А
 //
 // ----------------------------------------

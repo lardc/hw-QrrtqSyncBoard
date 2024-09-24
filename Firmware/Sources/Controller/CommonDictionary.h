@@ -32,10 +32,13 @@
 typedef enum __CommonDeviceState
 {
 	CDS_None = 0,
-	CDS_Fault = 1,
-	CDS_Disabled = 2,
-	CDS_Ready = 3,
-	CDS_InProcess = 4
+	CDS_Fault,
+	CDS_Disabled,
+	CDS_Ready,
+	CDS_ConfigReady,
+	CDS_InProcess,
+	CDS_BatteryCharging
+
 } CommonDeviceState;
 
 #define DS_SCOPE_DUMMY						255

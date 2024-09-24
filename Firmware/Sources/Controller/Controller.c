@@ -141,8 +141,6 @@ void CONTROL_Idle()
 			ZbGPIO_RCU_Sync(FALSE);
 			ZbGPIO_DCU_Sync(TRUE);
 			ZbGPIO_CSU_Sync(FALSE);
-			Test = Test + 1;
-			DataTable[REG_DBG] = Test ;
 		}
 	}
 	else
@@ -326,17 +324,25 @@ void CONTROL_SubProcessStateMachine()
 					DELAY_US(500);
 					CONTROL_Commutation(FALSE);
 
-					Int16U Register;
-					if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
+					if(!DataTable[REG_EMULATE_CROVU]) // для отдельного запуска FCROVU
 					{
-						DataTable[REG_FINISHED] = Register;
-						CONTROL_SwitchToReady();
+						Int16U Register;
+						if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
+						{
+							DataTable[REG_FINISHED] = Register;
+							CONTROL_SwitchToReady();
+						}
+						else
+						{
+							CONTROL_SwitchToFault(FAULT_PROTOCOL, FAULTEX_READ_TIMEOUT);
+
+							LOGIC_StateRealTime == LSRT_None;
+						}
 					}
 					else
 					{
-						CONTROL_SwitchToFault(FAULT_PROTOCOL, FAULTEX_READ_TIMEOUT);
-
-						LOGIC_StateRealTime == LSRT_None;
+						DataTable[REG_FINISHED] = COMM_OPRESULT_OK;
+						CONTROL_SwitchToReady();
 					}
 				}
 				else
@@ -694,6 +700,21 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				
 				DELAY_US(1000);
 				ZbGPIO_RCU_Sync(FALSE);
+			}
+			break;
+
+		case ACT_DIAG_QRR_DCU_PULSE:
+			{
+				int i;
+
+				ZbGPIO_DCU_Sync(TRUE);
+				DELAY_US(2000);
+				for(i = 0; i < DataTable[REG_DCU_SYNC_DELAY]; i++);
+					ZbGPIO_DCU_Sync(FALSE);
+				for(i = 0; i < DataTable[REG_RCU_SYNC_DELAY]; i++);
+					ZbGPIO_DCU_Sync(TRUE);
+				for(i = 0; i < DataTable[REG_DCU_SYNC_STOP]; i++);
+					ZbGPIO_DCU_Sync(FALSE);
 			}
 			break;
 

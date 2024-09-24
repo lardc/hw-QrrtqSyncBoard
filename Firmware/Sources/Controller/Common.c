@@ -146,21 +146,23 @@ void CMN_WaitNodesReadyConfig(Int64U TimeCounter, Int64U Timeout, volatile Exter
 void CMN_WaitNodesReadyX(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState, Boolean NodesConfig, Int16U Fault, LogicState NewState)
 {
-	Int16U DRCUWaitState, ScopeWaitState;
+	Int16U DRCUWaitState, ScopeWaitState, FCROVUWaitState;
 
 	if(NodesConfig)
 	{
+		FCROVUWaitState = CDS_ConfigReady;
 		DRCUWaitState = DRCU_DS_ConfigReady;
 		ScopeWaitState = CDS_InProcess;
 	}
 	else
 	{
+		FCROVUWaitState = CDS_Ready;
 		DRCUWaitState = CDS_Ready;
 		ScopeWaitState = CDS_None;
 	}
 
 	Boolean ReadyCROVU	= FullStateStorage->CROVU.Emulate || (FullStateStorage->CROVU.State == CDS_Ready);
-	Boolean ReadyFCROVU	= FullStateStorage->FCROVU.Emulate || (FullStateStorage->FCROVU.State == CDS_Ready);
+	Boolean ReadyFCROVU	= FullStateStorage->FCROVU.Emulate || (FullStateStorage->FCROVU.State == FCROVUWaitState);
 	Boolean ReadyDCU1	= FullStateStorage->DCU1.Emulate || (FullStateStorage->DCU1.State == DRCUWaitState);
 	Boolean ReadyDCU2	= FullStateStorage->DCU2.Emulate || (FullStateStorage->DCU2.State == DRCUWaitState);
 	Boolean ReadyDCU3	= FullStateStorage->DCU3.Emulate || (FullStateStorage->DCU3.State == DRCUWaitState);

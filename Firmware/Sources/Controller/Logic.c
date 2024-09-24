@@ -702,7 +702,7 @@ void LOGIC_ConfigureSequence()
 								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_CONFIG))
 								{
 									if(MeasurementMode == MODE_DVDT_ONLY)
-										LOGIC_State = LS_None;
+										LOGIC_State = LS_CFG_WaitStates;
 									else
 										LOGIC_State = LS_CFG_DCU1;
 								}
