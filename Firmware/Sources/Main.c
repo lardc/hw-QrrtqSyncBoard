@@ -11,6 +11,7 @@
 #include "SysConfig.h"
 //
 #include "Controller.h"
+#include "Logic.h"
 
 // FORWARD FUNCTIONS
 // -----------------------------------------
@@ -256,6 +257,8 @@ ISRCALL Timer1_ISR(void)
 	ZbGPIO_DCU_Sync(TRUE);
 	ZbGPIO_CSU_Sync(FALSE);
 	DELAY_US(1);
+	ZbGPIO_CROVU_Sync(TRUE);
+	DSP28x_usDelay(FCROVUTrigOffset);
 	ZbGPIO_FCROVU_Sync(TRUE);
 
 	ZwTimer_ReloadT0();

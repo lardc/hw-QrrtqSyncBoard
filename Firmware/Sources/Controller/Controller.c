@@ -317,32 +317,24 @@ void CONTROL_SubProcessStateMachine()
 			{
 				if(MeasurementMode == MODE_DVDT_ONLY)
 				{
-					ZbGPIO_FCROVU_Sync(TRUE);
+					ZbGPIO_CROVU_Sync(TRUE);
 					DELAY_US(SYNC_WIDTH_CROVU);
-					ZbGPIO_FCROVU_Sync(FALSE);
+					ZbGPIO_CROVU_Sync(FALSE);
 
 					DELAY_US(500);
 					CONTROL_Commutation(FALSE);
 
-					if(!DataTable[REG_EMULATE_CROVU]) // для отдельного запуска FCROVU
+					Int16U Register;
+					if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
 					{
-						Int16U Register;
-						if(HLI_CAN_Read16(DataTable[REG_CROVU_NODE_ID], COMM_REG_OP_RESULT, &Register))
-						{
-							DataTable[REG_FINISHED] = Register;
-							CONTROL_SwitchToReady();
-						}
-						else
-						{
-							CONTROL_SwitchToFault(FAULT_PROTOCOL, FAULTEX_READ_TIMEOUT);
-
-							LOGIC_StateRealTime == LSRT_None;
-						}
+						DataTable[REG_FINISHED] = Register;
+						CONTROL_SwitchToReady();
 					}
 					else
 					{
-						DataTable[REG_FINISHED] = COMM_OPRESULT_OK;
-						CONTROL_SwitchToReady();
+						CONTROL_SwitchToFault(FAULT_PROTOCOL, FAULTEX_READ_TIMEOUT);
+
+						LOGIC_StateRealTime == LSRT_None;
 					}
 				}
 				else
@@ -373,7 +365,6 @@ void CONTROL_SubProcessStateMachine()
 				LOGIC_StateRealTime = LSRT_WaitForConfig;
 				LOGIC_ConfigurePrepare();
 			}
-			
 		}
 	}
 }
@@ -638,11 +629,19 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 		case ACT_DIAG_PULSE_FCROVU:
 			{
 				ZbGPIO_FCROVU_Sync(TRUE);
-				DELAY_US(200);
+				DELAY_US(20);
 				ZbGPIO_FCROVU_Sync(FALSE);
 			}
 			break;
 			
+		case ACT_DIAG_PULSE_CROVU:
+			{
+				ZbGPIO_CROVU_Sync(TRUE);
+				DELAY_US(100);
+				ZbGPIO_CROVU_Sync(FALSE);
+			}
+			break;
+
 		case ACT_DIAG_PULSE_SB:
 			{
 				if(DataTable[REG_DBG])

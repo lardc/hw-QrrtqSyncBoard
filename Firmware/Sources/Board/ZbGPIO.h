@@ -24,6 +24,7 @@ void ZbGPIO_SCOPE_Sync(Boolean Set);
 void ZbGPIO_RCU_Sync(Boolean Set);
 void ZbGPIO_DCU_Sync(Boolean Set);
 void ZbGPIO_FCROVU_Sync(Boolean Set);
+void ZbGPIO_CROVU_Sync(Boolean Set);
 void ZbGPIO_DUT_Switch(Boolean Set);
 void ZbGPIO_DUT_Control(Boolean Set);
 void ZbGPIO_PC_TurnOn();

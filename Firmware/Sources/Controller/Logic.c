@@ -19,6 +19,7 @@
 //
 volatile DeviceSubState LOGIC_StateRealTime = LSRT_None;
 volatile Int32U LOGIC_RealTimeCounter = 0;
+volatile Int32U FCROVUTrigOffset = 0;
 static volatile Int64U Timeout;
 static volatile Int64U CSU_FanTimeout;
 volatile LogicState LOGIC_State = LS_None;
@@ -49,6 +50,7 @@ Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulatio
 void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset, Int16S I_To_V_Offset, Int16S I_To_V_K, Int16S I_To_V_K2, Int16S Ctrl1_Offset, Int16S Ctrl1_K);
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
+Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate);
 Int16U LOGIC_FindFallRate(Int16U FallRate);
 Boolean LOGIC_UpdateDeviceState();
 Boolean LOGIC_UpdateDeviceStateErrReset();
@@ -108,6 +110,7 @@ void LOGIC_RealTime()
 		{
 			DataTable[REG_RCU_SYNC_WIDTH] = TimeReverseStop;
 			ZbGPIO_FCROVU_Sync(FALSE);
+			ZbGPIO_CROVU_Sync(FALSE);
 			ZbGPIO_SCOPE_Sync(FALSE);
 			//
 			ZbGPIO_DCU_Sync(TRUE);
@@ -298,20 +301,19 @@ void LOGIC_CacheVariables()
 		else
 			K_MAX = 2;
 
-		RC_CurrentMaxPoint = (((Int32U)DC_Current * K_MAX * 100 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit)) + 1 );
+		RC_CurrentMaxPoint = (((Int32U)DC_Current * K_MAX * 100 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit)) + 1);
 		if ((RC_CurrentMaxPoint - 1) > (DataTable[REG_RCU_SYNC_MAX]) )
 		{
 			RC_CurrentMaxPoint = (DataTable[REG_RCU_SYNC_MAX] ) ;
 		}
 		DataTable[REG_DBG4] = RC_CurrentMaxPoint;
 
-		
-
-
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		
-		FCROVU_IShortCircuit = DC_Current * 0,5;
+		FCROVUTrigOffset = (((Int32U)LOGIC_FindFCROVUTrigOffset(CROVU_VoltageRate) * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5);
+		FCROVU_IShortCircuit = (DC_Current / 2);
+		DataTable[REG_FCROVU_I_SHORT] = FCROVU_IShortCircuit;
 
 		LOGIC_DriverOffTicks = (
 				((DC_Current / DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
@@ -683,7 +685,10 @@ void LOGIC_ConfigureSequence()
 								if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_ENABLE_EXT_SYNC))
 								{
 									CROVU_StrartConfig = TRUE;
-									LOGIC_State = LS_CFG_FCROVU;
+									if(MeasurementMode == MODE_DVDT_ONLY)
+										LOGIC_State = LS_None;
+									else
+										LOGIC_State = LS_CFG_FCROVU;
 								}
 						}
 					}
@@ -700,19 +705,11 @@ void LOGIC_ConfigureSequence()
 							if(HLI_CAN_Write16(DataTable[REG_FCROVU_NODE_ID], REG_FCROVU_I_SHORT_CIRCUIT,
 									FCROVU_IShortCircuit))
 								if(HLI_CAN_CallAction(DataTable[REG_FCROVU_NODE_ID], ACT_FCROVU_CONFIG))
-								{
-									if(MeasurementMode == MODE_DVDT_ONLY)
-										LOGIC_State = LS_CFG_WaitStates;
-									else
-										LOGIC_State = LS_CFG_DCU1;
-								}
+									LOGIC_State = LS_CFG_DCU1;
 					}
 					else
 					{
-						if(MeasurementMode == MODE_DVDT_ONLY)
-							LOGIC_State = LS_None;
-						else
-							LOGIC_State = LS_CFG_DCU1;
+						LOGIC_State = LS_CFG_DCU1;
 					}
 				}
 				break;
@@ -1410,6 +1407,28 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U NamberFallRate)
 	}
 }
 
+// ----------------------------------------
+
+Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate)
+{
+	switch(RiseRate)
+	{
+		case 200:
+			return DataTable[REG_FCROVU_TOFFS_20];
+
+		case 500:
+			return DataTable[REG_FCROVU_TOFFS_50];
+
+		case 1000:
+			return DataTable[REG_FCROVU_TOFFS_100];
+
+		case 2000:
+			return DataTable[REG_FCROVU_TOFFS_200];
+
+		default:
+			return DataTable[REG_FCROVU_TOFFS_20];
+	}
+}
 // ----------------------------------------
 
 Int16U LOGIC_FindFallRate(Int16U NamberFallRate)

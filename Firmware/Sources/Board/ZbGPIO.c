@@ -23,6 +23,7 @@ void ZbGPIO_Init()
 	ZwGPIO_WritePin(PIN_SYNC_RCU, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_DCU, FALSE);
 	ZwGPIO_WritePin(PIN_SYNC_FCROVU, FALSE);
+	ZwGPIO_WritePin(PIN_SYNC_CROVU, FALSE);
 	ZwGPIO_WritePin(PIN_CSU_FAN, FALSE);
 	ZwGPIO_WritePin(PIN_CSU_SYNC, FALSE);
 	ZwGPIO_WritePin(PIN_CSU_DISCH, FALSE);
@@ -40,6 +41,7 @@ void ZbGPIO_Init()
 	ZwGPIO_PinToOutput(PIN_SYNC_RCU);
 	ZwGPIO_PinToOutput(PIN_SYNC_DCU);
 	ZwGPIO_PinToOutput(PIN_SYNC_FCROVU);
+	ZwGPIO_PinToOutput(PIN_SYNC_CROVU);
 	ZwGPIO_PinToOutput(PIN_CSU_FAN);
 	ZwGPIO_PinToOutput(PIN_CSU_SYNC);
 	ZwGPIO_PinToOutput(PIN_CSU_DISCH);
@@ -108,6 +110,12 @@ void ZbGPIO_DCU_Sync(Boolean Set)
 void ZbGPIO_FCROVU_Sync(Boolean Set)
 {
 	ZwGPIO_WritePin(PIN_SYNC_FCROVU, Set);
+}
+// ----------------------------------------
+
+void ZbGPIO_CROVU_Sync(Boolean Set)
+{
+	ZwGPIO_WritePin(PIN_SYNC_CROVU, Set);
 }
 // ----------------------------------------
 

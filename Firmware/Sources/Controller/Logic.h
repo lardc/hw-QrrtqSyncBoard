@@ -173,5 +173,5 @@ void LOGIC_GenerateSyncSequence();
 extern volatile DeviceSubState LOGIC_StateRealTime;
 extern volatile Int32U LOGIC_RealTimeCounter;
 extern volatile Int16U MeasurementMode;
-
+extern volatile Int32U FCROVUTrigOffset;
 #endif // __LOGIC_H

@@ -29,11 +29,12 @@
 #define ACT_DIAG_PULSE_CSU_SYNC		27	// Generate control pulse for CSU sync
 #define ACT_DIAG_PULSE_SCOPE		28	// Generate control pulse for high speed scope
 #define ACT_DIAG_PULSE_FCROVU		29	// Generate control pulse for FCROVU
-#define ACT_DIAG_PULSE_SB			30	// Generate control pulse for SensingBoard
-#define ACT_DIAG_PULSE_QCUHC		31	// Generate control pulse for QCUHC
-#define ACT_DIAG_PULSE_GATE_RELAY	32	// Generate control pulse for Gate relay (QCUHV)
-#define ACT_DIAG_QRR_PULSE			33
-#define ACT_DIAG_QRR_DCU_PULSE		34
+#define ACT_DIAG_PULSE_CROVU		30	// Generate control pulse for CROVU
+#define ACT_DIAG_PULSE_SB			31	// Generate control pulse for SensingBoard
+#define ACT_DIAG_PULSE_QCUHC		32	// Generate control pulse for QCUHC
+#define ACT_DIAG_PULSE_GATE_RELAY	33	// Generate control pulse for Gate relay (QCUHV)
+#define ACT_DIAG_QRR_PULSE			34
+#define ACT_DIAG_QRR_DCU_PULSE		35
 //
 #define ACT_START					100	// Start measurement
 #define ACT_STOP					101	// Force measurement stop
@@ -100,6 +101,11 @@
 #define REG_RCU_TOFFS_R10			40	// Сдвиг срабатывания синхронизации RCU при 10 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_K4			41	// коэффицент сдвига
 //
+#define	REG_FCROVU_TOFFS_20			42	// Сдвиг срабатывания синхронизации FCROVU при 20В/мкс
+#define REG_FCROVU_TOFFS_50			43	// Сдвиг срабатывания синхронизации FCROVU при 50В/мкс
+#define REG_FCROVU_TOFFS_100		44	// Сдвиг срабатывания синхронизации FCROVU при 100В/мкс
+#define REG_FCROVU_TOFFS_200		45	// Сдвиг срабатывания синхронизации FCROVU при 200В/мкс
+//
 #define REG_FALL_RATE_R0			50 	// Фактическая скорость спада при 0 скорости спада комплекса (в А/мкс x10)
 #define REG_FALL_RATE_R1			51 	// Фактическая скорость спада при 1 скорости спада комплекса (в А/мкс x10)
 #define REG_FALL_RATE_R2			52 	// Фактическая скорость спада при 2 скорости спада комплекса (в А/мкс x10)
@@ -128,7 +134,7 @@
 #define REG_OSV_RATE				134 // Off-state voltage rise rate (in V/us)
 #define REG_TRIG_TIME				135	// Time to apply on-state voltage in single-pulse mode (in us)
 #define REG_TRR_DETECTION_MODE		136	// Select trr detection mode (0 - 90%-25%; 1 - 90%-50%)
-#define REG_FCROVU_I_SHORT			137	// FCROVU short circuit current
+#define REG_FCROVU_I_SHORT			137	// FCROVU short circuit current (Заданное)
 #define REG_CSU_VOLTAGE_THRE		138	// CSU voltage set (in V x10)
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
 #define REG_CALIBRATION_PROCESS		140 // Калибровка 2 RCU
