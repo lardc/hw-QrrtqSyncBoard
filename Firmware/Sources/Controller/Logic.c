@@ -169,6 +169,7 @@ void LOGIC_Halt()
 	if(LOGIC_StateRealTime == LSRT_WaitForConfig)
 		LOGIC_StateRealTime = LSRT_None;
 	
+	HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
 	LOGIC_State = LS_None;
 }
 // ----------------------------------------
