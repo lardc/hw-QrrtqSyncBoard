@@ -35,8 +35,8 @@ typedef enum __CommonDeviceState
 	CDS_Fault,
 	CDS_Disabled,
 	CDS_Ready,
-	CDS_ConfigReady,
 	CDS_InProcess,
+	CDS_ConfigReady,
 	CDS_BatteryCharging
 
 } CommonDeviceState;

@@ -184,6 +184,7 @@ void CMN_WaitNodesReadyX(Int64U TimeCounter, Int64U Timeout, volatile ExternalDe
 		}
 		else
 		{
+			HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
 			if(!ReadyCROVU)
 			{
 				CONTROL_SwitchToFault(FAULT_LOGIC_CROVU, Fault);

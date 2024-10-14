@@ -5,6 +5,7 @@
 // Header
 #include "ZbGPIO.h"
 #include "SysConfig.h"
+#include "Logic.h"
 
 // Functions
 //
@@ -109,6 +110,10 @@ void ZbGPIO_DCU_Sync(Boolean Set)
 
 void ZbGPIO_FCROVU_Sync(Boolean Set)
 {
+	if(FCROVUTrigOffset == 0)
+	ZwGPIO_WritePin(PIN_SYNC_FCROVU, Set);
+	ZwGPIO_WritePin(PIN_SYNC_CROVU, Set);
+	DSP28x_usDelay(FCROVUTrigOffset);
 	ZwGPIO_WritePin(PIN_SYNC_FCROVU, Set);
 }
 // ----------------------------------------

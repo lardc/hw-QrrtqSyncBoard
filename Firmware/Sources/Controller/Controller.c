@@ -317,9 +317,9 @@ void CONTROL_SubProcessStateMachine()
 			{
 				if(MeasurementMode == MODE_DVDT_ONLY)
 				{
-					ZbGPIO_CROVU_Sync(TRUE);
+					ZbGPIO_FCROVU_Sync(TRUE);
 					DELAY_US(SYNC_WIDTH_CROVU);
-					ZbGPIO_CROVU_Sync(FALSE);
+					ZbGPIO_FCROVU_Sync(FALSE);
 
 					DELAY_US(500);
 					CONTROL_Commutation(FALSE);
@@ -629,7 +629,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 		case ACT_DIAG_PULSE_FCROVU:
 			{
 				ZbGPIO_FCROVU_Sync(TRUE);
-				DELAY_US(20);
+				DELAY_US(100);
 				ZbGPIO_FCROVU_Sync(FALSE);
 			}
 			break;

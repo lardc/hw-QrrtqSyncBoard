@@ -35,7 +35,6 @@ typedef struct __TableItemConstraint
 
 // in us/10
 #define MAX_FCROVU_TRIG_OFFSET		100
-#define	MIN_FCROVU_TRIG_OFFSET		1
 
 // in us
 #define TQ_SINGLE_PULSE_MIN			5

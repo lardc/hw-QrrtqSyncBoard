@@ -167,6 +167,8 @@ void LOGIC_VoltageMeasuringCSU(Int16U * const restrict pResults);
 void LOGIC_SafetyProblem();
 // Generate sync pulses
 void LOGIC_GenerateSyncSequence();
+// Логика включения синхронизации CROVU/FCROVU
+Int16U LOGIC_FCROVUOnSync(Int16U Delay);
 
 // Variables
 //

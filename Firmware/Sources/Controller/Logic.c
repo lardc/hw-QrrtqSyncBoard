@@ -65,7 +65,7 @@ void LOGIC_RealTime()
 	if(LOGIC_StateRealTime != LSRT_None && LOGIC_StateRealTime != LSRT_WaitForConfig)
 	{
 		// Wait for direct current ready signal
-		if(LOGIC_StateRealTime == LSRT_DirectPulseStart && (ZbGPIO_DCU_Ready() || \
+		if(LOGIC_StateRealTime == LSRT_DirectPulseStart && (ZbGPIO_DCU_Ready() ||
 				(LOGIC_ExtDeviceState.DCU1.Emulate && LOGIC_ExtDeviceState.DCU2.Emulate && LOGIC_ExtDeviceState.DCU3.Emulate)))
 		{
 			TimeReverseStart = LOGIC_RealTimeCounter + DC_CurrentPlateTicks;
@@ -110,7 +110,6 @@ void LOGIC_RealTime()
 		{
 			DataTable[REG_RCU_SYNC_WIDTH] = TimeReverseStop;
 			ZbGPIO_FCROVU_Sync(FALSE);
-			ZbGPIO_CROVU_Sync(FALSE);
 			ZbGPIO_SCOPE_Sync(FALSE);
 			//
 			ZbGPIO_DCU_Sync(TRUE);
@@ -311,7 +310,7 @@ void LOGIC_CacheVariables()
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		
-		FCROVUTrigOffset = (((Int32U)LOGIC_FindFCROVUTrigOffset(CROVU_VoltageRate) * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5);
+		LOGIC_FCROVUOnSync(LOGIC_FindFCROVUTrigOffset(CROVU_VoltageRate));
 		FCROVU_IShortCircuit = (DC_Current / 2);
 		DataTable[REG_FCROVU_I_SHORT] = FCROVU_IShortCircuit;
 
@@ -1482,5 +1481,16 @@ void LOGIC_GenerateSyncSequence()
 	DELAY_US(DataTable[REG_GATE_DRV_TURNON_DELAY]);
 	ZbGPIO_DUT_Control(TRUE);
 	ZbGPIO_DUT_Switch(TRUE);
+}
+// ----------------------------------------
+
+Int16U LOGIC_FCROVUOnSync(Int16U Delay)
+{
+	if(Delay == 0)
+		FCROVUTrigOffset = 0;
+	else
+		FCROVUTrigOffset = ((Int32U)Delay * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
+
+	return FCROVUTrigOffset;
 }
 // ----------------------------------------
