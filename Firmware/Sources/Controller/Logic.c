@@ -1011,11 +1011,13 @@ void LOGIC_ReadDataSequence()
 						
 						if(LOGIC_ExtDeviceState.SCOPE.State == CDS_None)
 						{
+							Int16U Qrr = 0, Qrr32b = 0;
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_OP_RESULT, &Register);
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_PROBLEM, &Problem);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IRR, &Results[ResultsCounter].Irr);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TRR, &Results[ResultsCounter].Trr);
-							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR, &Results[ResultsCounter].Qrr);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR, &Qrr);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR_32B, &Qrr32b);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO, &Results[ResultsCounter].ZeroI);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
@@ -1023,6 +1025,7 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VD, &Results[ResultsCounter].Vd);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt);
+							Results[ResultsCounter].Qrr = ((Int32U)Qrr32b << 16) | Qrr;
 
 							if(!Result)
 							{
@@ -1176,7 +1179,7 @@ void LOGIC_LogData(MeasurementResult Result)
 	CONTROL_ValDiag2[CONTROL_ValDiag_Counter] = Result.OSVApplyTime * (TqFastThyristor ? 1 : 10);
 	CONTROL_ValDiag3[CONTROL_ValDiag_Counter] = Result.Irr;
 	CONTROL_ValDiag4[CONTROL_ValDiag_Counter] = Result.Trr;
-	CONTROL_ValDiag5[CONTROL_ValDiag_Counter] = Result.Qrr;
+	CONTROL_ValDiag5[CONTROL_ValDiag_Counter] = (Result.Qrr > INT16U_MAX) ? 0 : Result.Qrr;
 	CONTROL_ValDiag6[CONTROL_ValDiag_Counter] = Result.Idc;
 	CONTROL_ValDiag7[CONTROL_ValDiag_Counter] = Result.ZeroI;
 	CONTROL_ValDiag8[CONTROL_ValDiag_Counter] = Result.ZeroV;
@@ -1224,7 +1227,9 @@ void LOGIC_ResultToDataTable()
 			DataTable[REG_RES_TRR] = Trr;
 			DataTable[REG_RES_IDC] = AvgIdc / AvgCounter;
 			DataTable[REG_RES_DIDT] = AvgdIdt / AvgCounter;
-			DataTable[REG_RES_QRR_INT] = (AvgQrr * 10) / AvgCounter;
+			AvgQrr /= AvgCounter;
+			DataTable[REG_RES_QRR_INT] = AvgQrr & 0xFFFF;
+			DataTable[REG_RES_QRR_INT_32B] = AvgQrr >> 16;
 
 			DataTable[REG_EP_ELEMENT_FRACT] = Results[ResultsCounter - 1].EPTimeFract;
 			DataTable[REG_EP_STEP_FRACT_CNT] = Results[ResultsCounter - 1].EPTimeFractCnt;

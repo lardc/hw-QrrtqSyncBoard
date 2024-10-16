@@ -107,7 +107,7 @@ typedef struct __MeasurementResult
 	Int16U OSVApplyTime;		// Time of applying of on-state voltage (in us x10)
 	Int16U Irr;					// Reverse recovery current amplitude (in A)
 	Int16U Trr;					// Reverse recovery time (in us x10)
-	Int16U Qrr;					// Reverse recovery charge (in uQ)
+	Int32U Qrr;					// Reverse recovery charge (in uQ)
 	Int16U Idc;					// Actual direct current (in A)
 	Int16U Vd;					// Actual direct voltage (in V)
 	Int16U ZeroI;				// Time of current zero-crossing (in us x10)
