@@ -185,6 +185,7 @@
 #define REG_RES_DIDT				215	// Actual dI/dt value (in A/us x10)
 #define REG_RES_QRR_INT				216	// Reverse recovery charge (integration mode) (in uC x10)
 #define REG_RES_VD					217	// Actual direct voltage value (in V)
+#define REG_RES_QRR_32B				218	// Reverse recovery charge (in uC x10) (Calculation defined by GOST) 32bit part
 #define REG_RES_QRR_INT_32B			219	// Reverse recovery charge (integration mode) (in uC x10) 32bit part
 //
 #define REG_CANA_BUSOFF_COUNTER		220 // Counter of bus-off states

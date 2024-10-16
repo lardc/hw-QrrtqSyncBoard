@@ -1192,7 +1192,7 @@ void LOGIC_LogData(MeasurementResult Result)
 void LOGIC_ResultToDataTable()
 {
 	Int16U i, AvgCounter = 0;
-	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, AvgIdc = 0, AvgdIdt = 0, Irr, Trr;
+	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, AvgIdc = 0, AvgdIdt = 0, Irr, Trr, CalcQrr;
 
 	for(i = 0; i < ResultsCounter; ++i)
 	{
@@ -1222,7 +1222,9 @@ void LOGIC_ResultToDataTable()
 			DataTable[REG_RES_VD] = Results[ResultsCounter - 1].Vd;
 
 		case MODE_QRR_ONLY:
-			DataTable[REG_RES_QRR] = (Irr * Trr) >> 1;
+			CalcQrr = (Irr * Trr) >> 1;
+			DataTable[REG_RES_QRR] = CalcQrr & 0xFFFF;
+			DataTable[REG_RES_QRR_32B] = CalcQrr >> 16;
 			DataTable[REG_RES_IRR] = Irr;
 			DataTable[REG_RES_TRR] = Trr;
 			DataTable[REG_RES_IDC] = AvgIdc / AvgCounter;
