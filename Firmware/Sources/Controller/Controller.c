@@ -221,7 +221,8 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_SLAVE_EXTDATA] = 0;
 	//
 	DataTable[REG_FINISHED] = OPRESULT_NONE;
-	DataTable[REG_RES_QRR] = 0;
+	DataTable[REG_RES_QRR_mQ] = 0;
+	DataTable[REG_RES_QRR_uQ] = 0;
 	DataTable[REG_RES_IRR] = 0;
 	DataTable[REG_RES_TRR] = 0;
 	DataTable[REG_RES_TQ] = 0;
