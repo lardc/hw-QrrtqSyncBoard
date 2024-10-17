@@ -177,15 +177,15 @@
 #define REG_SLAVE_ERR				203	// Slave error
 #define REG_SLAVE_EXTDATA			204	// Slave call extended data
 //
-#define REG_RES_QRR					210	// Reverse recovery charge (in uC x10) (Calculation defined by GOST)
-#define REG_RES_IRR					211	// Reverse recovery current amplitude (in A)
+#define REG_RES_QRR					210	// Reverse recovery charge (in uC x100) (Calculation defined by GOST)
+#define REG_RES_IRR					211	// Reverse recovery current amplitude (in A x10)
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)
 #define REG_RES_TQ					213	// Turn-off time (in us x10)
 #define REG_RES_IDC					214	// Actual DC current value (in A)
 #define REG_RES_DIDT				215	// Actual dI/dt value (in A/us x10)
 #define REG_RES_QRR_INT				216	// Reverse recovery charge (integration mode) (in uC x10)
 #define REG_RES_VD					217	// Actual direct voltage value (in V)
-#define REG_RES_QRR_32B				218	// Reverse recovery charge (in uC x10) (Calculation defined by GOST) 32bit part
+#define REG_RES_QRR_32B				218	// Reverse recovery charge (in uC x100) (Calculation defined by GOST) 32bit part
 #define REG_RES_QRR_INT_32B			219	// Reverse recovery charge (integration mode) (in uC x10) 32bit part
 //
 #define REG_CANA_BUSOFF_COUNTER		220 // Counter of bus-off states
@@ -271,7 +271,7 @@
 #define REG_SCOPE_TR_050_METHOD		130	// Use 50% level of Irr to detect tr time
 //
 // Results
-#define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A)
+#define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A x10)
 #define REG_SCOPE_RESULT_TRR		202	// Reverse recovery time (in us x10)
 #define REG_SCOPE_RESULT_QRR		203	// Reverse recovery charge (in uQ x10)
 #define REG_SCOPE_RESULT_ZERO		204	// Zero-cross time (in us x10)
