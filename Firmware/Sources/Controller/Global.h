@@ -29,7 +29,7 @@
 #define	NODEID_SCCI_SCOPE				0
 //
 #define TIMEOUT_REINIT_RS232			10000	// in ms
-#define TIMEOUT_HL_LOGIC				10000	// in ms
+#define TIMEOUT_HL_LOGIC				30000	// in ms
 #define TIMEOUT_HL_LOGIC_POWER_ON		300000	// in ms
 #define TIMEOUT_HL_LOGIC_SHORT			2000	// in ms
 //
@@ -57,7 +57,7 @@
 //--------------------------------------------------------
 #define UNIT_TQ_MEASURE_PULSES			11		// (in pulses) + 1
 #define UNIT_TQ_EXTRA_PULSES			15		// in pulses
-#define QRR_AVG_COUNTER					1		// in pulses
+#define QRR_AVG_COUNTER					3		// in pulses
 #define UNIT_MAX_NUM_OF_PULSES			(UNIT_TQ_MEASURE_PULSES + UNIT_TQ_EXTRA_PULSES)	// in pulses
 #define TQ_MAX_TIME						1000	// in us
 #define TQ_FIRST_PROBE					100		// in us

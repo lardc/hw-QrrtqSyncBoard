@@ -36,7 +36,7 @@ static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset,	Ctrl1_K, Trig_K, K_MAX;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
-static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
+static volatile Int16U LOGIC_FirstPulseNumRemain, LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
 static Int16U CSUVoltage = 0, CSUVoltageHigh = 0, CSUVoltageLow = 0;
 static DRCUConfig DCUConfig, RCUConfig;
 
@@ -164,7 +164,7 @@ Boolean LOGIC_DUTTriggered()
 
 void LOGIC_Halt()
 {
-	LOGIC_PulseNumRemain = 0;
+	LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain = 0;
 	
 	if(LOGIC_StateRealTime == LSRT_WaitForConfig)
 		LOGIC_StateRealTime = LSRT_None;
@@ -262,11 +262,10 @@ void LOGIC_CacheVariables()
 		LOGIC_OperationResult = OPRESULT_OK;
 		
 		ResultsCounter = 0;
+		LOGIC_FirstPulseNumRemain = 0;
 		MeasurementMode = DataTable[REG_MODE];
 		MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
 		
-		if(DataTable[REG_CALIBRATION_PROCESS] == 1)
-			DC_Current = DataTable[REG_DIRECT_CURRENT];
 		DC_Current = DataTable[REG_DIRECT_CURRENT];
 		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] / TIMER2_PERIOD;
 		DC_CurrentRiseRate = DataTable[REG_DCU_I_RISE_RATE];
@@ -324,26 +323,30 @@ void LOGIC_CacheVariables()
 			if(CacheSinglePulse)
 			{
 				LOGIC_PulseNumRemain = 1;
+				LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain - 1;
 				CROVU_TrigTime = 0;
 			}
 			else
 			{
 				LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
+				LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain - 1;
 				CROVU_TrigTime = 0;
 			}
 		CacheUpdate = FALSE;
 		}
 
-		if(MeasurementMode == MODE_QRR_TQ)
+		else if(MeasurementMode == MODE_QRR_TQ)
 		{
 			if(CacheSinglePulse)
 			{
 				LOGIC_PulseNumRemain = 1;
+				LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain - 1;
 				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 			}
 			else
 			{
 				LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
+				LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain - 1;
 				CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
 			}
 
@@ -351,6 +354,7 @@ void LOGIC_CacheVariables()
 		else
 			{
 				LOGIC_PulseNumRemain = 1;
+				LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain - 1;
 				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 			}
 		
@@ -1011,6 +1015,11 @@ void LOGIC_ReadDataSequence()
 						
 						if(LOGIC_ExtDeviceState.SCOPE.State == CDS_None)
 						{
+							if(LOGIC_PulseNumRemain == LOGIC_FirstPulseNumRemain)
+								{
+								if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IDC, &Results[ResultsCounter].Idc);
+								if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
+								}
 							Int16U Qrr = 0, Qrr32b = 0;
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_OP_RESULT, &Register);
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_PROBLEM, &Problem);
@@ -1020,12 +1029,11 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR_32B, &Qrr32b);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO, &Results[ResultsCounter].ZeroI);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV);
-							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
-							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IDC, &Results[ResultsCounter].Idc);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VD, &Results[ResultsCounter].Vd);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt);
 							Results[ResultsCounter].Qrr = ((Int32U)Qrr32b << 16) | Qrr;
+
 
 							if(!Result)
 							{
@@ -1055,7 +1063,7 @@ void LOGIC_ReadDataSequence()
 										LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
 
 									// Read data plots
-									if (LOGIC_PulseNumRemain == 0 && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
+									if (LOGIC_PulseNumRemain == LOGIC_FirstPulseNumRemain && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
 									{
 										if (HLI_RS232_ReadArray16CB(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
 											if (MeasurementMode == MODE_QRR_TQ)
@@ -1192,21 +1200,23 @@ void LOGIC_LogData(MeasurementResult Result)
 void LOGIC_ResultToDataTable()
 {
 	Int16U i, AvgCounter = 0;
-	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, AvgIdc = 0, AvgdIdt = 0, Irr, Trr, CalcQrr;
+	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, Idc, dIdt, Irr, Trr, CalcQrr;
 
 	for(i = 0; i < ResultsCounter; ++i)
 	{
-		if(Results[i].Irr && Results[i].Trr && Results[i].Qrr && Results[i].Idc && Results[i].dIdt)
+		if(Results[i].Irr && Results[i].Trr && Results[i].Qrr)
 		{
 			AvgIrr += Results[i].Irr;
 			AvgTrr += Results[i].Trr;
 			AvgQrr += Results[i].Qrr;
-			AvgIdc += Results[i].Idc;
-			AvgdIdt += Results[i].dIdt;
-			
+
 			++AvgCounter;
 		}
 	}
+
+	// Значения Idc и dIdt берется из первого формирования
+	Idc = Results[0].Idc;
+	dIdt = Results[0].dIdt;
 
 	// Prevent division by zero
 	if(AvgCounter == 0)
@@ -1227,8 +1237,8 @@ void LOGIC_ResultToDataTable()
 			DataTable[REG_RES_QRR_32B] = CalcQrr >> 16;
 			DataTable[REG_RES_IRR] = Irr;
 			DataTable[REG_RES_TRR] = Trr;
-			DataTable[REG_RES_IDC] = AvgIdc / AvgCounter;
-			DataTable[REG_RES_DIDT] = AvgdIdt / AvgCounter;
+			DataTable[REG_RES_IDC] = Idc;
+			DataTable[REG_RES_DIDT] = dIdt;
 			AvgQrr /= AvgCounter;
 			DataTable[REG_RES_QRR_INT] = AvgQrr & 0xFFFF;
 			DataTable[REG_RES_QRR_INT_32B] = AvgQrr >> 16;
