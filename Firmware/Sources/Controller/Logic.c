@@ -36,7 +36,7 @@ static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset,	Ctrl1_K, Trig_K, K_MAX;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
-static volatile Int16U LOGIC_FirstPulseNumRemain, LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
+static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
 static Int16U CSUVoltage = 0, CSUVoltageHigh = 0, CSUVoltageLow = 0;
 static DRCUConfig DCUConfig, RCUConfig;
 
@@ -164,7 +164,7 @@ Boolean LOGIC_DUTTriggered()
 
 void LOGIC_Halt()
 {
-	LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain = 0;
+	LOGIC_PulseNumRemain = 0;
 	
 	if(LOGIC_StateRealTime == LSRT_WaitForConfig)
 		LOGIC_StateRealTime = LSRT_None;
@@ -267,7 +267,6 @@ void LOGIC_CacheVariables()
 		LOGIC_IsFirstQrrPulse = TRUE;
 		
 		ResultsCounter = 0;
-		LOGIC_FirstPulseNumRemain = 0;
 		MeasurementMode = DataTable[REG_MODE];
 		MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
 		
@@ -327,13 +326,11 @@ void LOGIC_CacheVariables()
 			if(CacheSinglePulse)
 			{
 				LOGIC_PulseNumRemain = 1;
-				LOGIC_FirstPulseNumRemain = 0;
 				CROVU_TrigTime = 0;
 			}
 			else
 			{
 				LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
-				LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain - 1;
 				CROVU_TrigTime = 0;
 			}
 		CacheUpdate = FALSE;
@@ -344,13 +341,11 @@ void LOGIC_CacheVariables()
 			if(CacheSinglePulse)
 			{
 				LOGIC_PulseNumRemain = 1;
-				LOGIC_FirstPulseNumRemain = 0;
 				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 			}
 			else
 			{
 				LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
-				LOGIC_FirstPulseNumRemain = LOGIC_PulseNumRemain - 1;
 				CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
 			}
 
@@ -358,7 +353,6 @@ void LOGIC_CacheVariables()
 		else
 			{
 				LOGIC_PulseNumRemain = 1;
-				LOGIC_FirstPulseNumRemain = 0;
 				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 			}
 		
