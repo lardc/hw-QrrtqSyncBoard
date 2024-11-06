@@ -19,6 +19,7 @@
 #define UNLOCK_PWD_3					1
 #define UNLOCK_PWD_4					1
 //
+#define EP_SAFETY_FACTOR				13		// in x10
 #define EP_COUNT						12
 #define VALUES_x_SIZE					2000
 //
@@ -29,7 +30,7 @@
 #define	NODEID_SCCI_SCOPE				0
 //
 #define TIMEOUT_REINIT_RS232			10000	// in ms
-#define TIMEOUT_HL_LOGIC				30000	// in ms
+#define TIMEOUT_HL_LOGIC				100000	// in ms
 #define TIMEOUT_HL_LOGIC_POWER_ON		300000	// in ms
 #define TIMEOUT_HL_LOGIC_SHORT			2000	// in ms
 //

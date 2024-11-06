@@ -29,7 +29,7 @@ static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 volatile Int16U ResultsCounter, MeasurementMode;
 //
 static Boolean MuteCROVU;
-static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE;
+static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, ScopeCurrentScale;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
@@ -255,13 +255,16 @@ void LOGIC_CacheVariables()
 	LOGIC_ExtDeviceState.CSU.Emulate	= DataTable[REG_EMULATE_CSU];
 	LOGIC_ExtDeviceState.SCOPE.Emulate	= DataTable[REG_EMULATE_SCOPE];
 
-	ScopeCurrentScale = Results[0].Irr;
+	ScopeCurrentScale = (Results[0].Irr < 500) ? 50 : (((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100);
+	DataTable[REG_DBG3] = Results[0].Irr;
+	DataTable[REG_DBG4] = ScopeCurrentScale;
 
 	if(CacheUpdate)
 	{
 		TqFastThyristor = FALSE;
 		DUTFinalIncrease = FALSE;
 		LOGIC_OperationResult = OPRESULT_OK;
+		LOGIC_IsFirstQrrPulse = TRUE;
 		
 		ResultsCounter = 0;
 		LOGIC_FirstPulseNumRemain = 0;
@@ -295,7 +298,6 @@ void LOGIC_CacheVariables()
 				LOGIC_ExtDeviceState.RCU3.Emulate, DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset, Ctrl1_K);
 
 		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit));
-		DataTable[REG_DBG3] = DC_CurrentZeroPoint;
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 
 		if(DataTable[REG_CALIBRATION_PROCESS] == 1)
@@ -308,7 +310,6 @@ void LOGIC_CacheVariables()
 		{
 			RC_CurrentMaxPoint = (DataTable[REG_RCU_SYNC_MAX] ) ;
 		}
-		DataTable[REG_DBG4] = RC_CurrentMaxPoint;
 
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
@@ -1062,8 +1063,11 @@ void LOGIC_ReadDataSequence()
 										LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
 
 									// Read data plots
-									if (LOGIC_PulseNumRemain == LOGIC_FirstPulseNumRemain && DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0)
+									if(DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0 &&
+											((LOGIC_PulseNumRemain == 0 && MeasurementMode == MODE_QRR_TQ) ||
+													(LOGIC_IsFirstQrrPulse && MeasurementMode == MODE_QRR_ONLY)))
 									{
+										LOGIC_IsFirstQrrPulse = FALSE;
 										if (HLI_RS232_ReadArray16CB(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
 											if (MeasurementMode == MODE_QRR_TQ)
 											{
@@ -1087,6 +1091,7 @@ void LOGIC_ReadDataSequence()
 						LOGIC_State = LS_None;
 					}
 				}
+
 				break;
 		}
 
@@ -1205,7 +1210,7 @@ void LOGIC_ResultToDataTable()
 	Idc = Results[0].Idc;
 	dIdt = Results[0].dIdt;
 
-	for(i = 1; i < ResultsCounter; ++i)
+	for(i = CacheSinglePulse ? 0 : 1; i < ResultsCounter; ++i)
 	{
 		if(Results[i].Irr && Results[i].Trr && Results[i].Qrr)
 		{
