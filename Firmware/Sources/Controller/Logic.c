@@ -255,7 +255,7 @@ void LOGIC_CacheVariables()
 	LOGIC_ExtDeviceState.CSU.Emulate	= DataTable[REG_EMULATE_CSU];
 	LOGIC_ExtDeviceState.SCOPE.Emulate	= DataTable[REG_EMULATE_SCOPE];
 
-	ScopeCurrentScale = (Results[0].Irr < 500) ? 50 : (((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100);
+	ScopeCurrentScale = (Results[0].Irr < (EP_MIN_SCALE * 10)) ? EP_MIN_SCALE : (((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100);
 	DataTable[REG_DBG3] = Results[0].Irr;
 	DataTable[REG_DBG4] = ScopeCurrentScale;
 
