@@ -20,6 +20,7 @@
 #define UNLOCK_PWD_4					1
 //
 #define EP_MIN_SCALE					50		// A
+#define EP_MAX_SCALE					3200	// А
 #define EP_SAFETY_FACTOR				13		// in x10
 #define EP_COUNT						12
 #define VALUES_x_SIZE					2000
