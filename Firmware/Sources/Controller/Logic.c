@@ -755,7 +755,7 @@ void LOGIC_ConfigureSequence()
 
 							case CDS_None:
 								{
-									if(HLI_RS232_Write16(REG_SCOPE_CURRENT_AMPL, ScopeCurrentScale))
+									if(HLI_RS232_Write16(REG_SCOPE_CURRENT_AMPL, ScopeCurrentScaleResult))
 										if(HLI_RS232_Write16(REG_SCOPE_MEASURE_MODE, MeasurementMode))
 											if(HLI_RS232_Write16(REG_SCOPE_TR_050_METHOD,
 													DataTable[REG_TRR_DETECTION_MODE]))
@@ -1046,7 +1046,7 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
 								}
-								else if(Results[ResultsCounter].Irr > DC_Current * 10)
+								else if(Results[ResultsCounter].Irr > DC_Current * 11)
 								{
 									LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
 								}
