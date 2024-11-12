@@ -31,7 +31,7 @@ volatile Int16U ResultsCounter, MeasurementMode;
 static Boolean MuteCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
-static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, ScopeCurrentScale, ScopeCurrentScaleResult;
+static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, ScopeCurrentScaleResult;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset,	Ctrl1_K, Trig_K, K_MAX;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
@@ -255,7 +255,8 @@ void LOGIC_CacheVariables()
 	LOGIC_ExtDeviceState.CSU.Emulate	= DataTable[REG_EMULATE_CSU];
 	LOGIC_ExtDeviceState.SCOPE.Emulate	= DataTable[REG_EMULATE_SCOPE];
 
-	ScopeCurrentScale = ((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100;
+
+	Int16U ScopeCurrentScale = ((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100;
 
 	ScopeCurrentScaleResult = (Results[0].Irr < (EP_MIN_SCALE * 10)) ? EP_MIN_SCALE :
 			(ScopeCurrentScale > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrentScale;
@@ -1046,7 +1047,7 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
 								}
-								else if(Results[ResultsCounter].Irr > DC_Current * 11)
+								else if(Results[ResultsCounter].Irr > DC_Current * 10)
 								{
 									LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
 								}
