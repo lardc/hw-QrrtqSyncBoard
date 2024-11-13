@@ -138,6 +138,7 @@
 #define REG_CSU_VOLTAGE_THRE		138	// CSU voltage set (in V x10)
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
 #define REG_CALIBRATION_PROCESS		140 // Калибровка 2 RCU
+#define REG_IRR_MIN					141	// Минимальное измеряемое значение Irr в А
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1
@@ -364,6 +365,7 @@
 #define WARNING_SCOPE_CALC_FAILED	3	// Calculations on scope node are failed
 #define WARNING_IRR_TO_HIGH			4	// Reverse current is too high
 #define WARNING_DEVICE_TRIGGERED	5	// Device remains in trigged state
+#define WARNING_IRR_TO_LOW			6	// Reverse current is too low
 #define WARNING_WATCHDOG_RESET		1001	// System has been reseted by WD
 
 // DISABLE CODES

@@ -158,7 +158,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 											   {CSU_VOLTAGE_MIN, CSU_VOLTAGE_MAX, CSU_VOLTAGE_DEF},						// 138
 											   {CSU_VOLTAGE_HYST_MIN, CSU_VOLTAGE_HYST_MAX, CSU_VOLTAGE_HYST_DEF},		// 139
                                     		   {NO, YES, NO},															// 140
-                                    		   {0, 0, 0},																// 141
+                                    		   {0, DIRECT_CURRENT_MAX, 0},												// 141
                                     		   {0, 0, 0},																// 142
                                     		   {0, 0, 0},																// 143
                                     		   {0, 0, 0},																// 144

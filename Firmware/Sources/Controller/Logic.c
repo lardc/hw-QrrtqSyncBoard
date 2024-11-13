@@ -1051,6 +1051,10 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
 								}
+								else if(Results[ResultsCounter].Irr < DataTable[REG_IRR_MIN] * 10)
+								{
+									LOGIC_AbortMeasurement(WARNING_IRR_TO_LOW);
+								}
 								else
 								{
 									// Save results
