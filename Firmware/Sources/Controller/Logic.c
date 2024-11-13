@@ -281,6 +281,11 @@ void LOGIC_CacheVariables()
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
 		ScopeCurrentScaleResult = DC_Current;
+			Int16U FallTime = (DC_Current * 10 * 2) / DC_CurrentFallRate;
+		if (FallTime > FALL_MAX_TIME)
+		{
+			LOGIC_AbortMeasurement(WARNING_BAD_CONFIG);
+		}
 
 		I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET];
 		I_To_V_K = DataTable[REG_I_TO_V_K];
