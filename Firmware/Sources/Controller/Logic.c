@@ -168,9 +168,10 @@ void LOGIC_Halt()
 	
 	if(LOGIC_StateRealTime == LSRT_WaitForConfig)
 		LOGIC_StateRealTime = LSRT_None;
-	
-	HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
+
 	LOGIC_State = LS_None;
+	if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
+		HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
 }
 // ----------------------------------------
 
@@ -255,12 +256,13 @@ void LOGIC_CacheVariables()
 	LOGIC_ExtDeviceState.CSU.Emulate	= DataTable[REG_EMULATE_CSU];
 	LOGIC_ExtDeviceState.SCOPE.Emulate	= DataTable[REG_EMULATE_SCOPE];
 
+	if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
+	{
+		Int16U ScopeCurrentScale = ((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100;
 
-	Int16U ScopeCurrentScale = ((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100;
-
-	ScopeCurrentScaleResult = (Results[0].Irr < (EP_MIN_SCALE * 10)) ? EP_MIN_SCALE :
+		ScopeCurrentScaleResult = (Results[0].Irr < (EP_MIN_SCALE * 10)) ? EP_MIN_SCALE :
 			(ScopeCurrentScale > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrentScale;
-
+	}
 	DataTable[REG_DBG_READ_CURRENT_SCALE] = Results[0].Irr;
 	DataTable[REG_DBG_WRITE_CURRENT_SCALE] = ScopeCurrentScaleResult;
 
@@ -281,10 +283,11 @@ void LOGIC_CacheVariables()
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
 		ScopeCurrentScaleResult = DC_Current;
-			Int16U FallTime = (DC_Current * 10 * 2) / DC_CurrentFallRate;
+
+		Int16U FallTime = (DC_Current * 10 * 2) / DC_CurrentFallRate;
 		if (FallTime > FALL_MAX_TIME)
 		{
-			LOGIC_AbortMeasurement(WARNING_BAD_CONFIG);
+			LOGIC_AbortMeasurementP(PROBLEM_BAD_CONFIG);
 		}
 
 		I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET];
@@ -331,47 +334,47 @@ void LOGIC_CacheVariables()
 				((DC_Current / DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
 						(DC_Current / DC_CurrentRiseRate / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
 		
-		if(MeasurementMode == MODE_QRR_ONLY)
-		{
-			if(CacheSinglePulse)
+		if(LOGIC_StateRealTime == LSRT_WaitForConfig)
+		{	if(MeasurementMode == MODE_QRR_ONLY)
 			{
-				LOGIC_PulseNumRemain = 1;
-				CROVU_TrigTime = 0;
+				if(CacheSinglePulse)
+				{
+					LOGIC_PulseNumRemain = 1;
+					CROVU_TrigTime = 0;
+				}
+				else
+				{
+					LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
+					CROVU_TrigTime = 0;
+				}
+				CacheUpdate = FALSE;
+			}
+			else if(MeasurementMode == MODE_QRR_TQ)
+			{
+				if(CacheSinglePulse)
+				{
+					LOGIC_PulseNumRemain = 1;
+					CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
+				}
+				else
+				{
+					LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
+					CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
+				}
+
 			}
 			else
-			{
-				LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
-				CROVU_TrigTime = 0;
-			}
-		CacheUpdate = FALSE;
-		}
-
-		else if(MeasurementMode == MODE_QRR_TQ)
-		{
-			if(CacheSinglePulse)
-			{
-				LOGIC_PulseNumRemain = 1;
-				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
-			}
-			else
-			{
-				LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
-				CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
-			}
-
-		}
-		else
 			{
 				LOGIC_PulseNumRemain = 1;
 				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 			}
 		
-		if (CROVU_TrigTime > RC_CurrentMaxPoint)
-		{
-			CROVU_TrigTime = RC_CurrentMaxPoint;
+			if (CROVU_TrigTime > RC_CurrentMaxPoint)
+			{
+				CROVU_TrigTime = RC_CurrentMaxPoint;
+			}
+			LOGIC_PreciseEventInit(CROVU_TrigTime);
 		}
-		LOGIC_PreciseEventInit(CROVU_TrigTime);
-
 		CacheUpdate = FALSE;
 	}
 }
@@ -652,7 +655,8 @@ void LOGIC_PowerOnSequence()
 void LOGIC_ConfigurePrepare()
 {
 	LOGIC_CacheVariables();
-	LOGIC_State = LS_CFG_WaitReady;
+	if(LOGIC_StateRealTime == LSRT_WaitForConfig)
+		LOGIC_State = LS_CFG_WaitReady;
 	Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
 
 	CONTROL_RequestDPC(&LOGIC_ConfigureSequence);
@@ -1058,7 +1062,7 @@ void LOGIC_ReadDataSequence()
 								}
 								else if(Results[ResultsCounter].Irr < DataTable[REG_IRR_MIN] * 10)
 								{
-									LOGIC_AbortMeasurement(WARNING_IRR_TO_LOW);
+									LOGIC_AbortMeasurementP(PROBLEM_IRR_TO_LOW);
 								}
 								else
 								{
@@ -1269,6 +1273,14 @@ void LOGIC_ResultToDataTable()
 void LOGIC_AbortMeasurement(Int16U WarningCode)
 {
 	DataTable[REG_WARNING] = WarningCode;
+	LOGIC_OperationResult = OPRESULT_FAIL;
+	LOGIC_Halt();
+}
+// ----------------------------------------
+
+void LOGIC_AbortMeasurementP(Int16U ProblemCode)
+{
+	DataTable[REG_PROBLEM] = ProblemCode;
 	LOGIC_OperationResult = OPRESULT_FAIL;
 	LOGIC_Halt();
 }

@@ -123,6 +123,8 @@
 #define REG_I_TO_V_K2				72	// Добавочный квадратичный коэффициент преобразования тока в напряжение внутреннего источника
 #define REG_CTRL1_OFFSET			73	// Добавочное смещение грубой подстройки тока при скрости спада
 #define REG_CTRL1_K					74	// Добавочный коэффицент грубой подстройки тока при скрости спада
+
+#define REG_IRR_MIN					80	// Минимальное измеряемое значение Irr в А
 // ----------------------------------------
 //
 #define REG_MODE					128	// Measurement mode
@@ -138,7 +140,6 @@
 #define REG_CSU_VOLTAGE_THRE		138	// CSU voltage set (in V x10)
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
 #define REG_CALIBRATION_PROCESS		140 // Калибровка 2 RCU
-#define REG_IRR_MIN					141	// Минимальное измеряемое значение Irr в А
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1
@@ -365,9 +366,15 @@
 #define WARNING_SCOPE_CALC_FAILED	3	// Calculations on scope node are failed
 #define WARNING_IRR_TO_HIGH			4	// Reverse current is too high
 #define WARNING_DEVICE_TRIGGERED	5	// Device remains in trigged state
-#define WARNING_IRR_TO_LOW			6	// Reverse current is too low
-#define WARNING_BAD_CONFIG			7	// Конфигурация не соответствует возможной
+
 #define WARNING_WATCHDOG_RESET		1001	// System has been reseted by WD
+
+
+// PROBLEM CODES
+//
+#define PROBLEM_NONE				0
+#define PROBLEM_IRR_TO_LOW			6	// Обратный ток слишком большой
+#define PROBLEM_BAD_CONFIG			7	// Конфигурация не соответствует возможной
 
 // DISABLE CODES
 //

@@ -158,6 +158,7 @@ void LOGIC_ResultToDataTable();
 // Log results to endpoint
 void LOGIC_LogData(MeasurementResult Result);
 // Unexpected abortion of measurement
+void LOGIC_AbortMeasurementP(Int16U ProblemCode);
 void LOGIC_AbortMeasurement(Int16U WarningCode);
 // Control CSU
 void LOGIC_FanAndVoltageControlCSU();

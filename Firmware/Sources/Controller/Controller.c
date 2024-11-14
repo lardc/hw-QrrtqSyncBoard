@@ -210,6 +210,7 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_DEV_STATE] = DS_None;
 	DataTable[REG_FAULT_REASON] = FAULT_NONE;
 	DataTable[REG_WARNING] = WARNING_NONE;
+	DataTable[REG_PROBLEM] = PROBLEM_NONE;
 	DataTable[REG_FAULT_REASON_EXT] = 0;
 	DataTable[REG_PULSES_COUNTER] = 0;
 	//
