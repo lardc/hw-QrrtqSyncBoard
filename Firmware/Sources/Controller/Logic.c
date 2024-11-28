@@ -84,6 +84,8 @@ void LOGIC_RealTime()
 		{
 			ZbGPIO_DCU_Sync(FALSE);
 			ZbGPIO_CSU_Sync(FALSE);
+			ZbGPIO_DUT_Control(FALSE);
+			ZbGPIO_DUT_Switch(FALSE);
 			LOGIC_StateRealTime = LSRT_None;
 
 			LOGIC_AbortMeasurement(WARNING_NO_DIRECT_CURRENT);
@@ -94,11 +96,12 @@ void LOGIC_RealTime()
 		{
 			ZbGPIO_SCOPE_Sync(TRUE);
 			ZbGPIO_RCU_Sync(TRUE);
-			DSP28x_usDelay(RCUConfig.RCUTrigOffsetTicks);
-			ZbGPIO_DCU_Sync(FALSE);
 			ZbGPIO_DUT_Control(FALSE);
 			ZbGPIO_DUT_Switch(FALSE);
+			DSP28x_usDelay(RCUConfig.RCUTrigOffsetTicks);
+			ZbGPIO_DCU_Sync(FALSE);
 			
+
 			LOGIC_StateRealTime = LSRT_ReversePulseStart;
 			TimeReverseStop = (LOGIC_RealTimeCounter + RC_CurrentMaxPoint + OSV_ON_TIME_TICK);
 
