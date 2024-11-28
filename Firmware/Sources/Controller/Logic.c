@@ -88,7 +88,7 @@ void LOGIC_RealTime()
 			ZbGPIO_DUT_Switch(FALSE);
 			LOGIC_StateRealTime = LSRT_None;
 
-			LOGIC_AbortMeasurement(WARNING_NO_DIRECT_CURRENT);
+			LOGIC_AbortMeasurement(PROBLEM_NO_DIRECT_CURRENT);
 		}
 		
 		// Start reverse current pulse and on-state voltage timer
@@ -290,7 +290,7 @@ void LOGIC_CacheVariables()
 		Int16U FallTime = (DC_Current * 10 * 2) / DC_CurrentFallRate;
 		if (FallTime > FALL_MAX_TIME)
 		{
-			LOGIC_AbortMeasurementP(PROBLEM_BAD_CONFIG);
+			LOGIC_AbortMeasurement(PROBLEM_BAD_CONFIG);
 		}
 
 		I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET];
@@ -1057,15 +1057,15 @@ void LOGIC_ReadDataSequence()
 										|| (Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ
 												&& !Results[ResultsCounter].DeviceTriggered))
 								{
-									LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
+									LOGIC_AbortMeasurement(PROBLEM_SCOPE_CALC_FAILED);
 								}
 								else if(Results[ResultsCounter].Irr > DC_Current * 10)
 								{
-									LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
+									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
 								}
 								else if(Results[ResultsCounter].Irr < DataTable[REG_IRR_MIN] * 10)
 								{
-									LOGIC_AbortMeasurementP(PROBLEM_IRR_TO_LOW);
+									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
 								}
 								else
 								{
@@ -1194,7 +1194,7 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 	// In case of fail
 	if(LOGIC_PulseNumRemain == 0 && DeviceTriggered)
 	{
-		DataTable[REG_WARNING] = WARNING_DEVICE_TRIGGERED;
+		DataTable[REG_PROBLEM] = PROBLEM_DEVICE_TRIGGERED;
 		LOGIC_OperationResult = OPRESULT_FAIL;
 	}
 }
@@ -1273,15 +1273,7 @@ void LOGIC_ResultToDataTable()
 }
 // ----------------------------------------
 
-void LOGIC_AbortMeasurement(Int16U WarningCode)
-{
-	DataTable[REG_WARNING] = WarningCode;
-	LOGIC_OperationResult = OPRESULT_FAIL;
-	LOGIC_Halt();
-}
-// ----------------------------------------
-
-void LOGIC_AbortMeasurementP(Int16U ProblemCode)
+void LOGIC_AbortMeasurement(Int16U ProblemCode)
 {
 	DataTable[REG_PROBLEM] = ProblemCode;
 	LOGIC_OperationResult = OPRESULT_FAIL;

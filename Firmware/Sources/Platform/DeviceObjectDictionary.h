@@ -361,18 +361,16 @@
 // WARNING CODES
 //
 #define WARNING_NONE				0
-#define WARNING_MANUAL_STOP			1	// Requested manual stop of the measurement
-#define WARNING_NO_DIRECT_CURRENT	2	// No direct current
-#define WARNING_SCOPE_CALC_FAILED	3	// Calculations on scope node are failed
-#define WARNING_IRR_TO_HIGH			4	// Reverse current is too high
-#define WARNING_DEVICE_TRIGGERED	5	// Device remains in trigged state
-
 #define WARNING_WATCHDOG_RESET		1001	// System has been reseted by WD
-
 
 // PROBLEM CODES
 //
 #define PROBLEM_NONE				0
+#define PROBLEM_MANUAL_STOP			1	// Requested manual stop of the measurement
+#define PROBLEM_NO_DIRECT_CURRENT	2	// No direct current
+#define PROBLEM_SCOPE_CALC_FAILED	3	// Calculations on scope node are failed
+#define PROBLEM_IRR_TO_HIGH			4	// Reverse current is too high
+#define PROBLEM_DEVICE_TRIGGERED	5	// Device remains in trigged state
 #define PROBLEM_IRR_TO_LOW			6	// Обратный ток слишком большой
 #define PROBLEM_BAD_CONFIG			7	// Конфигурация не соответствует возможной
 
