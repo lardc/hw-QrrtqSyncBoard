@@ -361,7 +361,6 @@
 // WARNING CODES
 //
 #define WARNING_NONE				0
-#define WARNING_WATCHDOG_RESET		1001	// System has been reseted by WD
 
 // PROBLEM CODES
 //

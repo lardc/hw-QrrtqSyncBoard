@@ -106,10 +106,7 @@ void CONTROL_Init(Boolean BadClockDetected)
 	if(!BadClockDetected)
 	{
 		if(ZwSystem_GetDogAlarmFlag())
-		{
-			DataTable[REG_WARNING] = WARNING_WATCHDOG_RESET;
 			ZwSystem_ClearDogAlarmFlag();
-		}
 	}
 	else
 	{
