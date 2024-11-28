@@ -140,7 +140,6 @@ void CONTROL_Idle()
 			}
 			ZbGPIO_RCU_Sync(FALSE);
 			ZbGPIO_DCU_Sync(TRUE);
-			ZbGPIO_CSU_Sync(FALSE);
 		}
 	}
 	else
