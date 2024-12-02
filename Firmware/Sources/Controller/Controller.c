@@ -730,6 +730,11 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			}
 			break;
 
+		case ACT_DIAG_SFTY_READ:
+			{
+				DataTable[REG_DBG] = ZbGPIO_SafetyCheck();
+			}
+			break;
 		default:
 			return FALSE;
 	}

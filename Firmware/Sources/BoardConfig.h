@@ -67,6 +67,7 @@
 #define PIN_DBG				14
 #define PIN_DCU_READY		15
 #define PIN_CSU_ITRIG		25
+#define PIN_SFTY_IN			16
 
 // ADC placement
 #define AIN_PRESSURE		0x00	// INA 0

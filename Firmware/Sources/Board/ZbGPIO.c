@@ -14,6 +14,7 @@ void ZbGPIO_Init()
 	// Configure input pin
 	ZwGPIO_PinToInput(PIN_DCU_READY, TRUE, GPIO_NSAMPLE);
 	ZwGPIO_PinToInput(PIN_CSU_ITRIG, TRUE, GPIO_NSAMPLE);
+	ZwGPIO_PinToInput(PIN_SFTY_IN, TRUE, GPIO_NSAMPLE);
 
 	// Reset to default state
 	ZwGPIO_WritePin(PIN_CSU_PS, TRUE);
@@ -162,7 +163,7 @@ void ZbGPIO_SafetyEnable(Boolean Set)
 
 Boolean ZbGPIO_SafetyCheck()
 {
-	return FALSE;
+	return ZwGPIO_ReadPin(PIN_SFTY_IN);
 }
 // ----------------------------------------
 

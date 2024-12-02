@@ -35,6 +35,7 @@
 #define ACT_DIAG_PULSE_GATE_RELAY	33	// Generate control pulse for Gate relay (QCUHV)
 #define ACT_DIAG_QRR_PULSE			34
 #define ACT_DIAG_QRR_DCU_PULSE		35
+#define ACT_DIAG_SFTY_READ			36	// Read state safety status
 //
 #define ACT_START					100	// Start measurement
 #define ACT_STOP					101	// Force measurement stop
@@ -293,7 +294,6 @@
 #define PROBLEM_SCOPE_CALC_IRR_090	3	// Problem calculating 90% fraction Irr
 #define PROBLEM_SCOPE_CALC_VZ		4	// Problem calculating V zero crossing
 #define PROBLEM_SCOPE_CALC_DIDT		5	// Problem calculating actual dIdt
-#define PROBLEM_SAFETY				6	// Problem safety
 //
 // Endpoints
 #define EP_SCOPE_IDC				1	// Scope current data
@@ -370,8 +370,9 @@
 #define PROBLEM_SCOPE_CALC_FAILED	3	// Calculations on scope node are failed
 #define PROBLEM_IRR_TO_HIGH			4	// Reverse current is too high
 #define PROBLEM_DEVICE_TRIGGERED	5	// Device remains in trigged state
-#define PROBLEM_IRR_TO_LOW			6	// Обратный ток слишком большой
+#define PROBLEM_IRR_TO_LOW			6	// Обратный ток слишком маленький
 #define PROBLEM_BAD_CONFIG			7	// Конфигурация не соответствует возможной
+#define PROBLEM_SAFETY				8	// Problem safety
 
 // DISABLE CODES
 //
