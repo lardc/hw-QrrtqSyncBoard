@@ -173,6 +173,15 @@ void LOGIC_Halt()
 		LOGIC_StateRealTime = LSRT_None;
 
 	LOGIC_State = LS_None;
+
+	// Выключение всех синхронизаций
+	ZbGPIO_DUT_Control(FALSE);
+	ZbGPIO_DUT_Switch(FALSE);
+	ZbGPIO_CSU_Sync(FALSE);
+	ZbGPIO_DCU_Sync(FALSE);
+	ZbGPIO_RCU_Sync(FALSE);
+	ZbGPIO_FCROVU_Sync(FALSE);
+	ZbGPIO_CROVU_Sync(FALSE);
 	if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
 		HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
 }
