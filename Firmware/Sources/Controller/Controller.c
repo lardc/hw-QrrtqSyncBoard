@@ -25,7 +25,7 @@
 //
 volatile DeviceState CONTROL_State = DS_None;
 volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause, CONTROL_CommutationDelay;
-static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE, CommutationForcedOn = FALSE;
+static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE, CommutationForcedOn = FALSE, SafetyCheck = FALSE;
 static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 //
 Int16U CONTROL_Values_1[VALUES_x_SIZE];
@@ -237,6 +237,7 @@ void CONTROL_FillWPPartDefault()
 void CONTROL_SwitchToReady()
 {
 	CONTROL_SetDeviceState(DS_Ready);
+	SafetyCheck = FALSE;
 }
 // ----------------------------------------
 
@@ -802,9 +803,11 @@ void CONTROL_Commutation(Boolean State)
 
 void CONTROL_SafetyHandler()
 {
-	if((CONTROL_State == DS_InProcess) && ZbGPIO_SafetyCheck())
+	if((CONTROL_State == DS_InProcess) && ZbGPIO_SafetyCheck() && !SafetyCheck)
+	{
+		SafetyCheck = TRUE;
 		LOGIC_SafetyProblem();
-	
+	}
 	// Safety system enable
 	ZbGPIO_SafetyEnable(DataTable[REG_SAFETY_EN]);
 }
