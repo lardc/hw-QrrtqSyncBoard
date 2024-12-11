@@ -175,5 +175,5 @@ Int16U LOGIC_FCROVUOnSync(Int16U Delay);
 extern volatile DeviceSubState LOGIC_StateRealTime;
 extern volatile Int32U LOGIC_RealTimeCounter;
 extern volatile Int16U MeasurementMode;
-extern volatile Int32U FCROVUTrigOffset;
+extern volatile Int32U FCROVUTrigOffset, CROVU_SyncTime;
 #endif // __LOGIC_H

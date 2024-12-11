@@ -19,7 +19,7 @@
 //
 volatile DeviceSubState LOGIC_StateRealTime = LSRT_None;
 volatile Int32U LOGIC_RealTimeCounter = 0;
-volatile Int32U FCROVUTrigOffset = 0;
+volatile Int32U FCROVUTrigOffset = 0, CROVU_SyncTime = 0, FCROVU_SyncTime = 0;
 static volatile Int64U Timeout;
 static volatile Int64U CSU_FanTimeout;
 volatile LogicState LOGIC_State = LS_None;
@@ -103,9 +103,14 @@ void LOGIC_RealTime()
 			
 
 			LOGIC_StateRealTime = LSRT_ReversePulseStart;
-			TimeReverseStop = (LOGIC_RealTimeCounter + RC_CurrentMaxPoint + OSV_ON_TIME_TICK);
 
-			LOGIC_PreciseEventStart();
+			if(MeasurementMode == MODE_QRR_TQ)
+			{
+				TimeReverseStop = LOGIC_RealTimeCounter + FCROVU_SyncTime;
+				LOGIC_PreciseEventStart();
+			}
+			else
+				TimeReverseStop = (LOGIC_RealTimeCounter + RC_CurrentMaxPoint + OSV_ON_TIME_TICK);
 		}
 		
 		// Stop process
@@ -209,14 +214,11 @@ void LOGIC_PreciseEventInit(Int16U usTime)
 
 void LOGIC_PreciseEventStart()
 {
-	if(MeasurementMode != MODE_QRR_ONLY)
-	{
 	// Avoid interrupts
 	ZwTimer_StopT0();
 	ZwTimer_StopT2();
 
 	ZwTimer_StartT1();
-	}
 }
 // ----------------------------------------
 
@@ -337,7 +339,9 @@ void LOGIC_CacheVariables()
 
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
-		
+		FCROVU_SyncTime = (CROVU_Voltage / DataTable[REG_OSV_RATE] + PRE_PROBE_TIME_US_CROVU)/ TIMER2_PERIOD;
+		CROVU_SyncTime = CROVU_Voltage / DataTable[REG_OSV_RATE] + PRE_PROBE_TIME_US_CROVU;
+
 		LOGIC_FCROVUOnSync(LOGIC_FindFCROVUTrigOffset(CROVU_VoltageRate));
 		FCROVU_IShortCircuit = (DC_Current / 2);
 		DataTable[REG_FCROVU_I_SHORT] = FCROVU_IShortCircuit;

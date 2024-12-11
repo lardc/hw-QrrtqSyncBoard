@@ -81,7 +81,7 @@
 #define CSU_ROUGH_VOLTAGE_HYST			10		// in V x10
 #define CSU_FAN_TIMEOUT					30000	// in ms
 //
-#define SYNC_WIDTH_CROVU				100		// in us
+#define PRE_PROBE_TIME_US_CROVU			100		// in us
 #define SYNC_WIDTH_FCROVU				20		// in us
 //--------------------------------------------------------
 
