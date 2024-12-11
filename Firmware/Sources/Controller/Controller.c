@@ -317,9 +317,9 @@ void CONTROL_SubProcessStateMachine()
 			{
 				if(MeasurementMode == MODE_DVDT_ONLY)
 				{
-					ZbGPIO_FCROVU_Sync(TRUE);
-					DELAY_US(SYNC_WIDTH_CROVU);
-					ZbGPIO_FCROVU_Sync(FALSE);
+					ZbGPIO_CROVU_Sync(TRUE);
+					DELAY_US(CROVU_SyncTime);
+					ZbGPIO_CROVU_Sync(FALSE);
 
 					DELAY_US(500);
 					CONTROL_Commutation(FALSE);
