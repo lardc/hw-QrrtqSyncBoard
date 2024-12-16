@@ -34,7 +34,7 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 void CMN_WaitNodesReadyPreConfig(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState, LogicState NewState);
 void CMN_WaitNodesReadyConfig(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
-		volatile LogicState *CurrentLogicState);
+		volatile LogicState *CurrentLogicState, Boolean MuteFCROVU);
 void CMN_WaitNodesReadyPowerOn(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState);
 

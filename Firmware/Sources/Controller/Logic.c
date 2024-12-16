@@ -28,7 +28,7 @@ static volatile ExternalDeviceState LOGIC_ExtDeviceState;
 static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 volatile Int16U ResultsCounter, MeasurementMode;
 //
-static Boolean MuteCROVU;
+static Boolean MuteCROVU, MuteFCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, ScopeCurrentScaleResult;
@@ -291,7 +291,7 @@ void LOGIC_CacheVariables()
 		
 		ResultsCounter = 0;
 		MeasurementMode = DataTable[REG_MODE];
-		MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
+		MuteFCROVU = MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
 		
 		DC_Current = DataTable[REG_DIRECT_CURRENT];
 		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] / TIMER2_PERIOD;
@@ -797,7 +797,7 @@ void LOGIC_ConfigureSequence()
 				break;
 				
 			case LS_CFG_WaitStates:
-				CMN_WaitNodesReadyConfig(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State);
+				CMN_WaitNodesReadyConfig(CONTROL_TimeCounter, Timeout, &LOGIC_ExtDeviceState, &LOGIC_State, MuteFCROVU);
 				break;
 		}
 		

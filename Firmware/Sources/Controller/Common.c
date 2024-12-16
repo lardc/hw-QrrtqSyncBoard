@@ -9,7 +9,7 @@
 
 // Forward functions
 void CMN_WaitNodesReadyX(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
-		volatile LogicState *CurrentLogicState, Boolean NodesConfig, Int16U Fault, LogicState NewState);
+		volatile LogicState *CurrentLogicState, Boolean NodesConfig, Int16U Fault, LogicState NewState, Boolean MuteFCROVU);
 
 // Functions
 //
@@ -125,32 +125,32 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 void CMN_WaitNodesReadyPowerOn(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState)
 {
-	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, FALSE, FAULTEX_PON_TIMEOUT, LS_None);
+	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, FALSE, FAULTEX_PON_TIMEOUT, LS_None, FALSE);
 }
 //-----------------------------
 
 void CMN_WaitNodesReadyPreConfig(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState, LogicState NewState)
 {
-	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, FALSE, FAULTEX_PRECFG_TIMEOUT, NewState);
+	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, FALSE, FAULTEX_PRECFG_TIMEOUT, NewState, FALSE);
 }
 //-----------------------------
 
 void CMN_WaitNodesReadyConfig(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
-		volatile LogicState *CurrentLogicState)
+		volatile LogicState *CurrentLogicState, Boolean MuteFCROVU)
 {
-	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, TRUE, FAULTEX_CFG_TIMEOUT, LS_None);
+	CMN_WaitNodesReadyX(TimeCounter, Timeout, FullStateStorage, CurrentLogicState, TRUE, FAULTEX_CFG_TIMEOUT, LS_None, MuteFCROVU);
 }
 //-----------------------------
 
 void CMN_WaitNodesReadyX(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
-		volatile LogicState *CurrentLogicState, Boolean NodesConfig, Int16U Fault, LogicState NewState)
+		volatile LogicState *CurrentLogicState, Boolean NodesConfig, Int16U Fault, LogicState NewState, Boolean MuteFCROVU)
 {
 	Int16U DRCUWaitState, ScopeWaitState, FCROVUWaitState;
 
 	if(NodesConfig)
 	{
-		FCROVUWaitState = CDS_ConfigReady;
+		FCROVUWaitState = MuteFCROVU ? CDS_Ready : CDS_ConfigReady;
 		DRCUWaitState = DRCU_DS_ConfigReady;
 		ScopeWaitState = CDS_InProcess;
 	}
