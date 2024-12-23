@@ -272,7 +272,7 @@ void LOGIC_CacheVariables()
 	LOGIC_ExtDeviceState.CSU.Emulate	= DataTable[REG_EMULATE_CSU];
 	LOGIC_ExtDeviceState.SCOPE.Emulate	= DataTable[REG_EMULATE_SCOPE];
 
-	if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
+	if(!LOGIC_ExtDeviceState.SCOPE.Emulate && MeasurementMode == MODE_QRR_ONLY)
 	{
 		Int16U ScopeCurrentScale = ((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100;
 
@@ -1073,7 +1073,7 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
 								}
-								else if(Results[ResultsCounter].Irr < DataTable[REG_IRR_MIN] * 10)
+								else if(Results[ResultsCounter].Irr < DataTable[REG_IRR_MIN] * 10 && MeasurementMode == MODE_QRR_ONLY)
 								{
 									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
 								}
