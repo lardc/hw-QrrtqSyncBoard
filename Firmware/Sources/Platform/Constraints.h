@@ -85,8 +85,13 @@ typedef struct __TableItemConstraint
 #define DEF_I_TO_V_OFFSET			0
 #define DEF_I_TO_V_K				1000
 #define DEF_I_TO_V_K2				0
+#define DEF_CTRL2_OFFSET			0
+#define DEF_CTRL2_K					1000
 #define DEF_CTRL1_OFFSET			0
 #define DEF_CTRL1_K					1000
+#define DEF_I_TO_DAC_P0				0
+#define DEF_I_TO_DAC_P1				1000
+#define DEF_I_TO_DAC_P2				1000
 // FCROVU
 //
 #define OS_VOLATGE_MIN				400		// in V
@@ -105,7 +110,7 @@ typedef struct __TableItemConstraint
 //
 #define CSU_VOLTAGE_MIN				100		// in V x10
 #define CSU_VOLTAGE_MAX				1000	// in V x10
-#define CSU_VOLTAGE_DEF				990 	// in V x10
+#define CSU_VOLTAGE_DEF				900 	// in V x10
 
 #define CSU_VOLTAGE_HYST_MIN		1		// in V x10
 #define CSU_VOLTAGE_HYST_MAX		50		// in V x10

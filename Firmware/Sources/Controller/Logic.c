@@ -33,7 +33,7 @@ static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FA
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, ScopeCurrentScaleResult;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
-static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl1_Offset,	Ctrl1_K, Trig_K;
+static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2, Trig_K;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
@@ -309,9 +309,14 @@ void LOGIC_CacheVariables()
 		I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET];
 		I_To_V_K = DataTable[REG_I_TO_V_K];
 		I_To_V_K2 = DataTable[REG_I_TO_V_K2];
+		Ctrl2_Offset = DataTable[REG_CTRL2_OFFSET];
+		Ctrl2_K = DataTable[REG_CTRL2_K];
 		Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET];
 		Ctrl1_K = DataTable[REG_CTRL1_K];
 		Trig_K = DataTable[REG_RCU_TOFFS_K4];
+		I_To_Dac_P0 = DataTable[REG_I_TO_DAC_P0];
+		I_To_Dac_P1 = DataTable[REG_I_TO_DAC_P1];
+		I_To_Dac_P2 = DataTable[REG_I_TO_DAC_P2];
 
 		// Подготовка конфигурации DCU и RCU
 
@@ -382,10 +387,10 @@ void LOGIC_CacheVariables()
 				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 			}
 		
-			if (CROVU_TrigTime > RC_CurrentMaxPoint)
-			{
-				CROVU_TrigTime = RC_CurrentMaxPoint;
-			}
+//			if (CROVU_TrigTime > RC_CurrentMaxPoint)
+//			{
+//				CROVU_TrigTime = RC_CurrentMaxPoint;
+//			}
 			LOGIC_PreciseEventInit(CROVU_TrigTime);
 		}
 		CacheUpdate = FALSE;
