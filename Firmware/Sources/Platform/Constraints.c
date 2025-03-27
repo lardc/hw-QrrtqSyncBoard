@@ -63,17 +63,17 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, 0, 0},																// 47
 											   {0, 0, 0},																// 48
 											   {0, 0, 0},																// 49
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R0},									// 50
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R1},									// 51
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R2},									// 52
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R3},									// 53
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R4},									// 54
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R5},									// 55
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R6},									// 56
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R7},									// 57
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R8},									// 58
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R9},									// 59
-											   {0, MAX_FALL_RATE, DEF_FALL_RATE_R10},									// 60
+											   {0, MAX_FALL_RATE, FALL_RATE_R0_DEF},									// 50
+											   {0, MAX_FALL_RATE, FALL_RATE_R1_DEF},									// 51
+											   {0, MAX_FALL_RATE, FALL_RATE_R2_DEF},									// 52
+											   {0, MAX_FALL_RATE, FALL_RATE_R3_DEF},									// 53
+											   {0, MAX_FALL_RATE, FALL_RATE_R4_DEF},									// 54
+											   {0, MAX_FALL_RATE, FALL_RATE_R5_DEF},									// 55
+											   {0, MAX_FALL_RATE, FALL_RATE_R6_DEF},									// 56
+											   {0, MAX_FALL_RATE, FALL_RATE_R7_DEF},									// 57
+											   {0, MAX_FALL_RATE, FALL_RATE_R8_DEF},									// 58
+											   {0, MAX_FALL_RATE, FALL_RATE_R9_DEF},									// 59
+											   {0, MAX_FALL_RATE, FALL_RATE_R10_DEF},									// 60
 											   {0, 0, 0},																// 61
 											   {0, 0, 0},																// 62
 											   {0, 0, 0},																// 63
@@ -83,16 +83,16 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, 0, 0},																// 67
 											   {0, 0, 0},																// 68
 											   {0, 0, 0},																// 69
-											   {0, INT16U_MAX, DEF_I_TO_V_OFFSET},										// 70
-											   {0, INT16U_MAX, DEF_I_TO_V_K},											// 71
-											   {0, INT16U_MAX, DEF_I_TO_V_K2},											// 72
-											   {0, INT16U_MAX, DEF_CTRL2_OFFSET},										// 73
-											   {0, INT16U_MAX, DEF_CTRL2_K},											// 74
-											   {0, INT16U_MAX, DEF_CTRL1_OFFSET},										// 75
-											   {0, INT16U_MAX, DEF_CTRL1_K},											// 76
-											   {0, INT16U_MAX, DEF_I_TO_DAC_P0},										// 77
-											   {0, INT16U_MAX, DEF_I_TO_DAC_P1},										// 78
-											   {0, INT16U_MAX, DEF_I_TO_DAC_P2},										// 79
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 70
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 71
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 72
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 73
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 74
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 75
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 76
+											   {0, INT16U_MAX, I_TO_DAC_P0_DEF},										// 77
+											   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 78
+											   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 79
 											   {0, DIRECT_CURRENT_MAX, 0},												// 80
 											   {0, 0, 0},																// 81
 											   {0, 0, 0},																// 82

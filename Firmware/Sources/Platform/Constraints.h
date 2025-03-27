@@ -70,28 +70,26 @@ typedef struct __TableItemConstraint
 #define REVERSE_RATE_DEF			4		// in A/us x10
 
 #define MAX_FALL_RATE				1000	// A/мкс x10
-#define DEF_FALL_RATE_R0			10		// A/мкс x10
-#define DEF_FALL_RATE_R1			15		// A/мкс x10
-#define DEF_FALL_RATE_R2			20		// A/мкс x10
-#define DEF_FALL_RATE_R3			50		// A/мкс x10
-#define DEF_FALL_RATE_R4			100		// A/мкс x10
-#define DEF_FALL_RATE_R5			150		// A/мкс x10
-#define DEF_FALL_RATE_R6			200		// A/мкс x10
-#define DEF_FALL_RATE_R7			300		// A/мкс x10
-#define DEF_FALL_RATE_R8			500		// A/мкс x10
-#define DEF_FALL_RATE_R9			600		// A/мкс x10
-#define DEF_FALL_RATE_R10			1000	// A/мкс x10
+#define FALL_RATE_R0_DEF			10		// A/мкс x10
+#define FALL_RATE_R1_DEF			15		// A/мкс x10
+#define FALL_RATE_R2_DEF			20		// A/мкс x10
+#define FALL_RATE_R3_DEF			50		// A/мкс x10
+#define FALL_RATE_R4_DEF			100		// A/мкс x10
+#define FALL_RATE_R5_DEF			150		// A/мкс x10
+#define FALL_RATE_R6_DEF			200		// A/мкс x10
+#define FALL_RATE_R7_DEF			300		// A/мкс x10
+#define FALL_RATE_R8_DEF			500		// A/мкс x10
+#define FALL_RATE_R9_DEF			600		// A/мкс x10
+#define FALL_RATE_R10_DEF			1000	// A/мкс x10
 //
-#define DEF_I_TO_V_OFFSET			0
-#define DEF_I_TO_V_K				1000
-#define DEF_I_TO_V_K2				0
-#define DEF_CTRL2_OFFSET			0
-#define DEF_CTRL2_K					1000
-#define DEF_CTRL1_OFFSET			0
-#define DEF_CTRL1_K					1000
-#define DEF_I_TO_DAC_P0				0
-#define DEF_I_TO_DAC_P1				1000
-#define DEF_I_TO_DAC_P2				1000
+#define I_TO_V_OFFSET_DEF			0
+#define I_TO_V_K_DEF				1000
+#define I_TO_V_K2_DEF				0
+#define CTRL_OFFSET_DEF				0
+#define CTRL_K_DEF					1000
+#define I_TO_DAC_P0_DEF				0
+#define I_TO_DAC_P1_DEF				1000
+#define I_TO_DAC_P2_DEF				1000
 // FCROVU
 //
 #define OS_VOLATGE_MIN				400		// in V
