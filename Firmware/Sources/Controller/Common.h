@@ -16,8 +16,11 @@ typedef struct __DRCUConfig
 	Int16S V_Offset;
 	Int16S V_K;
 	Int16S V_K2;
-	Int16S I_Offset;
-	Int16S I_K;
+	Int16S I_Ctrl_Offset;
+	Int16S I_Ctrl_K;
+	Int16S I_P0;
+	Int16S I_P1;
+	Int16S I_P2;
 
 } DRCUConfig, *pDRCUConfig;
 

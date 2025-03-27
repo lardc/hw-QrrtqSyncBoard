@@ -112,10 +112,13 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 				if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_OFFSET, Config->V_Offset))
 					if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K, Config->V_K))
 						if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K2, Config->V_K2))
-							if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL1_EXT_OFFSET, Config->I_Offset))
-								if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL1_EXT_K, Config->I_K))
-									if(HLI_CAN_CallAction(DataTable[NodeIDReg], DCRU_ACT_CONFIG))
-										*CurrentLogicState = NextLogicState;
+							if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL_EXT_OFFSET, Config->I_Ctrl_Offset))
+								if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL_EXT_K, Config->I_Ctrl_K))
+									if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P0, Config->I_P0))
+										if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P1, Config->I_P1))
+											if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P2, Config->I_P2))
+												if(HLI_CAN_CallAction(DataTable[NodeIDReg], DCRU_ACT_CONFIG))
+													*CurrentLogicState = NextLogicState;
 	}
 	else
 		*CurrentLogicState = NextLogicState;
