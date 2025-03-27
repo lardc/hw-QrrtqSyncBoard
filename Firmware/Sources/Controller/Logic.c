@@ -389,11 +389,6 @@ void LOGIC_CacheVariables()
 				LOGIC_PulseNumRemain = 1;
 				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
 			}
-		
-//			if (CROVU_TrigTime > RC_CurrentMaxPoint)
-//			{
-//				CROVU_TrigTime = RC_CurrentMaxPoint;
-//			}
 			LOGIC_PreciseEventInit(CROVU_TrigTime);
 		}
 		CacheUpdate = FALSE;
