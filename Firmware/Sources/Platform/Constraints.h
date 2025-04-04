@@ -83,7 +83,7 @@ typedef struct __TableItemConstraint
 #define FALL_RATE_R10_DEF			1000	// A/мкс x10
 //
 #define I_TO_V_OFFSET_DEF			0
-#define I_TO_V_K_DEF				1000
+#define I_TO_V_K_DEF				0
 #define I_TO_V_K2_DEF				0
 #define CTRL_OFFSET_DEF				0
 #define CTRL_K_DEF					1000

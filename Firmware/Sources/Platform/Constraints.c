@@ -54,7 +54,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 38
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 39
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 40
-											   {0, INT16U_MAX, 0},														// 41
+											   {0, 0, 0},																// 41
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 42
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 43
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 44
@@ -86,44 +86,43 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 70
 											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 71
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 72
-											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 73
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 74
-											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 75
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 76
-											   {0, INT16U_MAX, I_TO_DAC_P0_DEF},										// 77
-											   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 78
-											   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 79
-											   {0, DIRECT_CURRENT_MAX, 0},												// 80
-											   {0, 0, 0},																// 81
-											   {0, 0, 0},																// 82
-											   {0, 0, 0},																// 83
-											   {0, 0, 0},																// 84
-											   {0, 0, 0},																// 85
-											   {0, 0, 0},																// 86
-											   {0, 0, 0},																// 87
-											   {0, 0, 0},																// 88
-											   {0, 0, 0},																// 89
-											   {0, 0, 0},																// 90
-											   {0, 0, 0},																// 91
-											   {0, 0, 0},																// 92
-											   {0, 0, 0},																// 93
-											   {0, 0, 0},																// 94
-											   {0, 0, 0},																// 95
-											   {0, 0, 0},																// 96
-											   {0, 0, 0},																// 97
-											   {0, 0, 0},																// 98
-											   {0, 0, 0},																// 99
-											   {0, 0, 0},																// 100
-                                    		   {0, 0, 0},																// 101
-                                    		   {0, 0, 0},																// 102
-                                    		   {0, 0, 0},																// 103
-                                    		   {0, 0, 0},																// 104
-                                    		   {0, 0, 0},																// 105
-                                    		   {0, 0, 0},																// 106
-                                    		   {0, 0, 0},																// 107
-                                    		   {0, 0, 0},																// 108
-                                    		   {0, 0, 0},																// 109
-                                    		   {0, 0, 0},																// 110
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 73
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 74
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 75
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 76
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 77
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 78
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 79
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 80
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 81
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 82
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 83
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 84
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 85
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 86
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 87
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 88
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 89
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 91
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 92
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 93
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 94
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 95
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 96
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 97
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 98
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 99
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 100
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 101
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 102
+                                    		   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 103
+                                    		   {0, INT16U_MAX, CTRL_K_DEF},												// 104
+                                    		   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 105
+                                    		   {0, INT16U_MAX, CTRL_K_DEF},												// 106
+                                    		   {0, INT16U_MAX, I_TO_DAC_P0_DEF},										// 107
+                                    		   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 108
+                                    		   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 109
+                                    		   {0, DIRECT_CURRENT_MAX, 0},												// 110
                                     		   {0, 0, 0},																// 111
                                     		   {0, 0, 0},																// 112
                                     		   {0, 0, 0},																// 113

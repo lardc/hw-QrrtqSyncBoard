@@ -33,7 +33,7 @@ static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FA
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, ScopeCurrentScaleResult;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
-static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2, Trig_K;
+static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
@@ -307,14 +307,13 @@ void LOGIC_CacheVariables()
 			LOGIC_AbortMeasurement(PROBLEM_BAD_CONFIG);
 		}
 
-		I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET];
-		I_To_V_K = DataTable[REG_I_TO_V_K];
-		I_To_V_K2 = DataTable[REG_I_TO_V_K2];
+		I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R0];
+		I_To_V_K = DataTable[REG_I_TO_V_K_R0];
+		I_To_V_K2 = DataTable[REG_I_TO_V_K2_R0];
 		Ctrl2_Offset = DataTable[REG_CTRL2_OFFSET];
 		Ctrl2_K = DataTable[REG_CTRL2_K];
 		Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET];
 		Ctrl1_K = DataTable[REG_CTRL1_K];
-		Trig_K = DataTable[REG_RCU_TOFFS_K4];
 		I_To_Dac_P0 = DataTable[REG_I_TO_DAC_P0];
 		I_To_Dac_P1 = DataTable[REG_I_TO_DAC_P1];
 		I_To_Dac_P2 = DataTable[REG_I_TO_DAC_P2];
@@ -328,7 +327,7 @@ void LOGIC_CacheVariables()
 				DC_Current, DC_NamberFallRate, &DCUConfig, 0, I_To_V_Offset, I_To_V_K, I_To_V_K2,
 					Ctrl2_Offset, Ctrl2_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2);
 
-		Int16U TrigOffset = ((Int32S)LOGIC_FindRCUTrigOffset(DC_NamberFallRate) - ((Int32S)Trig_K * 1000/ DC_Current));
+		Int16U TrigOffset = (Int32S)LOGIC_FindRCUTrigOffset(DC_NamberFallRate);
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate, LOGIC_ExtDeviceState.RCU3.Emulate,
 				DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2,
 					Ctrl1_Offset, Ctrl1_K, 0, 0, 0);
