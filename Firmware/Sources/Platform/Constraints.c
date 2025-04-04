@@ -54,7 +54,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 38
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 39
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 40
-											   {0, 0, 0},																// 41
+											   {0, DIRECT_CURRENT_MAX, 0},												// 41
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 42
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 43
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 44
@@ -122,7 +122,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
                                     		   {0, INT16U_MAX, I_TO_DAC_P0_DEF},										// 107
                                     		   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 108
                                     		   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 109
-                                    		   {0, DIRECT_CURRENT_MAX, 0},												// 110
+                                    		   {0, 0, 0},																// 110
                                     		   {0, 0, 0},																// 111
                                     		   {0, 0, 0},																// 112
                                     		   {0, 0, 0},																// 113
