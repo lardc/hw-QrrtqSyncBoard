@@ -53,6 +53,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
 Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate);
 Int16U LOGIC_FindFallRate(Int16U FallRate);
+void LOGIC_CorrFallRate(Int16U NamberFallRate);
 Boolean LOGIC_UpdateDeviceState();
 Boolean LOGIC_UpdateDeviceStateErrReset();
 Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error);
@@ -307,9 +308,7 @@ void LOGIC_CacheVariables()
 			LOGIC_AbortMeasurement(PROBLEM_BAD_CONFIG);
 		}
 
-		I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R0];
-		I_To_V_K = DataTable[REG_I_TO_V_K_R0];
-		I_To_V_K2 = DataTable[REG_I_TO_V_K2_R0];
+		LOGIC_CorrFallRate(DC_NamberFallRate);
 		Ctrl2_Offset = DataTable[REG_CTRL2_OFFSET];
 		Ctrl2_K = DataTable[REG_CTRL2_K];
 		Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET];
@@ -1515,6 +1514,74 @@ Int16U LOGIC_FindFallRate(Int16U NamberFallRate)
 
 		default:
 			return DataTable[REG_FALL_RATE_R10];
+	}
+}
+
+// ----------------------------------------
+
+void LOGIC_CorrFallRate(Int16U NamberFallRate)
+{
+	switch(NamberFallRate)
+	{
+		case 0:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R0];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R0];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R0];
+
+		case 1:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R1];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R1];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R1];
+
+		case 2:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R2];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R2];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R2];
+
+		case 3:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R3];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R3];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R3];
+
+		case 4:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R4];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R4];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R4];
+
+		case 5:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R5];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R5];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R5];
+
+		case 6:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R6];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R6];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R6];
+
+		case 7:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R7];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R7];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R7];
+
+		case 8:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R8];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R8];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R8];
+
+		case 9:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R9];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R9];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R9];
+
+		case 10:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R10];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R10];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R10];
+
+		default:
+			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R4];
+			I_To_V_K = DataTable[REG_I_TO_V_K_R4];
+			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R4];
 	}
 }
 
