@@ -62,7 +62,7 @@
 #define UNIT_TQ_EXTRA_PULSES			15		// in pulses
 #define QRR_AVG_COUNTER					3		// in pulses
 #define UNIT_MAX_NUM_OF_PULSES			(UNIT_TQ_MEASURE_PULSES + UNIT_TQ_EXTRA_PULSES)	// in pulses
-#define FALL_MAX_TIME					1000	// in us
+#define FALL_MAX_TIME					300		// in us
 #define TQ_MAX_TIME						1000	// in us
 #define TQ_FIRST_PROBE					100		// in us
 #define TQ_ZERO_OFFSET					3		// in us

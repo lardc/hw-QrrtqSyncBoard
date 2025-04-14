@@ -103,17 +103,9 @@ void LOGIC_RealTime()
 			DSP28x_usDelay(RCUConfig.RCUTrigOffsetTicks);
 			ZbGPIO_DCU_Sync(FALSE);
 
-			if(MeasurementMode == MODE_QRR_TQ)
-			{
-				TimeReverseStop = LOGIC_RealTimeCounter + FCROVU_SyncTime + OSV_ON_TIME_TICK;
-				LOGIC_StateRealTime = LSRT_ReversePulseStart;
-				LOGIC_PreciseEventStart();
-			}
-			else
-			{
-				TimeReverseStop = (LOGIC_RealTimeCounter + ((RC_CurrentMaxPoint / TIMER2_PERIOD) + 1) + OSV_ON_TIME_TICK);
-				LOGIC_StateRealTime = LSRT_ReversePulseStart;
-			}
+			TimeReverseStop = LOGIC_RealTimeCounter + FCROVU_SyncTime + OSV_ON_TIME_TICK;
+			LOGIC_StateRealTime = LSRT_ReversePulseStart;
+			LOGIC_PreciseEventStart();
 		}
 		
 		// Stop process
@@ -301,13 +293,6 @@ void LOGIC_CacheVariables()
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
 		ScopeCurrentScaleResult = DC_Current;
-
-		Int16U FallTime = (DC_Current * 10 * 2) / DC_CurrentFallRate;
-		if (FallTime > FALL_MAX_TIME)
-		{
-			LOGIC_AbortMeasurement(PROBLEM_BAD_CONFIG);
-		}
-
 		LOGIC_CorrFallRate(DC_NamberFallRate);
 		Ctrl2_Offset = DataTable[REG_CTRL2_OFFSET];
 		Ctrl2_K = DataTable[REG_CTRL2_K];
@@ -333,13 +318,7 @@ void LOGIC_CacheVariables()
 
 		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit));
 		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
-
-		RC_CurrentMaxPoint = DC_CurrentZeroPoint * 2;
-		if ((RC_CurrentMaxPoint - 1) > (DataTable[REG_RCU_SYNC_MAX]) )
-		{
-			RC_CurrentMaxPoint = (DataTable[REG_RCU_SYNC_MAX] ) ;
-		}
-
+		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME) : (DC_CurrentZeroPoint * 2);
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		FCROVU_SyncTime = (CROVU_Voltage / DataTable[REG_OSV_RATE] + PRE_PROBE_TIME_US_CROVU) / TIMER2_PERIOD;
@@ -354,17 +333,18 @@ void LOGIC_CacheVariables()
 						(DC_Current / DC_CurrentRiseRate / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
 		
 		if(LOGIC_StateRealTime == LSRT_WaitForConfig)
-		{	if(MeasurementMode == MODE_QRR_ONLY)
+		{
+			if(MeasurementMode == MODE_QRR_ONLY)
 			{
 				if(CacheSinglePulse)
 				{
 					LOGIC_PulseNumRemain = 1;
-					CROVU_TrigTime = 0;
+					CROVU_TrigTime = RC_CurrentMaxPoint;
 				}
 				else
 				{
 					LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
-					CROVU_TrigTime = 0;
+					CROVU_TrigTime = RC_CurrentMaxPoint;
 				}
 				CacheUpdate = FALSE;
 			}
@@ -1527,61 +1507,73 @@ void LOGIC_CorrFallRate(Int16U NamberFallRate)
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R0];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R0];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R0];
+			break;
 
 		case 1:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R1];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R1];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R1];
+			break;
 
 		case 2:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R2];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R2];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R2];
+			break;
 
 		case 3:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R3];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R3];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R3];
+			break;
 
 		case 4:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R4];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R4];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R4];
+			break;
 
 		case 5:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R5];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R5];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R5];
+			break;
 
 		case 6:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R6];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R6];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R6];
+			break;
 
 		case 7:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R7];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R7];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R7];
+			break;
 
 		case 8:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R8];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R8];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R8];
+			break;
 
 		case 9:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R9];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R9];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R9];
+			break;
 
 		case 10:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R10];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R10];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R10];
+			break;
 
 		default:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R4];
 			I_To_V_K = DataTable[REG_I_TO_V_K_R4];
 			I_To_V_K2 = DataTable[REG_I_TO_V_K2_R4];
+			break;
 	}
 }
 
