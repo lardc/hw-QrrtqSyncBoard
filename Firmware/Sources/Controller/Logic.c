@@ -317,7 +317,9 @@ void LOGIC_CacheVariables()
 					Ctrl1_Offset, Ctrl1_K, 0, 0, 0);
 
 		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit));
-		DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
+		if(MeasurementMode != MODE_QRR_ONLY)
+			DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
+
 		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME) : (DC_CurrentZeroPoint * 2);
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
