@@ -176,6 +176,7 @@
 #define REG_FCROVU_I_SHORT			137	// FCROVU short circuit current (Заданное)
 #define REG_CSU_VOLTAGE_THRE		138	// CSU voltage set (in V x10)
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
+#define REG_CALIBRATION_PROCESS		140	// Флаг процесса калибровки
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1

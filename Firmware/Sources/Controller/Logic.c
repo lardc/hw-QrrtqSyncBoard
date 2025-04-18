@@ -115,7 +115,7 @@ void LOGIC_RealTime()
 			ZbGPIO_FCROVU_Sync(FALSE);
 			ZbGPIO_SCOPE_Sync(FALSE);
 			//
-			ZbGPIO_DCU_Sync(TRUE);
+			ZbGPIO_DCU_Sync(FALSE);
 			ZbGPIO_RCU_Sync(FALSE);
 			ZbGPIO_CSU_Sync(FALSE);
 			
@@ -321,6 +321,7 @@ void LOGIC_CacheVariables()
 			DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 
 		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME) : (DC_CurrentZeroPoint * 2);
+		RC_CurrentMaxPoint = (RC_CurrentMaxPoint > FALL_MIN_TIME) ? RC_CurrentMaxPoint : FALL_MIN_TIME;
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		FCROVU_SyncTime = (CROVU_Voltage / DataTable[REG_OSV_RATE] + PRE_PROBE_TIME_US_CROVU) / TIMER2_PERIOD;
@@ -360,7 +361,7 @@ void LOGIC_CacheVariables()
 				else
 				{
 					LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
-					CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
+					 CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
 				}
 
 			}
@@ -1052,9 +1053,9 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(PROBLEM_SCOPE_CALC_FAILED);
 								}
-								else if(Results[ResultsCounter].Irr > DC_Current * 10)
+								else if(Results[ResultsCounter].Irr > (DC_Current * 10) && !DataTable[REG_CALIBRATION_PROCESS])
 								{
-									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
+										LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
 								}
 								else if(Results[ResultsCounter].Irr < DataTable[REG_IRR_MIN] * 10 && MeasurementMode == MODE_QRR_ONLY)
 								{
