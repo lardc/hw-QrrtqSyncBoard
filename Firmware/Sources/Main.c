@@ -255,7 +255,7 @@ ISRCALL Timer1_ISR(void)
 	ZbGPIO_RCU_Sync(FALSE);
 	ZbGPIO_DCU_Sync(TRUE);
 	ZbGPIO_CSU_Sync(FALSE);
-	DELAY_US(1);
+//	DELAY_US(1);
 	ZbGPIO_FCROVU_Sync(TRUE);
 
 	ZwTimer_ReloadT0();

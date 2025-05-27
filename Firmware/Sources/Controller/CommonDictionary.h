@@ -13,7 +13,7 @@
 #define COMM_REG_DISABLE_REASON				194	// Регистр Disable
 #define COMM_REG_WARNING					195	// Регистр Warning
 #define COMM_REG_PROBLEM					196	// Регистр Problem
-#define COMM_REG_OP_RESULT					197	// Регистр результата операции
+#define COMM_REG_OP_RESULT					198	// Регистр результата операции
 
 // Operation results
 #define COMM_OPRESULT_NONE					0	// No information or not finished

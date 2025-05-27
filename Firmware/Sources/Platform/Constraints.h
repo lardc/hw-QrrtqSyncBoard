@@ -34,7 +34,7 @@ typedef struct __TableItemConstraint
 #define MAX_GATE_DRV_TURN_ON_DELAY	500
 
 // in us/10
-#define MAX_FCROVU_TRIG_OFFSET		100
+#define MAX_FCROVU_TRIG_OFFSET		500
 
 // in us
 #define TQ_SINGLE_PULSE_MIN			3
