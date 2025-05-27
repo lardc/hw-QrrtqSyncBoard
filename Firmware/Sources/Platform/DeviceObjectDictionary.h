@@ -287,6 +287,7 @@
 // Registers
 #define REG_CROVU_DESIRED_VOLTAGE	128	// Desired plate voltage
 #define REG_CROVU_VOLTAGE_RATE		129	// dV/dt rate
+#define REG_CROVU_CSU_VOLTAGE		130	// Дополнительное смещение напряжения для CSU (В х10)
 //
 // ----------------------------------------
 

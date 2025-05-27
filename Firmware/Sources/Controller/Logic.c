@@ -37,7 +37,7 @@ static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_O
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
-static Int16U CSUVoltage = 0, CSUVoltageHigh = 0, CSUVoltageLow = 0;
+static Int16U CSUVoltage = 0, CSUVoltageSet = 0, CSUVoltageHigh = 0, CSUVoltageLow = 0;
 static DRCUConfig DCUConfig, RCUConfig;
 
 // Forward functions
@@ -252,6 +252,7 @@ void LOGIC_CacheVariables()
 {
 	DCPulseFormed = FALSE;
 
+	CSUVoltageSet = DataTable[REG_CSU_VOLTAGE_THRE];
 	CSUVoltageHigh = DataTable[REG_CSU_VOLTAGE_THRE] + DataTable[REG_CSU_VOLTAGE_HYST] / 2;
 	CSUVoltageLow = DataTable[REG_CSU_VOLTAGE_THRE] - DataTable[REG_CSU_VOLTAGE_HYST] / 2;
 
@@ -689,8 +690,9 @@ void LOGIC_ConfigureSequence()
 						{
 							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
 								if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE, CROVU_VoltageRate))
-									if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
-										CROVU_StrartConfig = FALSE;
+									if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_CSU_VOLTAGE, CSUVoltageSet))
+										if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
+											CROVU_StrartConfig = FALSE;
 						}
 						else
 						{
