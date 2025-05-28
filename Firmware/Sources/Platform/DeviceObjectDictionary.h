@@ -221,7 +221,7 @@
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)
 #define REG_RES_TQ					213	// Turn-off time (in us x10)
 #define REG_RES_IDC					214	// Actual DC current value (in A)
-#define REG_RES_DIDT				215	// Actual dI/dt value (in A/us x10)
+#define REG_RES_DIDT				215	// Actual dI/dt value (in A/us x100)
 #define REG_RES_QRR_INT				216	// Reverse recovery charge (integration mode) (in uC x10)
 #define REG_RES_VD					217	// Actual direct voltage value (in V)
 #define REG_RES_QRR_32B				218	// Reverse recovery charge (in uC x100) (Calculation defined by GOST) 32bit part
