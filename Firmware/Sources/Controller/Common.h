@@ -24,6 +24,13 @@ typedef struct __DRCUConfig
 
 } DRCUConfig, *pDRCUConfig;
 
+typedef struct __ScopeConfig
+{
+	Int32U PreFallScopeSync;
+	Int16U ScopeCurrentScaleResult;
+
+} ScopeConfig, *pScopeConfig;
+
 // Functions
 Boolean CMN_UpdateNodeState(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity);
 void CMN_ResetNodeFault(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, volatile LogicState *CurrentLogicState,

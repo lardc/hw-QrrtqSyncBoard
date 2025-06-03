@@ -31,7 +31,7 @@ volatile Int16U ResultsCounter, MeasurementMode;
 static Boolean MuteCROVU, MuteFCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
-static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, ScopeCurrentScaleResult;
+static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, PreFallScopeSync;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
@@ -39,6 +39,7 @@ static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
 static volatile Int16U LOGIC_PulseNumRemain, LOGIC_OperationResult, LOGIC_DriverOffTicks;
 static Int16U CSUVoltage = 0, CSUVoltageSet = 0, CSUVoltageHigh = 0, CSUVoltageLow = 0;
 static DRCUConfig DCUConfig, RCUConfig;
+static ScopeConfig ScopeCurrentConfig;
 
 // Forward functions
 //
@@ -50,6 +51,7 @@ Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulatio
 void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset, Int16S I_To_V_Offset, Int16S I_To_V_K, Int16S I_To_V_K2,
 			Int16S Ctrl_Offset,	Int16S Ctrl_K, Int16S I_To_Dac_P0, Int16S I_To_Dac_P1, Int16S I_To_Dac_P2);
+void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, Int16U PreFallScopeSync, pScopeConfig Config);
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
 Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate);
 Int16U LOGIC_FindFallRate(Int16U FallRate);
@@ -96,11 +98,13 @@ void LOGIC_RealTime()
 		// Start reverse current pulse and on-state voltage timer
 		if(LOGIC_StateRealTime == LSRT_DirectPulseReady && LOGIC_RealTimeCounter > TimeReverseStart)
 		{
-			ZbGPIO_SCOPE_Sync(TRUE);
+
 			ZbGPIO_RCU_Sync(TRUE);
 			ZbGPIO_DUT_Control(FALSE);
 			ZbGPIO_DUT_Switch(FALSE);
 			DSP28x_usDelay(RCUConfig.RCUTrigOffsetTicks);
+			ZbGPIO_SCOPE_Sync(TRUE);
+			DSP28x_usDelay(ScopeCurrentConfig.PreFallScopeSync);
 			ZbGPIO_DCU_Sync(FALSE);
 
 			TimeReverseStop = LOGIC_RealTimeCounter + FCROVU_SyncTime + OSV_ON_TIME_TICK;
@@ -267,16 +271,6 @@ void LOGIC_CacheVariables()
 	LOGIC_ExtDeviceState.CSU.Emulate	= DataTable[REG_EMULATE_CSU];
 	LOGIC_ExtDeviceState.SCOPE.Emulate	= DataTable[REG_EMULATE_SCOPE];
 
-	if(!LOGIC_ExtDeviceState.SCOPE.Emulate && MeasurementMode == MODE_QRR_ONLY)
-	{
-		Int16U ScopeCurrentScale = ((Int32U)Results[0].Irr * EP_SAFETY_FACTOR) / 100;
-
-		ScopeCurrentScaleResult = (Results[0].Irr < (EP_MIN_SCALE * 10)) ? EP_MIN_SCALE :
-			(ScopeCurrentScale > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrentScale;
-	}
-	DataTable[REG_DBG_READ_CURRENT_SCALE] = Results[0].Irr;
-	DataTable[REG_DBG_WRITE_CURRENT_SCALE] = ScopeCurrentScaleResult;
-
 	if(CacheUpdate)
 	{
 		TqFastThyristor = FALSE;
@@ -293,7 +287,8 @@ void LOGIC_CacheVariables()
 		DC_CurrentRiseRate = DataTable[REG_DCU_I_RISE_RATE];
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
-		ScopeCurrentScaleResult = DC_Current;
+		ScopeCurrentConfig.ScopeCurrentScaleResult = DC_Current;
+		PreFallScopeSync = DataTable[REG_PRE_FALL_SCOPE];
 		LOGIC_CorrFallRate(DC_NamberFallRate);
 		Ctrl2_Offset = DataTable[REG_CTRL2_OFFSET];
 		Ctrl2_K = DataTable[REG_CTRL2_K];
@@ -375,6 +370,8 @@ void LOGIC_CacheVariables()
 		}
 		CacheUpdate = FALSE;
 	}
+
+	LOGIC_PrepareScopeConfig(LOGIC_ExtDeviceState.SCOPE.Emulate, MeasurementMode, Results[0].Irr, PreFallScopeSync, &ScopeCurrentConfig);
 }
 // ----------------------------------------
 
@@ -764,7 +761,7 @@ void LOGIC_ConfigureSequence()
 
 							case CDS_None:
 								{
-									if(HLI_RS232_Write16(REG_SCOPE_CURRENT_AMPL, ScopeCurrentScaleResult))
+									if(HLI_RS232_Write16(REG_SCOPE_CURRENT_AMPL, ScopeCurrentConfig.ScopeCurrentScaleResult))
 										if(HLI_RS232_Write16(REG_SCOPE_MEASURE_MODE, MeasurementMode))
 											if(HLI_RS232_Write16(REG_SCOPE_TR_050_METHOD,
 													DataTable[REG_TRR_DETECTION_MODE]))
@@ -1386,12 +1383,33 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 		Config->I_P1 = I_To_Dac_P1;
 		Config->I_P2 = I_To_Dac_P2;
 
-		Int32U Ticks = ((Int32U)RCUTrigOffset * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
+		Int32U Ticks = ((Int32U)(RCUTrigOffset - PreFallScopeSync) * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
 		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
 	}
 	else
 		Config->RCUTrigOffsetTicks = 0;
 }
+// ----------------------------------------
+
+void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, Int16U PreFallScopeSync, pScopeConfig Config)
+{
+	if(!Emulation && MeasurementMode == MODE_QRR_ONLY)
+	{
+		Int16U ScopeCurrentScale = (ScopeCurrent * EP_SAFETY_FACTOR) / 100;
+
+		Config->ScopeCurrentScaleResult = (ScopeCurrentScale < (EP_MIN_SCALE * 10)) ? EP_MIN_SCALE :
+			(ScopeCurrentScale > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrentScale;
+
+		DataTable[REG_DBG_READ_CURRENT_SCALE] = ScopeCurrent;
+		DataTable[REG_DBG_WRITE_CURRENT_SCALE] = Config->ScopeCurrentScaleResult;
+	}
+	else
+		Config->ScopeCurrentScaleResult = DC_Current;
+
+	Int32U Ticks = ((Int32U)PreFallScopeSync * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
+			Config->PreFallScopeSync = (Ticks > 0) ? Ticks : 0;
+}
+
 // ----------------------------------------
 
 Int16U LOGIC_FindRCUTrigOffset(Int16U NamberFallRate)
