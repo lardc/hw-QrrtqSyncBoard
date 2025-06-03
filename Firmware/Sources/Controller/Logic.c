@@ -51,7 +51,7 @@ Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulatio
 void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset, Int16S I_To_V_Offset, Int16S I_To_V_K, Int16S I_To_V_K2,
 			Int16S Ctrl_Offset,	Int16S Ctrl_K, Int16S I_To_Dac_P0, Int16S I_To_Dac_P1, Int16S I_To_Dac_P2);
-void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, Int16U PreFallScopeSync, pScopeConfig Config);
+void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, pScopeConfig Config);
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
 Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate);
 Int16U LOGIC_FindFallRate(Int16U FallRate);
@@ -271,6 +271,8 @@ void LOGIC_CacheVariables()
 	LOGIC_ExtDeviceState.CSU.Emulate	= DataTable[REG_EMULATE_CSU];
 	LOGIC_ExtDeviceState.SCOPE.Emulate	= DataTable[REG_EMULATE_SCOPE];
 
+	LOGIC_PrepareScopeConfig(LOGIC_ExtDeviceState.SCOPE.Emulate, MeasurementMode, Results[0].Irr, &ScopeCurrentConfig);
+
 	if(CacheUpdate)
 	{
 		TqFastThyristor = FALSE;
@@ -288,7 +290,6 @@ void LOGIC_CacheVariables()
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
 		ScopeCurrentConfig.ScopeCurrentScaleResult = DC_Current;
-		PreFallScopeSync = DataTable[REG_PRE_FALL_SCOPE];
 		LOGIC_CorrFallRate(DC_NamberFallRate);
 		Ctrl2_Offset = DataTable[REG_CTRL2_OFFSET];
 		Ctrl2_K = DataTable[REG_CTRL2_K];
@@ -370,8 +371,6 @@ void LOGIC_CacheVariables()
 		}
 		CacheUpdate = FALSE;
 	}
-
-	LOGIC_PrepareScopeConfig(LOGIC_ExtDeviceState.SCOPE.Emulate, MeasurementMode, Results[0].Irr, PreFallScopeSync, &ScopeCurrentConfig);
 }
 // ----------------------------------------
 
@@ -1391,7 +1390,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 }
 // ----------------------------------------
 
-void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, Int16U PreFallScopeSync, pScopeConfig Config)
+void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, pScopeConfig Config)
 {
 	if(!Emulation && MeasurementMode == MODE_QRR_ONLY)
 	{
@@ -1406,7 +1405,7 @@ void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U 
 	else
 		Config->ScopeCurrentScaleResult = DC_Current;
 
-	Int32U Ticks = ((Int32U)PreFallScopeSync * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
+	Int32U Ticks = ((Int32U)DataTable[REG_PRE_FALL_SCOPE] * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
 			Config->PreFallScopeSync = (Ticks > 0) ? Ticks : 0;
 }
 
