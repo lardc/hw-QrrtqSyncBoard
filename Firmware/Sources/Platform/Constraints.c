@@ -74,15 +74,15 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, MAX_FALL_RATE, FALL_RATE_R8_DEF},									// 58
 											   {0, MAX_FALL_RATE, FALL_RATE_R9_DEF},									// 59
 											   {0, MAX_FALL_RATE, FALL_RATE_R10_DEF},									// 60
-											   {0, 0, 0},																// 61
-											   {0, 0, 0},																// 62
-											   {0, 0, 0},																// 63
-											   {0, 0, 0},																// 64
-											   {0, 0, 0},																// 65
-											   {0, 0, 0},																// 66
-											   {0, 0, 0},																// 67
-											   {0, 0, 0},																// 68
-											   {0, 0, 0},																// 69
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 61
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 62
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 63
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 64
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 65
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 66
+											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 67
+											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 68
+											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 69
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 70
 											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 71
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 72
@@ -107,33 +107,33 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 91
 											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 92
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 93
-											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 94
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 95
-											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 96
-											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 97
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 98
-											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 99
-											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 100
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 101
-											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 102
-											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 103
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 104
-											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 105
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 106
-											   {0, INT16U_MAX, I_TO_DAC_P0_DEF},										// 107
-											   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 108
-											   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 109
-											   {0, 0, 0},																// 110
-                                    		   {0, 0, 0},																// 111
-                                    		   {0, 0, 0},																// 112
-                                    		   {0, 0, 0},																// 113
-                                    		   {0, 0, 0},																// 114
-                                    		   {0, 0, 0},																// 115
-                                    		   {0, 0, 0},																// 116
-                                    		   {0, 0, 0},																// 117
-                                    		   {0, 0, 0},																// 118
-                                    		   {0, 0, 0},																// 119
-                                    		   {0, 0, 0},																// 120
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 94
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 95
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 96
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 97
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 98
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 99
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 100
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 101
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 102
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 103
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 104
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 105
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 106
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 107
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 108
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 109
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 110
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 111
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 112
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 113
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 114
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 115
+											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 116
+											   {0, INT16U_MAX, CTRL_K_DEF},												// 117
+											   {0, INT16U_MAX, I_TO_DAC_P0_DEF},										// 118
+											   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 119
+											   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 120
                                     		   {0, 0, 0},																// 121
                                     		   {0, 0, 0},																// 122
                                     		   {0, 0, 0},																// 123

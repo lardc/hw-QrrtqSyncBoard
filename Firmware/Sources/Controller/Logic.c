@@ -56,6 +56,7 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
 Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate);
 Int16U LOGIC_FindFallRate(Int16U FallRate);
 void LOGIC_CorrFallRate(Int16U NamberFallRate);
+void LOGIC_CorrRCUCurrent(Int16U NamberFallRate);
 Boolean LOGIC_UpdateDeviceState();
 Boolean LOGIC_UpdateDeviceStateErrReset();
 Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error);
@@ -290,11 +291,11 @@ void LOGIC_CacheVariables()
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
 		ScopeCurrentConfig.ScopeCurrentScaleResult = DC_Current;
+		// Correct Reg
 		LOGIC_CorrFallRate(DC_NamberFallRate);
+		LOGIC_CorrRCUCurrent(DC_NamberFallRate);
 		Ctrl2_Offset = DataTable[REG_CTRL2_OFFSET];
 		Ctrl2_K = DataTable[REG_CTRL2_K];
-		Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET];
-		Ctrl1_K = DataTable[REG_CTRL1_K];
 		I_To_Dac_P0 = DataTable[REG_I_TO_DAC_P0];
 		I_To_Dac_P1 = DataTable[REG_I_TO_DAC_P1];
 		I_To_Dac_P2 = DataTable[REG_I_TO_DAC_P2];
@@ -317,7 +318,7 @@ void LOGIC_CacheVariables()
 		if(MeasurementMode != MODE_QRR_ONLY)
 			DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 
-		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME) : (DC_CurrentZeroPoint * 2 + FALL_DOP_TIME);
+		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME + FALL_DOP_TIME) : (DC_CurrentZeroPoint * 2 + FALL_DOP_TIME);
 		RC_CurrentMaxPoint = (RC_CurrentMaxPoint > FALL_MIN_TIME) ? RC_CurrentMaxPoint : FALL_MIN_TIME;
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
@@ -686,7 +687,7 @@ void LOGIC_ConfigureSequence()
 						{
 							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
 								if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE, CROVU_VoltageRate))
-									if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_CSU_VOLTAGE, CSUVoltageSet))
+									if(CMN_StartVoltageCROVU(CSUVoltageSet))
 										if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
 											CROVU_StrartConfig = FALSE;
 						}
@@ -1394,10 +1395,9 @@ void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U 
 {
 	if(!Emulation && MeasurementMode == MODE_QRR_ONLY)
 	{
-		Int16U ScopeCurrentScale = (ScopeCurrent * EP_SAFETY_FACTOR) / 100;
-
-		Config->ScopeCurrentScaleResult = (ScopeCurrentScale < (EP_MIN_SCALE * 10)) ? EP_MIN_SCALE :
-			(ScopeCurrentScale > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrentScale;
+		ScopeCurrent = ScopeCurrent / 10;
+		Config->ScopeCurrentScaleResult = (ScopeCurrent < EP_MIN_SCALE) ? EP_MIN_SCALE :
+			(ScopeCurrent > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrent;
 
 		DataTable[REG_DBG_READ_CURRENT_SCALE] = ScopeCurrent;
 		DataTable[REG_DBG_WRITE_CURRENT_SCALE] = Config->ScopeCurrentScaleResult;
@@ -1600,6 +1600,73 @@ void LOGIC_CorrFallRate(Int16U NamberFallRate)
 }
 
 // ----------------------------------------
+void LOGIC_CorrRCUCurrent(Int16U NamberFallRate)
+{
+	switch(NamberFallRate)
+	{
+		case 0:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R0];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R0];
+			break;
+
+		case 1:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R1];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R1];
+			break;
+
+		case 2:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R2];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R2];
+			break;
+
+		case 3:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R3];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R3];
+			break;
+
+		case 4:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R4];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R4];
+			break;
+
+		case 5:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R5];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R5];
+			break;
+
+		case 6:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R6];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R6];
+			break;
+
+		case 7:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R7];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R7];
+			break;
+
+		case 8:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R8];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R8];
+			break;
+
+		case 9:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R9];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R9];
+			break;
+
+		case 10:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R10];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R10];
+			break;
+
+		default:
+			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R4];
+			Ctrl1_K = DataTable[REG_CTRL1_K_R4];
+			break;
+	}
+}
+
+// ----------------------------------------
 
 void LOGIC_GenerateSyncSequence()
 {
@@ -1620,4 +1687,7 @@ Int16U LOGIC_FCROVUOnSync(Int16U Delay)
 
 	return FCROVUTrigOffset;
 }
+// ----------------------------------------
+
+
 // ----------------------------------------
