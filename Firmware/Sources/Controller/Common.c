@@ -125,20 +125,6 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 }
 //-----------------------------
 
-Boolean CMN_StartVoltageCROVU(Int16U CSUVoltageSet)
-{
-	if(MeasurementMode == MODE_QRR_TQ)
-	{
-		if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_CSU_VOLTAGE, CSUVoltageSet));
-			return 1;
-	}
-	else
-	{
-	if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_CSU_VOLTAGE, 0));
-		return 1;
-	}
-}
-//-----------------------------
 void CMN_WaitNodesReadyPowerOn(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState)
 {

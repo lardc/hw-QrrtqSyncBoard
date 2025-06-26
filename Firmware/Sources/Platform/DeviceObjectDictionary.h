@@ -88,7 +88,6 @@
 #define REG_CSU_VOLTAGE_OFFSET		27	// Оффсет при пересчете напряжения CSU
 #define REG_UNIT_DRCU				28  // Количество блоков в комплексе
 //
-#define REG_PRE_FALL_SCOPE			29	// Сдвиг начала оцифровки относительно начала спада (в нс x10)
 #define REG_RCU_TOFFS_R0			30	// Сдвиг срабатывания синхронизации RCU при 0 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R1			31	// Сдвиг срабатывания синхронизации RCU при 1 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R2			32	// Сдвиг срабатывания синхронизации RCU при 2 скорости спада (в нс x10)
@@ -239,6 +238,7 @@
 #define REG_SLAVE_ERR				203	// Slave error
 #define REG_SLAVE_EXTDATA			204	// Slave call extended data
 //
+#define REG_RES_DUT_TRIG			209 //
 #define REG_RES_QRR					210	// Reverse recovery charge (in uC x100) (Calculation defined by GOST)
 #define REG_RES_IRR					211	// Reverse recovery current amplitude (in A x10)
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)

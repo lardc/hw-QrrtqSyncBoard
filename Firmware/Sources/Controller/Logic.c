@@ -31,7 +31,7 @@ volatile Int16U ResultsCounter, MeasurementMode;
 static Boolean MuteCROVU, MuteFCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
-static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate, PreFallScopeSync;
+static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
@@ -99,13 +99,11 @@ void LOGIC_RealTime()
 		// Start reverse current pulse and on-state voltage timer
 		if(LOGIC_StateRealTime == LSRT_DirectPulseReady && LOGIC_RealTimeCounter > TimeReverseStart)
 		{
-
 			ZbGPIO_RCU_Sync(TRUE);
+			ZbGPIO_SCOPE_Sync(TRUE);
 			ZbGPIO_DUT_Control(FALSE);
 			ZbGPIO_DUT_Switch(FALSE);
 			DSP28x_usDelay(RCUConfig.RCUTrigOffsetTicks);
-			ZbGPIO_SCOPE_Sync(TRUE);
-			DSP28x_usDelay(ScopeCurrentConfig.PreFallScopeSync);
 			ZbGPIO_DCU_Sync(FALSE);
 
 			TimeReverseStop = LOGIC_RealTimeCounter + FCROVU_SyncTime + OSV_ON_TIME_TICK;
@@ -318,7 +316,7 @@ void LOGIC_CacheVariables()
 		if(MeasurementMode != MODE_QRR_ONLY)
 			DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 
-		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME + FALL_DOP_TIME) : (DC_CurrentZeroPoint * 2 + FALL_DOP_TIME);
+		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME) : (DC_CurrentZeroPoint * 2 + FALL_DOP_TIME);
 		RC_CurrentMaxPoint = (RC_CurrentMaxPoint > FALL_MIN_TIME) ? RC_CurrentMaxPoint : FALL_MIN_TIME;
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
@@ -687,7 +685,7 @@ void LOGIC_ConfigureSequence()
 						{
 							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
 								if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE, CROVU_VoltageRate))
-									if(CMN_StartVoltageCROVU(CSUVoltageSet))
+									if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_CSU_VOLTAGE, CSUVoltageSet)) //if(CMN_StartVoltageCROVU(CSUVoltageSet))
 										if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
 											CROVU_StrartConfig = FALSE;
 						}
@@ -1383,7 +1381,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 		Config->I_P1 = I_To_Dac_P1;
 		Config->I_P2 = I_To_Dac_P2;
 
-		Int32U Ticks = ((Int32U)(RCUTrigOffset - PreFallScopeSync) * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
+		Int32U Ticks = ((Int32U)RCUTrigOffset  * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
 		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
 	}
 	else
@@ -1405,8 +1403,6 @@ void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U 
 	else
 		Config->ScopeCurrentScaleResult = DC_Current;
 
-	Int32U Ticks = ((Int32U)DataTable[REG_PRE_FALL_SCOPE] * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
-			Config->PreFallScopeSync = (Ticks > 0) ? Ticks : 0;
 }
 
 // ----------------------------------------

@@ -103,7 +103,7 @@ typedef struct __TableItemConstraint
 
 // CSU
 //
-#define CSU_VOLTAGE_MIN				100		// in V x10
+#define CSU_VOLTAGE_MIN				500		// in V x10
 #define CSU_VOLTAGE_MAX				1000	// in V x10
 #define CSU_VOLTAGE_DEF				900 	// in V x10
 
