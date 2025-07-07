@@ -1,4 +1,4 @@
-﻿// -----------------------------------------
+// -----------------------------------------
 // Logic controller
 // ----------------------------------------
 
@@ -267,12 +267,17 @@
 #define DS_SCOPE_IN_PROCESS			3
 //
 // Problems
-#define PROBLEM_SCOPE_NONE			0	// No problem
+#define PROBLEM_NONE				0	// No problem
 #define PROBLEM_SCOPE_CALC_IRR		1	// Problem calculating Irr
 #define PROBLEM_SCOPE_CALC_IRR_025	2	// Problem calculating 25% fraction Irr
 #define PROBLEM_SCOPE_CALC_IRR_090	3	// Problem calculating 90% fraction Irr
 #define PROBLEM_SCOPE_CALC_VZ		4	// Problem calculating V zero crossing
 #define PROBLEM_SCOPE_CALC_DIDT		5	// Problem calculating actual dIdt
+#define PROBLEM_MANUAL_STOP			6	// Requested manual stop of the measurement
+#define PROBLEM_NO_DIRECT_CURRENT	7	// No direct current
+#define PROBLEM_SCOPE_CALC_FAILED	8	// Calculations on scope node are failed
+#define PROBLEM_IRR_TO_HIGH			9	// Reverse current is too high
+#define PROBLEM_DEVICE_TRIGGERED	10	// Device remains in trigged state
 //
 // ----------------------------------------
 
@@ -329,11 +334,6 @@
 // WARNING CODES
 //
 #define WARNING_NONE				0
-#define WARNING_MANUAL_STOP			1	// Requested manual stop of the measurement
-#define WARNING_NO_DIRECT_CURRENT	2	// No direct current
-#define WARNING_SCOPE_CALC_FAILED	3	// Calculations on scope node are failed
-#define WARNING_IRR_TO_HIGH			4	// Reverse current is too high
-#define WARNING_DEVICE_TRIGGERED	5	// Device remains in trigged state
 #define WARNING_WATCHDOG_RESET		1001	// System has been reseted by WD
 
 // DISABLE CODES

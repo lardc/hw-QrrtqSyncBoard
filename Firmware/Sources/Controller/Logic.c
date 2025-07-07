@@ -1,4 +1,4 @@
-ï»¿// -----------------------------------------
+// -----------------------------------------
 // Main logic library
 // ----------------------------------------
 
@@ -77,7 +77,7 @@ void LOGIC_RealTime()
 			if (++LOGIC_DCReadyRetries > DC_READY_RETRIES_NUM)
 			{
 				DataTable[REG_DC_READY_RETRIES] = LOGIC_DCReadyRetries;
-				LOGIC_AbortMeasurement(WARNING_NO_DIRECT_CURRENT);
+				LOGIC_AbortMeasurement(PROBLEM_NO_DIRECT_CURRENT);
 			}
 		}
 
@@ -237,7 +237,7 @@ void LOGIC_CacheVariables()
 		QPU_CurrentZeroPoint = QPU_Current * 10 / QPU_CurrentFallRate;
 		QPU_CurrentZeroPoint = (QPU_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (QPU_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 
-		// Ð“Ñ€ÑÐ·Ð½Ñ‹Ð¹ Ð¿Ð°Ñ‚Ñ‡ Ð´Ð»Ñ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ð½Ð° Ð½Ð°Ð¿Ñ€ÑÐ¶ÐµÐ½Ð¸ÑÑ… Ð²Ñ‹ÑˆÐµ 1798Ð’ (Ð¿Ð¾ 899Ð’ Ð½Ð° ÑÑ‡ÐµÐ¹ÐºÑƒ)
+		// Ãðÿçíûé ïàò÷ äëÿ ðàáîòû íà íàïðÿæåíèÿõ âûøå 1798Â (ïî 899Â íà ÿ÷åéêó)
 		FCROVU_Voltage = (DataTable[REG_OFF_STATE_VOLTAGE] > 1798) ? 1798 : DataTable[REG_OFF_STATE_VOLTAGE];
 		FCROVU_VoltageRate = DataTable[REG_OSV_RATE];
 
@@ -873,13 +873,13 @@ void LOGIC_ReadDataSequence()
 																		CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_WRONG_STATE);
 																	}
 																	else if ((Register == OPRESULT_FAIL && Problem != PROBLEM_SCOPE_CALC_VZ) ||
-																			(Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ && !Results[ResultsCounter].DeviceTriggered))
+																			 (Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ && !Results[ResultsCounter].DeviceTriggered))
 																	{
-																		LOGIC_AbortMeasurement(WARNING_SCOPE_CALC_FAILED);
+																		LOGIC_AbortMeasurement(PROBLEM_SCOPE_CALC_FAILED);
 																	}
 																	else if (Results[ResultsCounter].Irr > QPU_Current)
 																	{
-																		LOGIC_AbortMeasurement(WARNING_IRR_TO_HIGH);
+																		LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
 																	}
 																	else
 																	{
@@ -908,7 +908,7 @@ void LOGIC_ReadDataSequence()
 
 																		DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
 																	}
-																}		
+																}
 					}
 					else
 					{
@@ -1001,9 +1001,9 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 	}
 
 	// In case of fail
-	if (LOGIC_PulseNumRemain == 0 && DeviceTriggered)
+	if (LOGIC_PulseNumRemain == 0 && DeviceTriggered && LOGIC_OperationResult != OPRESULT_FAIL)
 	{
-		DataTable[REG_WARNING] = WARNING_DEVICE_TRIGGERED;
+		DataTable[REG_PROBLEM] = PROBLEM_DEVICE_TRIGGERED;
 		LOGIC_OperationResult = OPRESULT_FAIL;
 	}
 }
@@ -1065,10 +1065,13 @@ void LOGIC_ResultToDataTable()
 }
 // ----------------------------------------
 
-void LOGIC_AbortMeasurement(Int16U WarningCode)
+void LOGIC_AbortMeasurement(Int16U ProblemCode)
 {
-	DataTable[REG_WARNING] = WarningCode;
-	LOGIC_OperationResult = OPRESULT_FAIL;
+	if(LOGIC_OperationResult != OPRESULT_FAIL)
+	{
+		DataTable[REG_PROBLEM] = ProblemCode;
+		LOGIC_OperationResult = OPRESULT_FAIL;
+	}
 	LOGIC_Halt();
 }
 // ----------------------------------------

@@ -1,4 +1,4 @@
-﻿// -----------------------------------------
+// -----------------------------------------
 // Controller logic
 // ----------------------------------------
 
@@ -181,22 +181,25 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_WARNING] = WARNING_NONE;
 	DataTable[REG_FAULT_REASON_EXT] = 0;
 	DataTable[REG_PULSES_COUNTER] = 0;
-	//
+
 	DataTable[REG_LOGIC_STATE] = 0;
-	//
+
 	DataTable[REG_SLAVE_DEVICE] = 0;
 	DataTable[REG_SLAVE_FUNC] = 0;
 	DataTable[REG_SLAVE_ERR] = 0;
 	DataTable[REG_SLAVE_EXTDATA] = 0;
-	//
-	DataTable[REG_DC_READY_RETRIES] = 0;
 
+	DataTable[REG_PROBLEM] = PROBLEM_NONE;
 	DataTable[REG_FINISHED] = OPRESULT_NONE;
+
 	DataTable[REG_RES_QRR] = 0;
 	DataTable[REG_RES_IRR] = 0;
 	DataTable[REG_RES_TRR] = 0;
 	DataTable[REG_RES_TQ] = 0;
 	DataTable[REG_RES_IDC] = 0;
+	DataTable[REG_RES_DIDT] = 0;
+	DataTable[REG_RES_QRR_INT] = 0;
+	DataTable[REG_DC_READY_RETRIES] = 0;
 
 	DataTable[REG_EP_ELEMENT_FRACT] = 0;
 	DataTable[REG_EP_STEP_FRACT_CNT] = 0;
@@ -286,9 +289,13 @@ void CONTROL_SubProcessStateMachine()
 		{
 			if (LOGIC_GetPulsesRemain() == 0)
 			{
-				LOGIC_ResultToDataTable();
-				DataTable[REG_FINISHED] = LOGIC_GetOpResult();
 				CONTROL_SwitchToReady();
+
+				Int16U OpResult = LOGIC_GetOpResult();
+				DataTable[REG_FINISHED] = OpResult;
+
+				if(OpResult == OPRESULT_OK)
+					LOGIC_ResultToDataTable();
 			}
 			else
 			{
@@ -346,7 +353,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 
 		case ACT_STOP:
 			{
-				LOGIC_AbortMeasurement(WARNING_MANUAL_STOP);
+				LOGIC_AbortMeasurement(PROBLEM_MANUAL_STOP);
 				CONTROL_SwitchToReady();
 			}
 			break;
