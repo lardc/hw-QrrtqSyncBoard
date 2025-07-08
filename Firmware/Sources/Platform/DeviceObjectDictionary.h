@@ -83,10 +83,11 @@
 #define REG_DCU_CURRENT_PER_UNIT	22	// Максимальный ток DCU на блок (в А)
 #define REG_RCU_CURRENT_PER_UNIT	23	// Максимальный ток RCU на блок (в А)
 #define REG_RCU_DEF_FALL_RATE		24	// Скорость спада тока RCU на блок (в А/мкс х10)
-#define REG_DCU_I_RISE_RATE			25	// Скорость нарастания тока в DCU (в А/мкс x10)
+#define REG_RCU_SYNC_WIDTH			25	// Длина импульса синхронизации RCU
 #define REG_GATE_DRV_TURNON_DELAY	26	// Задержка формирования импульса управления (в мкс)
 #define REG_CSU_VOLTAGE_OFFSET		27	// Оффсет при пересчете напряжения CSU
 #define REG_UNIT_DRCU				28  // Количество блоков в комплексе
+#define REG_SCOPE_TRIG				29	// Тригер отпирания прибора с QSU
 //
 #define REG_RCU_TOFFS_R0			30	// Сдвиг срабатывания синхронизации RCU при 0 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R1			31	// Сдвиг срабатывания синхронизации RCU при 1 скорости спада (в нс x10)
@@ -106,6 +107,11 @@
 #define REG_FCROVU_TOFFS_50			43	// Сдвиг срабатывания синхронизации FCROVU при 50В/мкс
 #define REG_FCROVU_TOFFS_100		44	// Сдвиг срабатывания синхронизации FCROVU при 100В/мкс
 #define REG_FCROVU_TOFFS_200		45	// Сдвиг срабатывания синхронизации FCROVU при 200В/мкс
+//
+#define REG_TQ_TOFFS_20				46	// Оффсет задания Tq при 20В/мкс
+#define REG_TQ_TOFFS_50				47	// Оффсет задания Tq при 50В/мкс
+#define REG_TQ_TOFFS_100			48	// Оффсет задания Tq при 100В/мкс
+#define REG_TQ_TOFFS_200			49	// Оффсет задания Tq при 200В/мкс
 //
 #define REG_FALL_RATE_R0			50 	// Фактическая скорость спада при 0 скорости спада комплекса (в А/мкс x10)
 #define REG_FALL_RATE_R1			51 	// Фактическая скорость спада при 1 скорости спада комплекса (в А/мкс x10)
@@ -189,8 +195,8 @@
 #define REG_MODE					128	// Measurement mode
 #define REG_DIRECT_CURRENT			129	// Direct current amplitude (in A)
 #define REG_DCU_PULSE_WIDTH			130	// Direct current pulse duration (in us)
-#define REG_RCU_SYNC_WIDTH			131	// Длина импульса синхронизации RCU
-#define REG_CURRENT_FALL_RATE		132 // Direct current fall rate (in A/us x10)
+#define REG_DCU_I_RISE_RATE			131	// Скорость нарастания тока в DCU (в А/мкс x10)
+#define REG_CURRENT_FALL_RATE		132 // Direct current fall rate (in Namber)
 #define REG_OFF_STATE_VOLTAGE		133 // Off-state voltage (in V)
 #define REG_OSV_RATE				134 // Off-state voltage rise rate (in V/us)
 #define REG_TRIG_TIME				135	// Time to apply on-state voltage in single-pulse mode (in us)
@@ -337,6 +343,7 @@
 #define REG_SCOPE_CURRENT_AMPL		128	// Current amplitude (in A)
 #define REG_SCOPE_MEASURE_MODE		129	// Select sampling mode (Qrr or Qrr-tq)
 #define REG_SCOPE_TR_050_METHOD		130	// Use 50% level of Irr to detect tr time
+#define REG_SCOPE_VOLTAGE_AMPL		131	// Voltage amplitude (in V)
 //
 // Results
 #define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A x10)

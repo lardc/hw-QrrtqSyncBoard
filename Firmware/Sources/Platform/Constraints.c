@@ -38,11 +38,11 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, DRCU_CURRENT_MAX, 0},												// 22
 											   {0, DRCU_CURRENT_MAX, 0},												// 23
 											   {0, 0, 0},																// 24
-											   {0, DCU_I_RISE_RATE_MAX, DCU_I_RISE_RATE_DEF},							// 25
+											   {IRC_SYNC_WIDTH_MIN, IRC_SYNC_WIDTH_MAX, IRC_SYNC_WIDTH_DEF},			// 25
 											   {0, MAX_GATE_DRV_TURN_ON_DELAY, 0},										// 26
 											   {0, INT16U_MAX, 0},														// 27
 											   {0, MAX_UNIT_DRCU, DEF_UNIT_DRCU},										// 28
-											   {0, 0, 0},																// 29
+											   {NO, YES, NO},															// 29
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 30
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 31
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 32
@@ -59,10 +59,10 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 43
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 44
 											   {0, MAX_FCROVU_TRIG_OFFSET, 0},											// 45
-											   {0, 0, 0},																// 46
-											   {0, 0, 0},																// 47
-											   {0, 0, 0},																// 48
-											   {0, 0, 0},																// 49
+											   {0, MAX_TQ_OFFSET, 0},													// 46
+											   {0, MAX_TQ_OFFSET, 0},													// 47
+											   {0, MAX_TQ_OFFSET, 0},													// 48
+											   {0, MAX_TQ_OFFSET, 0},													// 49
 											   {0, MAX_FALL_RATE, FALL_RATE_R0_DEF},									// 50
 											   {0, MAX_FALL_RATE, FALL_RATE_R1_DEF},									// 51
 											   {0, MAX_FALL_RATE, FALL_RATE_R2_DEF},									// 52
@@ -148,7 +148,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
                                     		   {MODE_QRR_ONLY, MODE_DVDT_ONLY, MODE_QRR_ONLY},							// 128
 											   {DIRECT_CURRENT_MIN, DIRECT_CURRENT_MAX, DIRECT_CURRENT_DEF},			// 129
 											   {IDC_PULSE_WIDTH_MIN, IDC_PULSE_WIDTH_MAX, IDC_PULSE_WIDTH_DEF},			// 130
-											   {IRC_SYNC_WIDTH_MIN, IRC_SYNC_WIDTH_MAX, IRC_SYNC_WIDTH_DEF},			// 131
+											   {0, DCU_I_RISE_RATE_MAX, DCU_I_RISE_RATE_DEF},							// 131
 											   {REVERSE_RATE_MIN, REVERSE_RATE_MAX, REVERSE_RATE_DEF},					// 132
 											   {OS_VOLATGE_MIN, OS_VOLATGE_MAX, OS_VOLATGE_DEF},						// 133
 											   {OSV_RATE_MIN, OSV_RATE_MAX, OSV_RATE_DEF},								// 134

@@ -23,6 +23,8 @@
 #define EP_MAX_SCALE					3200	// А
 #define EP_COUNT						12
 #define VALUES_x_SIZE					2000
+
+#define VD_HYST							100 	// in V
 //
 #define	SCCI_MASTER_TIMEOUT_TICKS_MS	500		// in ms
 #define	SCCI_SLAVE_TIMEOUT_TICKS_MS		100		// in ms
@@ -36,8 +38,8 @@
 #define TIMEOUT_HL_LOGIC_SHORT			2000	// in ms
 //
 #define UNIT_PULSE_TO_PULSE_FAST		700		// in ms
-#define UNIT_PULSE_TO_PULSE_PAUSE		1500	// in ms
-#define UNIT_PULSE_TO_PULSE_LONG		5000	// in ms
+#define UNIT_PULSE_TO_PULSE_PAUSE		500		// in ms
+#define UNIT_PULSE_TO_PULSE_LONG		1400	// in ms
 //
 #define DELAY_COMMUTATION				500		// in ms
 //--------------------------------------------------------
@@ -66,7 +68,6 @@
 #define FALL_MIN_TIME					10		// in us
 #define TQ_MAX_TIME						1000	// in us
 #define TQ_FIRST_PROBE					100		// in us
-#define TQ_ZERO_OFFSET					3		// in us
 //
 #define OSV_ON_TIME						200	// in us
 #define OSV_ON_TIME_TICK				(OSV_ON_TIME / TIMER2_PERIOD)

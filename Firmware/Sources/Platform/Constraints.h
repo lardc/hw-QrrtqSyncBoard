@@ -37,6 +37,8 @@ typedef struct __TableItemConstraint
 #define MAX_FCROVU_TRIG_OFFSET		500
 
 // in us
+#define MAX_TQ_OFFSET				15
+
 #define TQ_SINGLE_PULSE_MIN			3
 #define TQ_SINGLE_PULSE_MAX			1000
 #define TQ_SINGLE_PULSE_DEF			100
@@ -54,7 +56,7 @@ typedef struct __TableItemConstraint
 #define DIRECT_CURRENT_MAX			3300	// in A
 #define DIRECT_CURRENT_DEF			300		// in A
 
-#define IDC_PULSE_WIDTH_MIN			500		// in us
+#define IDC_PULSE_WIDTH_MIN			100		// in us
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
 #define IDC_PULSE_WIDTH_DEF			2000	// in us
 

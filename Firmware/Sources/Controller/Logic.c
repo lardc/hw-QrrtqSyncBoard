@@ -19,7 +19,7 @@
 //
 volatile DeviceSubState LOGIC_StateRealTime = LSRT_None;
 volatile Int32U LOGIC_RealTimeCounter = 0;
-volatile Int32U FCROVUTrigOffset = 0, CROVU_SyncTime = 0, FCROVU_SyncTime = 0;
+volatile Int32U FCROVUTrigOffset = 0, TQ_ZeroOffset = 0, CROVU_SyncTime = 0, FCROVU_SyncTime = 0;
 static volatile Int64U Timeout;
 static volatile Int64U CSU_FanTimeout;
 volatile LogicState LOGIC_State = LS_None;
@@ -54,6 +54,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, pScopeConfig Config);
 Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
 Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate);
+Int16U LOGIC_FindTQZeroOffset(Int16U RiseRate);
 Int16U LOGIC_FindFallRate(Int16U FallRate);
 void LOGIC_CorrFallRate(Int16U NamberFallRate);
 void LOGIC_CorrRCUCurrent(Int16U NamberFallRate);
@@ -284,7 +285,7 @@ void LOGIC_CacheVariables()
 		MuteFCROVU = MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
 		
 		DC_Current = DataTable[REG_DIRECT_CURRENT];
-		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] / TIMER2_PERIOD;
+		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] /(2 * TIMER2_PERIOD);
 		DC_CurrentRiseRate = DataTable[REG_DCU_I_RISE_RATE];
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
@@ -312,14 +313,17 @@ void LOGIC_CacheVariables()
 				DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2,
 					Ctrl1_Offset, Ctrl1_K, 0, 0, 0);
 
+		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
+		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
+		TQ_ZeroOffset = LOGIC_FindTQZeroOffset(CROVU_VoltageRate);
+
 		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit));
 		if(MeasurementMode != MODE_QRR_ONLY)
-			DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (DC_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
+			DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZeroOffset) ? (DC_CurrentZeroPoint - TQ_ZeroOffset) : 0;
 
 		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME) : (DC_CurrentZeroPoint * 2 + FALL_DOP_TIME);
 		RC_CurrentMaxPoint = (RC_CurrentMaxPoint > FALL_MIN_TIME) ? RC_CurrentMaxPoint : FALL_MIN_TIME;
-		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
-		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
+
 		FCROVU_SyncTime = (CROVU_Voltage / DataTable[REG_OSV_RATE] + PRE_PROBE_TIME_US_CROVU) / TIMER2_PERIOD;
 		CROVU_SyncTime = CROVU_Voltage / DataTable[REG_OSV_RATE] + PRE_PROBE_TIME_US_CROVU;
 
@@ -685,7 +689,7 @@ void LOGIC_ConfigureSequence()
 						{
 							if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_DESIRED_VOLTAGE, CROVU_Voltage))
 								if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_VOLTAGE_RATE, CROVU_VoltageRate))
-									if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_CSU_VOLTAGE, CSUVoltageSet)) //if(CMN_StartVoltageCROVU(CSUVoltageSet))
+									if(HLI_CAN_Write16(DataTable[REG_CROVU_NODE_ID], REG_CROVU_CSU_VOLTAGE, CSUVoltageSet))
 										if(HLI_CAN_CallAction(DataTable[REG_CROVU_NODE_ID], ACT_CROVU_APPLY_SETTINGS))
 											CROVU_StrartConfig = FALSE;
 						}
@@ -763,8 +767,9 @@ void LOGIC_ConfigureSequence()
 										if(HLI_RS232_Write16(REG_SCOPE_MEASURE_MODE, MeasurementMode))
 											if(HLI_RS232_Write16(REG_SCOPE_TR_050_METHOD,
 													DataTable[REG_TRR_DETECTION_MODE]))
-												if(HLI_RS232_CallAction(ACT_SCOPE_START_TEST))
-													LOGIC_State = LS_CFG_WaitStates;
+												if(HLI_RS232_Write16(REG_SCOPE_VOLTAGE_AMPL, DataTable[REG_OFF_STATE_VOLTAGE]))
+													if(HLI_RS232_CallAction(ACT_SCOPE_START_TEST))
+														LOGIC_State = LS_CFG_WaitStates;
 								}
 								break;
 						}
@@ -921,7 +926,8 @@ void LOGIC_ReadDataSequence()
 									else
 									{
 										LOGIC_State = LS_READ_FCROVU;
-										Results[ResultsCounter].DeviceTriggered = (Register == OPRESULT_OK) ? FALSE : TRUE;
+										if(!DataTable[REG_SCOPE_TRIG])
+											Results[ResultsCounter].DeviceTriggered = (Register == OPRESULT_OK) ? FALSE : TRUE;
 									}
 								}
 								break;
@@ -1037,6 +1043,13 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt);
 							Results[ResultsCounter].Qrr = ((Int32U)Qrr32b << 16) | Qrr;
 
+							if(DataTable[REG_SCOPE_TRIG])
+							{
+								Results[ResultsCounter].DeviceTriggered = ((Results[ResultsCounter].Vd - VD_HYST) < CROVU_Voltage) &&
+										((Results[ResultsCounter].Vd + VD_HYST) > CROVU_Voltage) ? FALSE : TRUE;
+								DataTable[REG_DBG] = Results[ResultsCounter].Vd;
+								DataTable[REG_DBG2] = Results[ResultsCounter].DeviceTriggered;
+							}
 							if(!Result)
 							{
 								LOGIC_State = LS_Error;
@@ -1242,7 +1255,7 @@ void LOGIC_ResultToDataTable()
 			DataTable[REG_RES_VD] = Results[ResultsCounter - 1].Vd;
 
 		case MODE_QRR_ONLY:
-			CalcQrr = (Irr * Trr) >> 1;
+			CalcQrr = (Irr * (Trr / 10)) >> 1;
 			DataTable[REG_RES_QRR] = CalcQrr & 0xFFFF;
 			DataTable[REG_RES_QRR_32B] = CalcQrr >> 16;
 			DataTable[REG_RES_IRR] = Irr;
@@ -1469,6 +1482,28 @@ Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate)
 
 		default:
 			return DataTable[REG_FCROVU_TOFFS_20];
+	}
+}
+// ----------------------------------------
+
+Int16U LOGIC_FindTQZeroOffset(Int16U RiseRate)
+{
+	switch(RiseRate)
+	{
+		case 200:
+			return DataTable[REG_TQ_TOFFS_20];
+
+		case 500:
+			return DataTable[REG_TQ_TOFFS_50];
+
+		case 1000:
+			return DataTable[REG_TQ_TOFFS_100];
+
+		case 2000:
+			return DataTable[REG_TQ_TOFFS_200];
+
+		default:
+			return DataTable[REG_TQ_TOFFS_20];
 	}
 }
 // ----------------------------------------
