@@ -9,6 +9,7 @@
 //
 #include "ZbBoard.h"
 #include "DeviceObjectDictionary.h"
+#include "FirmwareInfo.h"
 
 
 // Constants
@@ -75,5 +76,17 @@ void DT_ResetWRPart(FUNC_SetDefaultValues SetFunc)
 	if(SetFunc)
 		SetFunc();
 }
+// ----------------------------------------
 
-// No more.
+void DT_SaveFirmwareInfo(Int16U SlaveNID, Int16U MasterNID)
+{
+	if(DATA_TABLE_SIZE > REG_FWINFO_STR_BEGIN)
+	{
+		DataTable[REG_FWINFO_SLAVE_NID] = SlaveNID;
+		DataTable[REG_FWINFO_MASTER_NID] = MasterNID;
+
+		DataTable[REG_FWINFO_STR_LEN] = FWINF_Compose((pInt16U)(&DataTable[REG_FWINFO_STR_BEGIN]),
+				(DATA_TABLE_SIZE - REG_FWINFO_STR_BEGIN) * 2);
+	}
+}
+// ----------------------------------------
