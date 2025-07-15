@@ -244,6 +244,11 @@
 #define REG_SLAVE_ERR				203	// Slave error
 #define REG_SLAVE_EXTDATA			204	// Slave call extended data
 //
+// 205 - 206
+//
+#define REG_RES_TS				    207 // Time ts
+#define REG_RES_TF				    208 // Time tf
+//
 #define REG_RES_DUT_TRIG			209 //
 #define REG_RES_QRR					210	// Reverse recovery charge (in uC x100) (Calculation defined by GOST)
 #define REG_RES_IRR					211	// Reverse recovery current amplitude (in A x10)
@@ -355,6 +360,8 @@
 #define REG_SCOPE_RESULT_IDC		207	// Actual value of Idc (in A)
 #define REG_SCOPE_RESULT_VD			208	// Actual value of Vd (in V)
 #define REG_SCOPE_RESULT_QRR_32B	209	// Reverse recovery charge (in uQ x10) 32bit part
+#define REG_SCOPE_RESULT_TS		    210 // Time ts
+#define REG_SCOPE_RESULT_TF		    211 // Time tf
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step

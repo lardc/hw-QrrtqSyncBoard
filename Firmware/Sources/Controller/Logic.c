@@ -1039,6 +1039,8 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IDC, &Results[ResultsCounter].Idc);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VD, &Results[ResultsCounter].Vd);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TS, &Results[ResultsCounter].ts);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TF, &Results[ResultsCounter].tf);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt);
 							Results[ResultsCounter].Qrr = ((Int32U)Qrr32b << 16) | Qrr;
@@ -1223,7 +1225,7 @@ void LOGIC_LogData(MeasurementResult Result)
 void LOGIC_ResultToDataTable()
 {
 	Int16U i, AvgCounter = 0;
-	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, Idc, dIdt, Irr, Trr, CalcQrr;
+	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0,  AvgTs = 0, AvgTf = 0, Idc, dIdt, Irr, Trr, CalcQrr, ts, tf;
 
 	// Значения Idc и dIdt берется из первого формирования
 	Idc = Results[0].Idc;
@@ -1231,11 +1233,13 @@ void LOGIC_ResultToDataTable()
 
 	for(i = CacheSinglePulse ? 0 : 1; i < ResultsCounter; ++i)
 	{
-		if(Results[i].Irr && Results[i].Trr && Results[i].Qrr)
+		if(Results[i].Irr && Results[i].Trr && Results[i].Qrr && Results[i].ts && Results[i].tf)
 		{
 			AvgIrr += Results[i].Irr;
 			AvgTrr += Results[i].Trr;
 			AvgQrr += Results[i].Qrr;
+			AvgTs += Results[i].ts;
+			AvgTf += Results[i].tf;
 
 			++AvgCounter;
 		}
@@ -1247,6 +1251,9 @@ void LOGIC_ResultToDataTable()
 	
 	Trr = AvgTrr / AvgCounter;
 	Irr = AvgIrr / AvgCounter;
+
+	ts = AvgTs / AvgCounter;
+	tf = AvgTf / AvgCounter;
 	
 	switch(MeasurementMode)
 	{
@@ -1262,6 +1269,8 @@ void LOGIC_ResultToDataTable()
 			DataTable[REG_RES_TRR] = Trr;
 			DataTable[REG_RES_IDC] = Idc;
 			DataTable[REG_RES_DIDT] = dIdt;
+			DataTable[REG_RES_TS] = ts;
+			DataTable[REG_RES_TF] = tf;
 			AvgQrr /= AvgCounter;
 			DataTable[REG_RES_QRR_INT] = AvgQrr & 0xFFFF;
 			DataTable[REG_RES_QRR_INT_32B] = AvgQrr >> 16;
