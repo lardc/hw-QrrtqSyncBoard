@@ -285,7 +285,6 @@ void LOGIC_CacheVariables()
 		MuteFCROVU = MuteCROVU = (MeasurementMode == MODE_QRR_ONLY) ? TRUE : FALSE;
 		
 		DC_Current = DataTable[REG_DIRECT_CURRENT];
-		DC_CurrentPlateTicks = DataTable[REG_DCU_PULSE_WIDTH] /(2 * TIMER2_PERIOD);
 		DC_CurrentRiseRate = DataTable[REG_DCU_I_RISE_RATE];
 		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
 		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
@@ -335,6 +334,8 @@ void LOGIC_CacheVariables()
 				((DC_Current / DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
 						(DC_Current / DC_CurrentRiseRate / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
 		
+		DC_CurrentPlateTicks = (DataTable[REG_DCU_PULSE_WIDTH] - DC_TIME_DRU - LOGIC_DriverOffTicks) / TIMER2_PERIOD;
+
 		if(LOGIC_StateRealTime == LSRT_WaitForConfig)
 		{
 			if(MeasurementMode == MODE_QRR_ONLY)
@@ -346,6 +347,9 @@ void LOGIC_CacheVariables()
 				}
 				else
 				{
+					if(DataTable[REG_CALIBRATION_PROCESS])
+						LOGIC_PulseNumRemain = QRR_CAL_COUNTER;
+					else
 					LOGIC_PulseNumRemain = QRR_AVG_COUNTER;
 					CROVU_TrigTime = RC_CurrentMaxPoint;
 				}

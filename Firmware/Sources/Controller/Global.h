@@ -61,7 +61,8 @@
 //--------------------------------------------------------
 #define UNIT_TQ_MEASURE_PULSES			11		// (in pulses) + 1
 #define UNIT_TQ_EXTRA_PULSES			15		// in pulses
-#define QRR_AVG_COUNTER					3		// in pulses
+#define QRR_AVG_COUNTER					4		// in pulses
+#define QRR_CAL_COUNTER					2		// in pulses
 #define UNIT_MAX_NUM_OF_PULSES			(UNIT_TQ_MEASURE_PULSES + UNIT_TQ_EXTRA_PULSES)	// in pulses
 #define FALL_MAX_TIME					300		// in us
 #define FALL_DOP_TIME					100		// in us
@@ -75,6 +76,8 @@
 #define DC_READY_TIMEOUT_DELAY			5000	// in us
 #define DC_READY_TIMEOUT_TICK			(DC_READY_TIMEOUT_DELAY / TIMER2_PERIOD)
 #define DC_DRIVER_OFF_DELAY_MIN			200		// in us
+
+#define DC_TIME_DRU						100		// in us
 //
 #define RT_DATA_READ_DELAY				500000	// in us
 #define RT_DATA_READ_DELAY_TICK			(RT_DATA_READ_DELAY / TIMER2_PERIOD)
