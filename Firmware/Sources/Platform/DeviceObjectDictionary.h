@@ -246,8 +246,8 @@
 //
 // 205 - 206
 //
-#define REG_RES_TS				    207 // Time ts
-#define REG_RES_TF				    208 // Time tf
+#define REG_RES_TS				    207	// Time ts (in us)
+#define REG_RES_TF				    208	// Time tf (in us)
 //
 #define REG_RES_DUT_TRIG			209 //
 #define REG_RES_QRR					210	// Reverse recovery charge (in uC x100) (Calculation defined by GOST)
