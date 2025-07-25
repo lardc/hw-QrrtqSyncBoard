@@ -349,6 +349,7 @@
 #define REG_SCOPE_MEASURE_MODE		129	// Select sampling mode (Qrr or Qrr-tq)
 #define REG_SCOPE_TR_050_METHOD		130	// Use 50% level of Irr to detect tr time
 #define REG_SCOPE_VOLTAGE_AMPL		131	// Voltage amplitude (in V)
+#define REG_SCOPE_DC_FALL_RATE		132	// Current fall rate
 //
 // Results
 #define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A x10)
