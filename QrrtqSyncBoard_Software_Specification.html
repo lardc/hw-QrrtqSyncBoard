@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QrrtqSyncBoard Software Specification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #e3f2fd;
+        }
+        .git-info {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #27ae60;
+        }
+        .notes {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .notes ul {
+            margin: 10px 0;
+        }
+        .notes li {
+            margin: 5px 0;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QrrtqSyncBoard Software Specification</h1>
+
+        <div class="section">
+            <h2>1. Firmware Description</h2>
+            <p>The QrrtqSyncBoard firmware is a specialized measurement system designed for testing semiconductor devices, specifically for reverse recovery charge (Qrr) measurements. The system coordinates multiple hardware modules including DCU (Direct Current Units), RCU (Reverse Current Units), CROVU/FCROVU (Current/Voltage measurement units), CSU (Control and Supply Unit), and SCOPE (high-speed oscilloscope) to perform precise electrical characterization of power semiconductor devices. The firmware manages synchronized pulse generation, real-time data acquisition, and measurement result processing according to GOST standards.</p>
+            
+            <div class="git-info">
+                <strong>Git Information:</strong><br>
+                - Branch: develop-PCBv2.0-MME016<br>
+                - Commit: 8179ebeffb223f18a5be92eadae4d1b551c95010
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2. Writable Registers</h2>
+            
+            <h3>Device Identification & Configuration</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>REG_EMULATE_CROVU</td>
+                        <td>uint16</td>
+                        <td>Enable CROVU emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>CROVU emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>CROVU emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>REG_EMULATE_FCROVU</td>
+                        <td>uint16</td>
+                        <td>Enable FCROVU emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>FCROVU emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>FCROVU emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>REG_EMULATE_DCU1</td>
+                        <td>uint16</td>
+                        <td>Enable DCU1 emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>DCU1 emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>DCU1 emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>REG_EMULATE_DCU2</td>
+                        <td>uint16</td>
+                        <td>Enable DCU2 emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>DCU2 emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>DCU2 emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>REG_EMULATE_DCU3</td>
+                        <td>uint16</td>
+                        <td>Enable DCU3 emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>DCU3 emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>DCU3 emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>REG_EMULATE_RCU1</td>
+                        <td>uint16</td>
+                        <td>Enable RCU1 emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>RCU1 emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>RCU1 emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>REG_EMULATE_RCU2</td>
+                        <td>uint16</td>
+                        <td>Enable RCU2 emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>RCU2 emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>RCU2 emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>REG_EMULATE_RCU3</td>
+                        <td>uint16</td>
+                        <td>Enable RCU3 emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>RCU3 emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>RCU3 emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>REG_EMULATE_SCOPE</td>
+                        <td>uint16</td>
+                        <td>Enable SCOPE emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>SCOPE emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>SCOPE emulation enabled</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>REG_EMULATE_CSU</td>
+                        <td>uint16</td>
+                        <td>Enable CSU emulation</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>CSU emulation disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>CSU emulation enabled</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>CAN Node Configuration</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>10</td>
+                        <td>REG_CROVU_NODE_ID</td>
+                        <td>uint16</td>
+                        <td>CROVU CAN node ID</td>
+                        <td>0-255</td>
+                        <td>0 to MAX_NODE_ID</td>
+                        <td>CAN bus node identifier</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>REG_FCROVU_NODE_ID</td>
+                        <td>uint16</td>
+                        <td>FCROVU CAN node ID</td>
+                        <td>0-255</td>
+                        <td>0 to MAX_NODE_ID</td>
+                        <td>CAN bus node identifier</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>REG_DCU1_NODE_ID</td>
+                        <td>uint16</td>
+                        <td>DCU1 CAN node ID</td>
+                        <td>0-255</td>
+                        <td>0 to MAX_NODE_ID</td>
+                        <td>CAN bus node identifier</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>REG_DCU2_NODE_ID</td>
+                        <td>uint16</td>
+                        <td>DCU2 CAN node ID</td>
+                        <td>0-255</td>
+                        <td>0 to MAX_NODE_ID</td>
+                        <td>CAN bus node identifier</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>REG_DCU3_NODE_ID</td>
+                        <td>uint16</td>
+                        <td>DCU3 CAN node ID</td>
+                        <td>0-255</td>
+                        <td>0 to MAX_NODE_ID</td>
+                        <td>CAN bus node identifier</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>REG_RCU1_NODE_ID</td>
+                        <td>uint16</td>
+                        <td>RCU1 CAN node ID</td>
+                        <td>0-255</td>
+                        <td>0 to MAX_NODE_ID</td>
+                        <td>CAN bus node identifier</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>REG_RCU2_NODE_ID</td>
+                        <td>uint16</td>
+                        <td>RCU2 CAN node ID</td>
+                        <td>0-255</td>
+                        <td>0 to MAX_NODE_ID</td>
+                        <td>CAN bus node identifier</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>REG_RCU3_NODE_ID</td>
+                        <td>uint16</td>
+                        <td>RCU3 CAN node ID</td>
+                        <td>0-255</td>
+                        <td>0 to MAX_NODE_ID</td>
+                        <td>CAN bus node identifier</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>System Control</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>18</td>
+                        <td>REG_RR_STOP_RCU_EN</td>
+                        <td>uint16</td>
+                        <td>Enable RCU stop at reverse recovery point</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>RCU stop control disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>RCU stop control enabled</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>REG_RR_STOP_RCU_DELAY</td>
+                        <td>uint16</td>
+                        <td>Delay before RCU stop (μs)</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_RCU_STOP_DELAY</td>
+                        <td>Stop delay timing</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>REG_SAFETY_EN</td>
+                        <td>uint16</td>
+                        <td>Safety enable</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>Safety system disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>Safety system enabled</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Calibration Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>21</td>
+                        <td>REG_CSU_VOLTAGE_K</td>
+                        <td>uint16</td>
+                        <td>CSU voltage coefficient</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_VOLTAGE_COEFF</td>
+                        <td>Voltage calibration factor</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>REG_DCU_CURRENT_PER_UNIT</td>
+                        <td>uint16</td>
+                        <td>Max DCU current per unit (A)</td>
+                        <td>0-1100</td>
+                        <td>0 to DRCU_CURRENT_MAX</td>
+                        <td>Maximum current per DCU unit</td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>REG_RCU_CURRENT_PER_UNIT</td>
+                        <td>uint16</td>
+                        <td>Max RCU current per unit (A)</td>
+                        <td>0-1100</td>
+                        <td>0 to DRCU_CURRENT_MAX</td>
+                        <td>Maximum current per RCU unit</td>
+                    </tr>
+                    <tr>
+                        <td>24</td>
+                        <td>REG_RCU_DEF_FALL_RATE</td>
+                        <td>uint16</td>
+                        <td>RCU default fall rate (A/μs ×10)</td>
+                        <td>0-1000</td>
+                        <td>0 to MAX_FALL_RATE</td>
+                        <td>Default current fall rate</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>REG_RCU_SYNC_WIDTH</td>
+                        <td>uint16</td>
+                        <td>RCU sync pulse width</td>
+                        <td>500-2000</td>
+                        <td>IRC_SYNC_WIDTH_MIN to IRC_SYNC_WIDTH_MAX</td>
+                        <td>Synchronization pulse duration</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>500</td>
+                        <td>IRC_SYNC_WIDTH_DEF</td>
+                        <td>Default sync pulse width</td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>REG_GATE_DRV_TURNON_DELAY</td>
+                        <td>uint16</td>
+                        <td>Gate driver turn-on delay (μs)</td>
+                        <td>0-500</td>
+                        <td>0 to MAX_GATE_DRV_TURNON_DELAY</td>
+                        <td>Gate control timing</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>REG_CSU_VOLTAGE_OFFSET</td>
+                        <td>uint16</td>
+                        <td>CSU voltage offset</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_VOLTAGE_OFFSET</td>
+                        <td>Voltage measurement offset</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>REG_UNIT_DRCU</td>
+                        <td>uint16</td>
+                        <td>Number of DCU/RCU units</td>
+                        <td>1-6</td>
+                        <td>1 to MAX_UNIT_DRCU</td>
+                        <td>Total unit configuration</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>6</td>
+                        <td>DEF_UNIT_DRCU</td>
+                        <td>Default unit count</td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>REG_SCOPE_TRIG</td>
+                        <td>uint16</td>
+                        <td>Scope trigger control</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>Oscilloscope trigger disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>Oscilloscope trigger enabled</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Measurement Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>128</td>
+                        <td>REG_MODE</td>
+                        <td>uint16</td>
+                        <td>Measurement mode</td>
+                        <td>0</td>
+                        <td>MODE_QRR_ONLY</td>
+                        <td>Measure only reverse recovery (Qrr) parameters</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>MODE_QRR_TQ</td>
+                        <td>Measure Qrr-tq parameters</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2</td>
+                        <td>MODE_DVDT_ONLY</td>
+                        <td>dVdt process only</td>
+                    </tr>
+                    <tr>
+                        <td>129</td>
+                        <td>REG_DIRECT_CURRENT</td>
+                        <td>uint16</td>
+                        <td>Direct current amplitude (A)</td>
+                        <td>100-3300</td>
+                        <td>DIRECT_CURRENT_MIN to DIRECT_CURRENT_MAX</td>
+                        <td>Forward current setting range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>300</td>
+                        <td>DIRECT_CURRENT_DEF</td>
+                        <td>Default forward current setting</td>
+                    </tr>
+                    <tr>
+                        <td>130</td>
+                        <td>REG_DCU_PULSE_WIDTH</td>
+                        <td>uint16</td>
+                        <td>DCU pulse duration (μs)</td>
+                        <td>100-5000</td>
+                        <td>IDC_PULSE_WIDTH_MIN to IDC_PULSE_WIDTH_MAX</td>
+                        <td>Pulse width setting range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2000</td>
+                        <td>IDC_PULSE_WIDTH_DEF</td>
+                        <td>Default pulse width setting</td>
+                    </tr>
+                    <tr>
+                        <td>131</td>
+                        <td>REG_DCU_I_RISE_RATE</td>
+                        <td>uint16</td>
+                        <td>DCU current rise rate (A/μs ×100)</td>
+                        <td>0-300</td>
+                        <td>0 to DCU_I_RISE_RATE_MAX</td>
+                        <td>Current rise rate range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>66</td>
+                        <td>DCU_I_RISE_RATE_DEF</td>
+                        <td>Default current rise rate</td>
+                    </tr>
+                    <tr>
+                        <td>132</td>
+                        <td>REG_CURRENT_FALL_RATE</td>
+                        <td>uint16</td>
+                        <td>Current fall rate selection</td>
+                        <td>0</td>
+                        <td>CURRENT_FALL_DIDT_R0</td>
+                        <td>Fall rate mode 0</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>CURRENT_FALL_DIDT_R1</td>
+                        <td>Fall rate mode 1</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2</td>
+                        <td>CURRENT_FALL_DIDT_R2</td>
+                        <td>Fall rate mode 2</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>3</td>
+                        <td>CURRENT_FALL_DIDT_R3</td>
+                        <td>Fall rate mode 3</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>4</td>
+                        <td>CURRENT_FALL_DIDT_R4</td>
+                        <td>Fall rate mode 4</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>5</td>
+                        <td>CURRENT_FALL_DIDT_R5</td>
+                        <td>Fall rate mode 5</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>6</td>
+                        <td>CURRENT_FALL_DIDT_R6</td>
+                        <td>Fall rate mode 6</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>7</td>
+                        <td>CURRENT_FALL_DIDT_R7</td>
+                        <td>Fall rate mode 7</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>8</td>
+                        <td>CURRENT_FALL_DIDT_R8</td>
+                        <td>Fall rate mode 8</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>9</td>
+                        <td>CURRENT_FALL_DIDT_R9</td>
+                        <td>Fall rate mode 9</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>10</td>
+                        <td>CURRENT_FALL_DIDT_R10</td>
+                        <td>Fall rate mode 10</td>
+                    </tr>
+                    <tr>
+                        <td>133</td>
+                        <td>REG_OFF_STATE_VOLTAGE</td>
+                        <td>uint16</td>
+                        <td>Off-state voltage (V)</td>
+                        <td>400-4400</td>
+                        <td>OS_VOLATGE_MIN to OS_VOLATGE_MAX</td>
+                        <td>Reverse voltage setting range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>500</td>
+                        <td>OS_VOLATGE_DEF</td>
+                        <td>Default reverse voltage setting</td>
+                    </tr>
+                    <tr>
+                        <td>134</td>
+                        <td>REG_OSV_RATE</td>
+                        <td>uint16</td>
+                        <td>Off-state voltage rise rate (V/μs)</td>
+                        <td>20-200</td>
+                        <td>OSV_RATE_MIN to OSV_RATE_MAX</td>
+                        <td>Voltage rise rate range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>50</td>
+                        <td>OSV_RATE_DEF</td>
+                        <td>Default voltage rise rate</td>
+                    </tr>
+                    <tr>
+                        <td>135</td>
+                        <td>REG_TRIG_TIME</td>
+                        <td>uint16</td>
+                        <td>Trigger time in single-pulse mode (μs)</td>
+                        <td>3-1000</td>
+                        <td>TQ_SINGLE_PULSE_MIN to TQ_SINGLE_PULSE_MAX</td>
+                        <td>Trigger timing range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>100</td>
+                        <td>TQ_SINGLE_PULSE_DEF</td>
+                        <td>Default trigger timing</td>
+                    </tr>
+                    <tr>
+                        <td>136</td>
+                        <td>REG_TRR_DETECTION_MODE</td>
+                        <td>uint16</td>
+                        <td>TRR detection mode</td>
+                        <td>0</td>
+                        <td>90%-25% threshold</td>
+                        <td>Detection threshold mode 1</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>90%-50% threshold</td>
+                        <td>Detection threshold mode 2</td>
+                    </tr>
+                    <tr>
+                        <td>137</td>
+                        <td>REG_FCROVU_I_SHORT</td>
+                        <td>uint16</td>
+                        <td>FCROVU short circuit current</td>
+                        <td>400-1600</td>
+                        <td>OSV_CURRENT_MIN to OSV_CURRENT_MAX</td>
+                        <td>Short circuit current range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1600</td>
+                        <td>OSV_CURRENT_DEF</td>
+                        <td>Default short circuit current</td>
+                    </tr>
+                    <tr>
+                        <td>138</td>
+                        <td>REG_CSU_VOLTAGE_THRE</td>
+                        <td>uint16</td>
+                        <td>CSU voltage threshold (V ×10)</td>
+                        <td>500-1000</td>
+                        <td>CSU_VOLTAGE_MIN to CSU_VOLTAGE_MAX</td>
+                        <td>Voltage threshold range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>900</td>
+                        <td>CSU_VOLTAGE_DEF</td>
+                        <td>Default voltage threshold</td>
+                    </tr>
+                    <tr>
+                        <td>139</td>
+                        <td>REG_CSU_VOLTAGE_HYST</td>
+                        <td>uint16</td>
+                        <td>CSU voltage hysteresis (V ×10)</td>
+                        <td>1-50</td>
+                        <td>CSU_VOLTAGE_HYST_MIN to CSU_VOLTAGE_HYST_MAX</td>
+                        <td>Voltage hysteresis range</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>5</td>
+                        <td>CSU_VOLTAGE_HYST_DEF</td>
+                        <td>Default voltage hysteresis</td>
+                    </tr>
+                    <tr>
+                        <td>140</td>
+                        <td>REG_CALIBRATION_PROCESS</td>
+                        <td>uint16</td>
+                        <td>Calibration process flag</td>
+                        <td>0</td>
+                        <td>Disabled</td>
+                        <td>Calibration disabled</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Enabled</td>
+                        <td>Calibration enabled</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Password Protection</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>180</td>
+                        <td>REG_PWD_1</td>
+                        <td>uint16</td>
+                        <td>Unlock password location 1</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_PASSWORD_VALUE</td>
+                        <td>Password component 1</td>
+                    </tr>
+                    <tr>
+                        <td>181</td>
+                        <td>REG_PWD_2</td>
+                        <td>uint16</td>
+                        <td>Unlock password location 2</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_PASSWORD_VALUE</td>
+                        <td>Password component 2</td>
+                    </tr>
+                    <tr>
+                        <td>182</td>
+                        <td>REG_PWD_3</td>
+                        <td>uint16</td>
+                        <td>Unlock password location 3</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_PASSWORD_VALUE</td>
+                        <td>Password component 3</td>
+                    </tr>
+                    <tr>
+                        <td>183</td>
+                        <td>REG_PWD_4</td>
+                        <td>uint16</td>
+                        <td>Unlock password location 4</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_PASSWORD_VALUE</td>
+                        <td>Password component 4</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>3. Read-Only Registers</h2>
+            
+            <h3>Device Status</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>192</td>
+                        <td>REG_DEV_STATE</td>
+                        <td>uint16</td>
+                        <td>Device state</td>
+                        <td>0</td>
+                        <td>DS_None</td>
+                        <td>No state</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>DS_Fault</td>
+                        <td>Fault state</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2</td>
+                        <td>DS_Disabled</td>
+                        <td>Disabled state</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>3</td>
+                        <td>DS_PowerOn</td>
+                        <td>Power-on state</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>4</td>
+                        <td>DS_Ready</td>
+                        <td>Ready state</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>5</td>
+                        <td>DS_InProcess</td>
+                        <td>In process state</td>
+                    </tr>
+                    <tr>
+                        <td>193</td>
+                        <td>REG_FAULT_REASON</td>
+                        <td>uint16</td>
+                        <td>Fault reason code</td>
+                        <td>0</td>
+                        <td>FAULT_NONE</td>
+                        <td>No fault</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>FAULT_PROTOCOL</td>
+                        <td>Error in communication protocol</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2</td>
+                        <td>FAULT_LOGIC_GENERAL</td>
+                        <td>High-level logic state-machine error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>3</td>
+                        <td>FAULT_LOGIC_CROVU</td>
+                        <td>CROVU node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>4</td>
+                        <td>FAULT_LOGIC_FCROVU</td>
+                        <td>FCROVU node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>5</td>
+                        <td>FAULT_LOGIC_DCU1</td>
+                        <td>DCU1 node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>6</td>
+                        <td>FAULT_LOGIC_DCU2</td>
+                        <td>DCU2 node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>7</td>
+                        <td>FAULT_LOGIC_DCU3</td>
+                        <td>DCU3 node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>8</td>
+                        <td>FAULT_LOGIC_RCU1</td>
+                        <td>RCU1 node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>9</td>
+                        <td>FAULT_LOGIC_RCU2</td>
+                        <td>RCU2 node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>10</td>
+                        <td>FAULT_LOGIC_RCU3</td>
+                        <td>RCU3 node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>11</td>
+                        <td>FAULT_LOGIC_SCOPE</td>
+                        <td>SCOPE node error</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>12</td>
+                        <td>FAULT_PRESSURE</td>
+                        <td>No pressure</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Measurement Results</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>209</td>
+                        <td>REG_RES_DUT_TRIG</td>
+                        <td>uint16</td>
+                        <td>DUT trigger result</td>
+                        <td>0</td>
+                        <td>Not triggered</td>
+                        <td>Device not triggered</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>Triggered</td>
+                        <td>Device triggered</td>
+                    </tr>
+                    <tr>
+                        <td>210</td>
+                        <td>REG_RES_QRR</td>
+                        <td>uint16</td>
+                        <td>Reverse recovery charge (μC ×100)</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_QRR_VALUE</td>
+                        <td>Qrr measurement result</td>
+                    </tr>
+                    <tr>
+                        <td>211</td>
+                        <td>REG_RES_IRR</td>
+                        <td>uint16</td>
+                        <td>Reverse recovery current amplitude (A ×10)</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_IRR_VALUE</td>
+                        <td>Irr measurement result</td>
+                    </tr>
+                    <tr>
+                        <td>212</td>
+                        <td>REG_RES_TRR</td>
+                        <td>uint16</td>
+                        <td>Reverse recovery time (μs ×10)</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_TRR_VALUE</td>
+                        <td>Trr measurement result</td>
+                    </tr>
+                    <tr>
+                        <td>213</td>
+                        <td>REG_RES_TQ</td>
+                        <td>uint16</td>
+                        <td>Turn-off time (μs ×10)</td>
+                        <td>0-1000</td>
+                        <td>0 to TQ_MAX_TIME</td>
+                        <td>Tq measurement result</td>
+                    </tr>
+                    <tr>
+                        <td>214</td>
+                        <td>REG_RES_IDC</td>
+                        <td>uint16</td>
+                        <td>Actual DC current value (A)</td>
+                        <td>0-3300</td>
+                        <td>0 to DIRECT_CURRENT_MAX</td>
+                        <td>Idc measurement result</td>
+                    </tr>
+                    <tr>
+                        <td>215</td>
+                        <td>REG_RES_DIDT</td>
+                        <td>uint16</td>
+                        <td>Actual dI/dt value (A/μs ×100)</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_DIDT_VALUE</td>
+                        <td>dI/dt measurement result</td>
+                    </tr>
+                    <tr>
+                        <td>216</td>
+                        <td>REG_RES_QRR_INT</td>
+                        <td>uint16</td>
+                        <td>Qrr integration mode (μC ×10)</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_QRR_INT_VALUE</td>
+                        <td>Integrated Qrr result</td>
+                    </tr>
+                    <tr>
+                        <td>217</td>
+                        <td>REG_RES_VD</td>
+                        <td>uint16</td>
+                        <td>Actual direct voltage value (V)</td>
+                        <td>0-4400</td>
+                        <td>0 to OS_VOLATGE_MAX</td>
+                        <td>Vd measurement result</td>
+                    </tr>
+                    <tr>
+                        <td>218</td>
+                        <td>REG_RES_QRR_32B</td>
+                        <td>uint16</td>
+                        <td>Qrr 32-bit part (μC ×100)</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_QRR_32B_VALUE</td>
+                        <td>High precision Qrr</td>
+                    </tr>
+                                         <tr>
+                         <td>219</td>
+                         <td>REG_RES_QRR_INT_32B</td>
+                         <td>uint16</td>
+                         <td>Qrr integration 32-bit part (μC ×10)</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_QRR_INT_32B_VALUE</td>
+                         <td>High precision integrated Qrr</td>
+                     </tr>
+                 </tbody>
+             </table>
+
+             <h3>CAN Bus Status</h3>
+             <table>
+                 <thead>
+                     <tr>
+                         <th>Num</th>
+                         <th>Name</th>
+                         <th>Type</th>
+                         <th>Description</th>
+                         <th>Value List/Range</th>
+                         <th>Value Name</th>
+                         <th>Value Description</th>
+                     </tr>
+                 </thead>
+                 <tbody>
+                     <tr>
+                         <td>220</td>
+                         <td>REG_CANA_BUSOFF_COUNTER</td>
+                         <td>uint16</td>
+                         <td>CAN A bus-off counter</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_BUSOFF_COUNT</td>
+                         <td>Bus-off event count</td>
+                     </tr>
+                     <tr>
+                         <td>221</td>
+                         <td>REG_CANA_STATUS_REG</td>
+                         <td>uint16</td>
+                         <td>CAN A status register (32-bit)</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_STATUS_REG</td>
+                         <td>CAN A status</td>
+                     </tr>
+                     <tr>
+                         <td>222</td>
+                         <td>REG_CANA_STATUS_REG_32</td>
+                         <td>uint16</td>
+                         <td>CAN A status register 32-bit part</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_STATUS_REG_32</td>
+                         <td>Extended CAN A status</td>
+                     </tr>
+                     <tr>
+                         <td>223</td>
+                         <td>REG_CANA_DIAG_TEC</td>
+                         <td>uint16</td>
+                         <td>CAN A TEC counter</td>
+                         <td>0-255</td>
+                         <td>0 to MAX_TEC_COUNT</td>
+                         <td>Transmit error counter</td>
+                     </tr>
+                     <tr>
+                         <td>224</td>
+                         <td>REG_CANA_DIAG_REC</td>
+                         <td>uint16</td>
+                         <td>CAN A REC counter</td>
+                         <td>0-255</td>
+                         <td>0 to MAX_REC_COUNT</td>
+                         <td>Receive error counter</td>
+                     </tr>
+                     <tr>
+                         <td>225</td>
+                         <td>REG_CANB_BUSOFF_COUNTER</td>
+                         <td>uint16</td>
+                         <td>CAN B bus-off counter</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_BUSOFF_COUNT</td>
+                         <td>Bus-off event count</td>
+                     </tr>
+                     <tr>
+                         <td>226</td>
+                         <td>REG_CANB_STATUS_REG</td>
+                         <td>uint16</td>
+                         <td>CAN B status register (32-bit)</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_STATUS_REG</td>
+                         <td>CAN B status</td>
+                     </tr>
+                     <tr>
+                         <td>227</td>
+                         <td>REG_CANB_STATUS_REG_32</td>
+                         <td>uint16</td>
+                         <td>CAN B status register 32-bit part</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_STATUS_REG_32</td>
+                         <td>Extended CAN B status</td>
+                     </tr>
+                     <tr>
+                         <td>228</td>
+                         <td>REG_CANB_DIAG_TEC</td>
+                         <td>uint16</td>
+                         <td>CAN B TEC counter</td>
+                         <td>0-255</td>
+                         <td>0 to MAX_TEC_COUNT</td>
+                         <td>Transmit error counter</td>
+                     </tr>
+                     <tr>
+                         <td>229</td>
+                         <td>REG_CANB_DIAG_REC</td>
+                         <td>uint16</td>
+                         <td>CAN B REC counter</td>
+                         <td>0-255</td>
+                         <td>0 to MAX_REC_COUNT</td>
+                         <td>Receive error counter</td>
+                     </tr>
+                 </tbody>
+             </table>
+
+             <h3>System Information</h3>
+             <table>
+                 <thead>
+                     <tr>
+                         <th>Num</th>
+                         <th>Name</th>
+                         <th>Type</th>
+                         <th>Description</th>
+                         <th>Value List/Range</th>
+                         <th>Value Name</th>
+                         <th>Value Description</th>
+                     </tr>
+                 </thead>
+                 <tbody>
+                     <tr>
+                         <td>256</td>
+                         <td>REG_FWINFO_SLAVE_NID</td>
+                         <td>uint16</td>
+                         <td>Device CAN slave node ID</td>
+                         <td>0-255</td>
+                         <td>0 to MAX_NODE_ID</td>
+                         <td>Slave node identifier</td>
+                     </tr>
+                     <tr>
+                         <td>257</td>
+                         <td>REG_FWINFO_MASTER_NID</td>
+                         <td>uint16</td>
+                         <td>Device CAN master node ID</td>
+                         <td>0-255</td>
+                         <td>0 to MAX_NODE_ID</td>
+                         <td>Master node identifier</td>
+                     </tr>
+                     <tr>
+                         <td>260</td>
+                         <td>REG_FWINFO_STR_LEN</td>
+                         <td>uint16</td>
+                         <td>Information string length</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_STRING_LENGTH</td>
+                         <td>String length</td>
+                     </tr>
+                     <tr>
+                         <td>261</td>
+                         <td>REG_FWINFO_STR_BEGIN</td>
+                         <td>uint16</td>
+                         <td>Information string beginning</td>
+                         <td>0-65535</td>
+                         <td>0 to MAX_STRING_DATA</td>
+                         <td>Firmware information</td>
+                     </tr>
+                 </tbody>
+             </table>
+         </div>
+
+        <div class="section">
+            <h2>4. Commands</h2>
+            
+            <h3>System Control Commands</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>ACT_ENABLE_POWER</td>
+                        <td>Enable flyback converter</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>ACT_DISABLE_POWER</td>
+                        <td>Disable flyback converter</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>ACT_CLR_FAULT</td>
+                        <td>Clear fault (try switch state from FAULT to NONE)</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>ACT_CLR_WARNING</td>
+                        <td>Clear warning</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Diagnostic Commands</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>10</td>
+                        <td>ACT_DIAG_READ_REG</td>
+                        <td>Read external node register</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>ACT_DIAG_WRITE_REG</td>
+                        <td>Write external node register</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>ACT_DIAG_CALL</td>
+                        <td>Call external node action</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>ACT_DIAG_READ_EP</td>
+                        <td>Read external node EP array</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>ACT_DIAG_TURN_ON_PC</td>
+                        <td>Turn-on PC</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>ACT_DIAG_FILL_RESULTS</td>
+                        <td>Fill results with values</td>
+                    </tr>
+                    <tr>
+                        <td>36</td>
+                        <td>ACT_DIAG_SFTY_READ</td>
+                        <td>Read state safety status</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Pulse Generation Commands</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>20</td>
+                        <td>ACT_DIAG_PULSE_DUT</td>
+                        <td>Generate control pulse for DUT</td>
+                    </tr>
+                    <tr>
+                        <td>21</td>
+                        <td>ACT_DIAG_PULSE_SW_DUT</td>
+                        <td>Generate control pulse for switch DUT</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>ACT_DIAG_PULSE_DC_SYNC</td>
+                        <td>Generate control pulse for direct current sync</td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>ACT_DIAG_PULSE_RC_SYNC</td>
+                        <td>Generate control pulse for reverse current sync</td>
+                    </tr>
+                    <tr>
+                        <td>24</td>
+                        <td>ACT_DIAG_PULSE_CSU_PS</td>
+                        <td>Generate control pulse for CSU power supply</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>ACT_DIAG_PULSE_CSU_DISCH</td>
+                        <td>Generate control pulse for CSU discharge</td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>ACT_DIAG_PULSE_CSU_FAN</td>
+                        <td>Generate control pulse for CSU fan</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>ACT_DIAG_PULSE_CSU_SYNC</td>
+                        <td>Generate control pulse for CSU sync</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>ACT_DIAG_PULSE_SCOPE</td>
+                        <td>Generate control pulse for high speed scope</td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>ACT_DIAG_PULSE_FCROVU</td>
+                        <td>Generate control pulse for FCROVU</td>
+                    </tr>
+                    <tr>
+                        <td>30</td>
+                        <td>ACT_DIAG_PULSE_CROVU</td>
+                        <td>Generate control pulse for CROVU</td>
+                    </tr>
+                    <tr>
+                        <td>31</td>
+                        <td>ACT_DIAG_PULSE_SB</td>
+                        <td>Generate control pulse for SensingBoard</td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>ACT_DIAG_PULSE_QCUHC</td>
+                        <td>Generate control pulse for QCUHC</td>
+                    </tr>
+                    <tr>
+                        <td>33</td>
+                        <td>ACT_DIAG_PULSE_GATE_RELAY</td>
+                        <td>Generate control pulse for Gate relay (QCUHV)</td>
+                    </tr>
+                    <tr>
+                        <td>34</td>
+                        <td>ACT_DIAG_QRR_PULSE</td>
+                        <td>Generate QRR pulse</td>
+                    </tr>
+                    <tr>
+                        <td>35</td>
+                        <td>ACT_DIAG_QRR_DCU_PULSE</td>
+                        <td>Generate QRR DCU pulse</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Measurement Control Commands</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>100</td>
+                        <td>ACT_START</td>
+                        <td>Start measurement</td>
+                    </tr>
+                    <tr>
+                        <td>101</td>
+                        <td>ACT_STOP</td>
+                        <td>Force measurement stop</td>
+                    </tr>
+                    <tr>
+                        <td>102</td>
+                        <td>ACT_SINGLE_START</td>
+                        <td>Start single-pulse measurement</td>
+                    </tr>
+                    <tr>
+                        <td>110</td>
+                        <td>ACT_COMMUTATION_FORCED_ON</td>
+                        <td>Commutation enable</td>
+                    </tr>
+                    <tr>
+                        <td>111</td>
+                        <td>ACT_COMMUTATION_FORCED_OFF</td>
+                        <td>Commutation disable</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Configuration Commands</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>200</td>
+                        <td>ACT_SAVE_TO_ROM</td>
+                        <td>Save parameters to EEPROM module</td>
+                    </tr>
+                    <tr>
+                        <td>201</td>
+                        <td>ACT_RESTORE_FROM_ROM</td>
+                        <td>Restore parameters from EEPROM module</td>
+                    </tr>
+                    <tr>
+                        <td>202</td>
+                        <td>ACT_RESET_TO_DEFAULT</td>
+                        <td>Reset parameters to default values</td>
+                    </tr>
+                    <tr>
+                        <td>203</td>
+                        <td>ACT_LOCK_NV_AREA</td>
+                        <td>Lock modifications of parameters area</td>
+                    </tr>
+                    <tr>
+                        <td>204</td>
+                        <td>ACT_UNLOCK_NV_AREA</td>
+                        <td>Unlock modifications of parameters area (password-protected)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>System Commands</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>320</td>
+                        <td>ACT_BOOT_LOADER_REQUEST</td>
+                        <td>Request reboot to bootloader</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>5. Endpoints</h2>
+            
+            <h3>Data Acquisition Endpoints</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Data Type</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>EP_Current</td>
+                        <td>Current data array</td>
+                        <td>Int16U</td>
+                        <td>2000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>EP_Voltage</td>
+                        <td>Voltage data array</td>
+                        <td>Int16U</td>
+                        <td>2000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Diagnostic Endpoints</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Data Type</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>3</td>
+                        <td>EP_DIAG1_DevTrig</td>
+                        <td>Device trigger diagnostic data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>EP_DIAG2_OSVTime</td>
+                        <td>Off-state voltage time data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>EP_DIAG3_Irr</td>
+                        <td>Reverse recovery current data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>EP_DIAG4_Trr</td>
+                        <td>Reverse recovery time data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>EP_DIAG5_Qrr</td>
+                        <td>Reverse recovery charge data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>EP_DIAG6_Idc</td>
+                        <td>Direct current data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>EP_DIAG7_ZeroI</td>
+                        <td>Current zero-crossing data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>EP_DIAG8_ZeroV</td>
+                        <td>Voltage zero-crossing data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>EP_DIAG9_dIdt</td>
+                        <td>dI/dt data</td>
+                        <td>Int16U</td>
+                        <td>26</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Communication Endpoints</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Data Type</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>12</td>
+                        <td>EP_SlaveData</td>
+                        <td>Data obtained from slave device</td>
+                        <td>Int16U</td>
+                        <td>Variable</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Scope Endpoints</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Data Type</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>EP_SCOPE_IDC</td>
+                        <td>Scope current data</td>
+                        <td>Int16U</td>
+                        <td>Variable</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>EP_SCOPE_VD</td>
+                        <td>Scope voltage data</td>
+                        <td>Int16U</td>
+                        <td>Variable</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="notes">
+            <h2>Notes</h2>
+            <ul>
+                <li>All register addresses are 16-bit values</li>
+                <li>Data types are primarily uint16 (16-bit unsigned integers)</li>
+                <li>Endpoint sizes are configurable based on measurement requirements</li>
+                <li>The system supports both CAN and RS232 communication protocols</li>
+                <li>Calibration parameters are stored in non-volatile memory</li>
+                <li>The firmware implements GOST-compliant measurement procedures</li>
+                <li>Real-time data acquisition operates at 10kHz update rate</li>
+                <li>Safety interlocks are implemented for high-voltage operation</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html> 
