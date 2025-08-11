@@ -1360,6 +1360,8 @@
                 </tbody>
             </table>
 
+            
+            <h3>Logic and Slave Status Registers</h3>
             <table>
                 <thead>
                     <tr>
@@ -1374,62 +1376,53 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>-</td>
-                        <td>PROBLEM_SCOPE_*</td>
+                        <td>200</td>
+                        <td>REG_LOGIC_STATE</td>
                         <td>uint16</td>
-                        <td>Scope-specific problem codes</td>
-                        <td>0</td>
-                        <td>PROBLEM_SCOPE_NONE</td>
-                        <td>No problem</td>
+                        <td>High-level logic state</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_LOGIC_STATE</td>
+                        <td>Current logic state</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>1</td>
-                        <td>PROBLEM_SCOPE_CALC_IRR</td>
-                        <td>Problem calculating Irr</td>
+                        <td>201</td>
+                        <td>REG_SLAVE_DEVICE</td>
+                        <td>uint16</td>
+                        <td>Slave device</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_SLAVE_DEVICE</td>
+                        <td>Slave device identifier</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>2</td>
-                        <td>PROBLEM_SCOPE_CALC_IRR_025</td>
-                        <td>Problem calculating 25% fraction Irr</td>
+                        <td>202</td>
+                        <td>REG_SLAVE_FUNC</td>
+                        <td>uint16</td>
+                        <td>Slave function</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_SLAVE_FUNC</td>
+                        <td>Slave function code</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>3</td>
-                        <td>PROBLEM_SCOPE_CALC_IRR_090</td>
-                        <td>Problem calculating 90% fraction Irr</td>
+                        <td>203</td>
+                        <td>REG_SLAVE_ERR</td>
+                        <td>uint16</td>
+                        <td>Slave error</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_SLAVE_ERR</td>
+                        <td>Slave error code</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>4</td>
-                        <td>PROBLEM_SCOPE_CALC_VZ</td>
-                        <td>Problem calculating V zero crossing</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>5</td>
-                        <td>PROBLEM_SCOPE_CALC_DIDT</td>
-                        <td>Problem calculating actual dIdt</td>
+                        <td>204</td>
+                        <td>REG_SLAVE_EXTDATA</td>
+                        <td>uint16</td>
+                        <td>Slave call extended data</td>
+                        <td>0-65535</td>
+                        <td>0 to MAX_SLAVE_EXTDATA</td>
+                        <td>Extended slave data</td>
                     </tr>
                 </tbody>
             </table>
-
+            
             <h3>Measurement Results</h3>
             <table>
                 <thead>
@@ -1714,6 +1707,7 @@
                      </tr>
                  </tbody>
              </table>
+
          </div>
 
         <div class="section">
