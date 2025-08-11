@@ -1165,6 +1165,271 @@
                 </tbody>
             </table>
 
+            <h3>Extended Fault and Problem Reason Registers</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>197</td>
+                        <td>REG_FAULT_REASON_EXT</td>
+                        <td>uint16</td>
+                        <td>Fault reason extended code</td>
+                        <td>0</td>
+                        <td>FAULTEX_NONE</td>
+                        <td>No extended information</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>FAULTEX_PON_WRONG_STATE</td>
+                        <td>Wrong state during power-on stage</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2</td>
+                        <td>FAULTEX_PON_TIMEOUT</td>
+                        <td>Timeout during power-on stage</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>3</td>
+                        <td>FAULTEX_CFG_WRONG_STATE</td>
+                        <td>Wrong state during configuration stage</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>4</td>
+                        <td>FAULTEX_CFG_TIMEOUT</td>
+                        <td>Timeout during configuration stage</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>5</td>
+                        <td>FAULTEX_POFF_WRONG_STATE</td>
+                        <td>Wrong state during power-off stage</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>6</td>
+                        <td>FAULTEX_POFF_TIMEOUT</td>
+                        <td>Timeout during power-off stage</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>7</td>
+                        <td>FAULTEX_READ_WRONG_STATE</td>
+                        <td>Wrong state during read data</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>8</td>
+                        <td>FAULTEX_READ_TIMEOUT</td>
+                        <td>Timeout during read data</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>9</td>
+                        <td>FAULTEX_PRECFG_TIMEOUT</td>
+                        <td>Timeout during preconfig stage</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>196</td>
+                        <td>REG_PROBLEM</td>
+                        <td>uint16</td>
+                        <td>Problem if present</td>
+                        <td>0</td>
+                        <td>PROBLEM_NONE</td>
+                        <td>No problem</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>PROBLEM_MANUAL_STOP</td>
+                        <td>Requested manual stop of the measurement</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2</td>
+                        <td>PROBLEM_NO_DIRECT_CURRENT</td>
+                        <td>No direct current</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>3</td>
+                        <td>PROBLEM_SCOPE_CALC_FAILED</td>
+                        <td>Calculations on scope node are failed</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>4</td>
+                        <td>PROBLEM_IRR_TO_HIGH</td>
+                        <td>Reverse current is too high</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>5</td>
+                        <td>PROBLEM_DEVICE_TRIGGERED</td>
+                        <td>Device remains in triggered state</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>6</td>
+                        <td>PROBLEM_IRR_TO_LOW</td>
+                        <td>Reverse current is too low</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>8</td>
+                        <td>PROBLEM_SAFETY</td>
+                        <td>Problem safety</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Num</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Value List/Range</th>
+                        <th>Value Name</th>
+                        <th>Value Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>-</td>
+                        <td>PROBLEM_SCOPE_*</td>
+                        <td>uint16</td>
+                        <td>Scope-specific problem codes</td>
+                        <td>0</td>
+                        <td>PROBLEM_SCOPE_NONE</td>
+                        <td>No problem</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1</td>
+                        <td>PROBLEM_SCOPE_CALC_IRR</td>
+                        <td>Problem calculating Irr</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2</td>
+                        <td>PROBLEM_SCOPE_CALC_IRR_025</td>
+                        <td>Problem calculating 25% fraction Irr</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>3</td>
+                        <td>PROBLEM_SCOPE_CALC_IRR_090</td>
+                        <td>Problem calculating 90% fraction Irr</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>4</td>
+                        <td>PROBLEM_SCOPE_CALC_VZ</td>
+                        <td>Problem calculating V zero crossing</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>5</td>
+                        <td>PROBLEM_SCOPE_CALC_DIDT</td>
+                        <td>Problem calculating actual dIdt</td>
+                    </tr>
+                </tbody>
+            </table>
+
             <h3>Measurement Results</h3>
             <table>
                 <thead>
@@ -1884,6 +2149,8 @@
                 </tbody>
             </table>
         </div>
+
+
 
         <div class="notes">
             <h2>Notes</h2>
