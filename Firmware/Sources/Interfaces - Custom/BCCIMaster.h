@@ -9,6 +9,7 @@
 #include "stdinc.h"
 //
 #include "BCCITypes.h"
+#include "BCCIParams.h"
 
 
 // Types

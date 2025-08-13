@@ -32,6 +32,8 @@
 //
 #define READ_BLOCK_16_BUFFER_SIZE	2000
 
+#define CAN_MASTER_NID_MASK			0x03FC0000
+#define CAN_SLAVE_NID_MASK			0x0003FC00
 
 // Forward functions
 //
@@ -48,6 +50,7 @@ static void BCCIM_PrepareDataExchange(Int16U Code);
 //
 static Int16U ReadBlock16Buffer[READ_BLOCK_16_BUFFER_SIZE], ReadBlock16BufferCounter;
 static Int16U SavedEndpointRB16;
+static Int32U MasterShiftedNodeID = 0;
 //
 volatile BCCIM_DataExchange BCCIM_ReceivedData;
 
@@ -56,25 +59,27 @@ volatile BCCIM_DataExchange BCCIM_ReceivedData;
 //
 void BCCIM_Init(pBCCIM_Interface Interface, pBCCI_IOConfig IOConfig,  Int32U MessageTimeoutTicks, volatile Int64U *pTimer)
 {
+	MasterShiftedNodeID = (CAN_MASTER_NID_MPY * BCCI_MASTER_ADDRESS) & BCCIM_ACCEPTANCE_MASK;
+
 	// Save parameters
 	Interface->IOConfig = IOConfig;
 	Interface->TimeoutValueTicks = MessageTimeoutTicks;
 	Interface->pTimerCounter = pTimer;
 
 	// Setup messages
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_R_16, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_R_16, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_R_16_A, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_R_16 + 1, TRUE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_R_16, MasterShiftedNodeID + CAN_ID_R_16, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_R_16_A, MasterShiftedNodeID + CAN_ID_R_16 + 1, TRUE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
 
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_W_16, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_W_16, FALSE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_W_16_A, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_W_16 + 1, TRUE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_W_16, MasterShiftedNodeID + CAN_ID_W_16, FALSE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_W_16_A, MasterShiftedNodeID + CAN_ID_W_16 + 1, TRUE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
 
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_C, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_CALL, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_C_A, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_CALL + 1, TRUE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_C, MasterShiftedNodeID + CAN_ID_CALL, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_C_A, MasterShiftedNodeID + CAN_ID_CALL + 1, TRUE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
 
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_16, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_RB_16, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_16_A, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_RB_16 + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_16, MasterShiftedNodeID + CAN_ID_RB_16, FALSE, 2, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, ZW_CAN_STRONG_MATCH);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_RB_16_A, MasterShiftedNodeID + CAN_ID_RB_16 + 1, TRUE, 8, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
 
-	Interface->IOConfig->IO_ConfigMailbox(MBOX_ERR_A, BCCI_MASTER_ADDRESS * DEV_ADDR_MPY + CAN_ID_ERR, TRUE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
+	Interface->IOConfig->IO_ConfigMailbox(MBOX_ERR_A, MasterShiftedNodeID + CAN_ID_ERR, TRUE, 4, ZW_CAN_MBProtected, ZW_CAN_NO_PRIORITY, BCCIM_ACCEPTANCE_MASK);
 }
 // ----------------------------------------
 
@@ -283,7 +288,9 @@ static void BCCIM_HandleError(pBCCIM_Interface Interface)
 
 static void BCCIM_SendFrame(pBCCIM_Interface Interface, Int16U Mailbox, pCANMessage Message, Int32U Node, Int16U Command)
 {
-	Message->MsgID.all = (Node << 10) | Command;
+	Int32U ShiftedSlaveNodeID = ((Int32U)Node * CAN_SLAVE_NID_MPY) & BCCIM_ACCEPTANCE_MASK;
+	Message->MsgID.all = MasterShiftedNodeID | ShiftedSlaveNodeID | Command;
+	//Message->MsgID.all = (Node << 10) | Command;
 	Interface->IOConfig->IO_SendMessageEx(Mailbox, Message, TRUE, FALSE);
 }
 // ----------------------------------------
