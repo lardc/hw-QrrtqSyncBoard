@@ -91,6 +91,9 @@
 //
 #define REG_DC_READY_RETRIES		205	// Number of attempts to start direct current
 //
+#define REG_RES_TS				    207 // Time ts (in us)
+#define REG_RES_TF				    208 // Time tf (in us)
+//
 #define REG_RES_QRR					210	// Reverse recovery charge (in uC x10)
 #define REG_RES_IRR					211	// Reverse recovery current amplitude (in A)
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)
@@ -256,6 +259,9 @@
 #define REG_SCOPE_RESULT_ZERO		204	// Zero-cross time (in us x10)
 #define REG_SCOPE_RESULT_ZERO_V		205	// Zero-cross time for on-state voltage (in us x10)
 #define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x10)
+//
+#define REG_SCOPE_RESULT_TS		    210 // Time ts (in us)
+#define REG_SCOPE_RESULT_TF		    211 // Time tf (in us)
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
