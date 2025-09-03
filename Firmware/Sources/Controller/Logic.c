@@ -1049,8 +1049,8 @@ void LOGIC_ReadDataSequence()
 
 							if(DataTable[REG_SCOPE_TRIG])
 							{
-								Results[ResultsCounter].DeviceTriggered = ((Results[ResultsCounter].Vd - VD_HYST) < CROVU_Voltage) &&
-										((Results[ResultsCounter].Vd + VD_HYST) > CROVU_Voltage) ? FALSE : TRUE;
+								Results[ResultsCounter].DeviceTriggered = (Results[ResultsCounter].Vd > CROVU_Voltage / 100 * VD_HYST_MIN ) &&
+										(Results[ResultsCounter].Vd < CROVU_Voltage / 100 * VD_HYST_MAX ) ? FALSE : TRUE;
 								DataTable[REG_DBG] = Results[ResultsCounter].Vd;
 								DataTable[REG_DBG2] = Results[ResultsCounter].DeviceTriggered;
 							}
