@@ -115,6 +115,8 @@ typedef struct __MeasurementResult
 	Int16U dIdt;				// Actual dIdt value (in A/us x10)
 	Int16U EPTimeFract;			// Time fraction for EP data step (in ns)
 	Int16U EPTimeFractCnt;		// Number of time fractions in data step
+    Int16U ts;                  // Time ts
+    Int16U tf;                  // Time tf
 } MeasurementResult;
 
 // Functions
