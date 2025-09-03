@@ -316,6 +316,10 @@ void LOGIC_CacheVariables()
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		TQ_ZeroOffset = LOGIC_FindTQZeroOffset(CROVU_VoltageRate);
 
+		ScopeCurrentConfig.ScopeCurrentSamplingTime = TrigOffset / 10 + DC_Current / DC_CurrentFallRate * 10;
+
+		DataTable[REG_DBG_WRITE_SAMLING_TIME] = ScopeCurrentConfig.ScopeCurrentSamplingTime;
+
 		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit));
 		if(MeasurementMode != MODE_QRR_ONLY)
 			DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZeroOffset) ? (DC_CurrentZeroPoint - TQ_ZeroOffset) : 0;
@@ -772,7 +776,7 @@ void LOGIC_ConfigureSequence()
 											if(HLI_RS232_Write16(REG_SCOPE_TR_050_METHOD,
 													DataTable[REG_TRR_DETECTION_MODE]))
 												if(HLI_RS232_Write16(REG_SCOPE_VOLTAGE_AMPL, DataTable[REG_OFF_STATE_VOLTAGE]))
-												    if(HLI_RS232_Write16(REG_SCOPE_DC_FALL_RATE, DataTable[REG_CURRENT_FALL_RATE]))
+												    if(HLI_RS232_Write16(REG_DC_FALL_TIME, ScopeCurrentConfig.ScopeCurrentSamplingTime))
 												        if(HLI_RS232_CallAction(ACT_SCOPE_START_TEST))
 												            LOGIC_State = LS_CFG_WaitStates;
 								}

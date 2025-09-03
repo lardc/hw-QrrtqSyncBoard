@@ -219,6 +219,7 @@
 #define REG_DBG2					171	// Отладочный регистр 2
 #define REG_DBG_READ_CURRENT_SCALE	172	// Отладочный регистр Значения Irr для корректировки скейла в SCOPE
 #define REG_DBG_WRITE_CURRENT_SCALE	173 // Отладочный регистр значения скейла записанный в SCOPE
+#define REG_DBG_WRITE_SAMLING_TIME  174 // Отладочный регистр значения времени записанный в SCOPE
 //
 #define REG_PWD_1					180	// Unlock password location 1
 #define REG_PWD_2					181	// Unlock password location 2
@@ -347,7 +348,7 @@
 #define REG_SCOPE_MEASURE_MODE		129	// Select sampling mode (Qrr or Qrr-tq)
 #define REG_SCOPE_TR_050_METHOD		130	// Use 50% level of Irr to detect tr time
 #define REG_SCOPE_VOLTAGE_AMPL		131	// Voltage amplitude (in V)
-#define REG_SCOPE_DC_FALL_RATE      132 // Current fall rate
+#define REG_DC_FALL_TIME            132 // Current fall rate
 //
 // Results
 #define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A x10)

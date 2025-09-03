@@ -27,6 +27,7 @@ typedef struct __DRCUConfig
 typedef struct __ScopeConfig
 {
 	Int16U ScopeCurrentScaleResult;
+	Int16U ScopeCurrentSamplingTime;
 
 } ScopeConfig, *pScopeConfig;
 
