@@ -26,6 +26,8 @@
 
 #define VD_HYST_MIN						90 		// in %
 #define VD_HYST_MAX						110 	// in %
+
+#define IRR_TO_HIGH                     9       // in %*10
 //
 #define	SCCI_MASTER_TIMEOUT_TICKS_MS	500		// in ms
 #define	SCCI_SLAVE_TIMEOUT_TICKS_MS		100		// in ms
@@ -35,6 +37,7 @@
 //
 #define TIMEOUT_REINIT_RS232			10000	// in ms
 #define TIMEOUT_HL_LOGIC				100000	// in ms
+#define TIMEOUT_HL_PRE_CONF_LOGIC       600000  // in ms
 #define TIMEOUT_HL_LOGIC_POWER_ON		300000	// in ms
 #define TIMEOUT_HL_LOGIC_SHORT			2000	// in ms
 //

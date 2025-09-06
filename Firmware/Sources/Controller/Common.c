@@ -105,23 +105,33 @@ void CMN_NodePowerOff(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDRCUConfig Config,
 		volatile LogicState *CurrentLogicState, LogicState NextLogicState)
 {
-	if(!DevEntity->Emulate)
-	{
-		if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_MAX_VALUE, Config->Current))
-			if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE, Config->CurrentRate))
-				if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_OFFSET, Config->V_Offset))
-					if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K, Config->V_K))
-						if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K2, Config->V_K2))
-							if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL_EXT_OFFSET, Config->I_Ctrl_Offset))
-								if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL_EXT_K, Config->I_Ctrl_K))
-									if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P0, Config->I_P0))
-										if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P1, Config->I_P1))
-											if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P2, Config->I_P2))
-												if(HLI_CAN_CallAction(DataTable[NodeIDReg], DCRU_ACT_CONFIG))
-													*CurrentLogicState = NextLogicState;
-	}
-	else
-		*CurrentLogicState = NextLogicState;
+    if(!DevEntity->Emulate)
+    {
+        // Check if device is ready for configuration
+        if(DevEntity->State == CDS_Ready)
+        {
+            // Device is ready - proceed with configuration
+            if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_MAX_VALUE, Config->Current))
+                if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE, Config->CurrentRate))
+                    if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_OFFSET, Config->V_Offset))
+                        if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K, Config->V_K))
+                            if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K2, Config->V_K2))
+                                if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL_EXT_OFFSET, Config->I_Ctrl_Offset))
+                                    if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL_EXT_K, Config->I_Ctrl_K))
+                                        if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P0, Config->I_P0))
+                                            if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P1, Config->I_P1))
+                                                if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P2, Config->I_P2))
+                                                    if(HLI_CAN_CallAction(DataTable[NodeIDReg], DCRU_ACT_CONFIG))
+                                                        *CurrentLogicState = NextLogicState;
+        }
+        else
+        {
+            // Device is not ready for configuration - return to wait ready state
+            *CurrentLogicState = LS_CFG_WaitReady;
+        }
+      }
+      else
+          *CurrentLogicState = NextLogicState;
 }
 //-----------------------------
 

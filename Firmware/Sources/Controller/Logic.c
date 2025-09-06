@@ -661,8 +661,8 @@ void LOGIC_ConfigurePrepare()
 {
 	LOGIC_CacheVariables();
 	if(LOGIC_StateRealTime == LSRT_WaitForConfig)
-		LOGIC_State = LS_CFG_WaitReady;
-	Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
+	    LOGIC_State = LS_CFG_WaitReady;
+	Timeout = CONTROL_TimeCounter + TIMEOUT_HL_PRE_CONF_LOGIC;
 
 	CONTROL_RequestDPC(&LOGIC_ConfigureSequence);
 }
@@ -1074,9 +1074,9 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(PROBLEM_SCOPE_CALC_FAILED);
 								}
-								else if(Results[ResultsCounter].Irr > (DC_Current * 10) && !DataTable[REG_CALIBRATION_PROCESS])
+								else if(Results[ResultsCounter].Irr > (Results[ResultsCounter].Idc * IRR_TO_HIGH) && !DataTable[REG_CALIBRATION_PROCESS])
 								{
-										LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
+									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
 								}
 								else if(Results[ResultsCounter].Irr < DataTable[REG_IRR_MIN] * 10 && MeasurementMode == MODE_QRR_ONLY)
 								{
