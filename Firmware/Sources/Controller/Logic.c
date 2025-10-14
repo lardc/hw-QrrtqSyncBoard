@@ -867,6 +867,8 @@ void LOGIC_ReadDataSequence()
 															if (HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract))
 																if (HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt))
 																{
+																	Int16U IrrShortLevel = (Int32U)QPU_Current *
+																			((DataTable[REG_DUT_I_SHORT_THR] == 0) ? 100 : DataTable[REG_DUT_I_SHORT_THR]) / 100;
 																	if (Register == OPRESULT_NONE)
 																	{
 																		LOGIC_State = LS_Error;
@@ -877,7 +879,7 @@ void LOGIC_ReadDataSequence()
 																	{
 																		LOGIC_AbortMeasurement(PROBLEM_SCOPE_CALC_FAILED);
 																	}
-																	else if (Results[ResultsCounter].Irr > QPU_Current)
+																	else if (Results[ResultsCounter].Irr > IrrShortLevel)
 																	{
 																		LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
 																	}

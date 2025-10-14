@@ -46,6 +46,8 @@
 #define REG_EMULATE_QPU				1	// Enable QPU emulation
 #define REG_EMULATE_SCOPE			2	// Enable SCOPE emulation
 //
+#define REG_DUT_I_SHORT_THR			5	// Уровень обратного тока от прямого тока для случая КЗ (в %)
+//
 #define REG_SP__1					127
 //
 // ----------------------------------------

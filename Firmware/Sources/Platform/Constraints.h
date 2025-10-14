@@ -28,6 +28,10 @@ typedef struct __TableItemConstraint
 #define X_D_DEF2					1000
 #define X_D_DEF3					10000
 
+#define DUT_I_SHORT_THR_MIN			20
+#define DUT_I_SHORT_THR_MAX			120
+#define DUT_I_SHORT_THR_DEF			80
+
 // QPU LP
 //
 #define DIRECT_CURRENT_MIN			10		// in A
