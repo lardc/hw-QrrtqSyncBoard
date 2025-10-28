@@ -31,6 +31,7 @@ volatile Int16U ResultsCounter, MeasurementMode;
 static Boolean MuteCROVU, MuteFCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
+static volatile Boolean TQ_MaxTimeActive = FALSE;
 static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2;
@@ -1163,6 +1164,24 @@ void LOGIC_ReadDataSequence()
 void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 {
 	// Main logic
+	// If we are in the max-time probe, stop when device triggered,
+	// otherwise clear the probe flag and continue.
+	if(TQ_MaxTimeActive)
+	{
+		if(DeviceTriggered)
+		{
+			TQ_MaxTimeActive = FALSE;
+			LOGIC_PulseNumRemain = 0;
+			DataTable[REG_PROBLEM] = PROBLEM_DEVICE_TRIGGERED;
+			LOGIC_OperationResult = OPRESULT_FAIL;
+			return;
+		}
+		else
+		{
+			TQ_MaxTimeActive = FALSE;
+		}
+	}
+
 	if(LOGIC_PulseNumRemain > 0)
 	{
 		// Detect first pulse
@@ -1170,9 +1189,10 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 		{
 			if(DeviceTriggered)
 			{
-				// Init slow thyristors measurement
+				// Init slow thyristors measurement (max-time probe)
 				CROVU_TrigTime = DC_CurrentZeroPoint + TQ_MAX_TIME;
 				CROVU_TrigTime_LastHalf = TQ_MAX_TIME >> 1;
+				TQ_MaxTimeActive = TRUE;
 			}
 			else
 			{
