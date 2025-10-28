@@ -201,6 +201,8 @@ void LOGIC_TrimTrigTime(Boolean Increase)
 		CROVU_TrigTime -= CROVU_TrigTime_LastHalf;
 	
 	CROVU_TrigTime_LastHalf >>= 1;
+	if(TqFastThyristor)
+	    CROVU_TrigTime_LastHalf = (CROVU_TrigTime_LastHalf < DC_CurrentZeroPoint * 10) ? DC_CurrentZeroPoint * 10 : CROVU_TrigTime_LastHalf;
 }
 // ----------------------------------------
 
