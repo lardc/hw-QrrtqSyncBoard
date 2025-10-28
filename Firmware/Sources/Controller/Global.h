@@ -24,10 +24,11 @@
 #define EP_COUNT						12
 #define VALUES_x_SIZE					2000
 
-#define VD_HYST_MIN						90 		// in %
+#define VD_HYST_MIN						95 		// in %
 #define VD_HYST_MAX						110 	// in %
 
 #define IRR_TO_HIGH                     9       // in %*10
+#define ID_TO_HIGH                      120     // in %
 //
 #define	SCCI_MASTER_TIMEOUT_TICKS_MS	500		// in ms
 #define	SCCI_SLAVE_TIMEOUT_TICKS_MS		100		// in ms

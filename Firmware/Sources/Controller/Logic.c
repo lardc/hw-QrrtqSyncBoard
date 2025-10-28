@@ -1082,6 +1082,10 @@ void LOGIC_ReadDataSequence()
 								{
 									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
 								}
+								else if(Results[ResultsCounter].Idc > DC_Current * ID_TO_HIGH)
+								{
+								    LOGIC_AbortMeasurement(PROBLEM_ID_TO_HIGH);
+								}
 								else
 								{
 									// Save results

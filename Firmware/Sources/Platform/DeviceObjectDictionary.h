@@ -452,6 +452,7 @@
 #define PROBLEM_DEVICE_TRIGGERED	5	// Device remains in trigged state
 #define PROBLEM_IRR_TO_LOW			6	// Обратный ток слишком маленький
 #define PROBLEM_SAFETY				8	// Problem safety
+#define PROBLEM_ID_TO_HIGH          9   // Прямой ток выше задаваемого
 
 // DISABLE CODES
 //
