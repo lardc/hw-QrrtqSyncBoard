@@ -9,6 +9,9 @@
 #include "ZwDSP.h"
 #include "SysConfig.h"
 #include "Controller.h"
+// Constants
+
+#define SYS_PUMOD_CUSTOM	(ZW_POWER_SCIA_CLK | ZW_POWER_SCIB_CLK  | ZW_POWER_CANB_CLK)
 
 // FORWARD FUNCTIONS
 // -----------------------------------------
@@ -59,7 +62,7 @@ void FlashLoader(void)
 	// Setup ISRs
 	BEGIN_ISR_MAP
 		ADD_ISR(TINT2, Timer2_ISR);
-		ADD_ISR(ECAN0INTA, CAN0_ISR);
+		ADD_ISR(ECAN0INTB, CAN0_ISR);
 		ADD_ISR(ILLEGAL, IllegalInstruction_ISR);
 	END_ISR_MAP
 
@@ -85,7 +88,7 @@ Boolean InitializeCPU()
     Boolean clockInitResult;
 
 	// Init clock and peripherals
-    clockInitResult = ZwSystem_Init(CPU_PLL, CPU_CLKINDIV, SYS_LOSPCP, SYS_HISPCP, SYS_PUMOD);
+    clockInitResult = ZwSystem_Init(CPU_PLL, CPU_CLKINDIV, SYS_LOSPCP, SYS_HISPCP, SYS_PUMOD_CUSTOM);
 
     if(clockInitResult)
     {
@@ -214,7 +217,7 @@ ISRCALL Timer2_ISR(void)
 ISRCALL CAN0_ISR(void)
 {
     // handle CAN system events
-	ZwCANa_DispatchSysEvent();
+	ZwCANb_DispatchSysEvent();
 
 	// allow other interrupts from group 9
 	CAN_ISR_DONE;
