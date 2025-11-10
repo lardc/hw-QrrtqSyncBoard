@@ -157,14 +157,14 @@ void InitializeSCI()
 void InitializeCAN()
 {
 	// Init CAN
-	ZwCANa_Init(CANA_BR, CANA_BRP, CANA_TSEG1, CANA_TSEG2, CANA_SJW);
+	ZwCANb_Init(CANA_BR, CANA_BRP, CANA_TSEG1, CANA_TSEG2, CANA_SJW);
 
 	// Register system handler
-	ZwCANa_RegisterSysEventHandler(&CONTROL_NotifyCANFault);
+	ZwCANb_RegisterSysEventHandler(&CONTROL_NotifyCANFault);
 
 	// Allow interrupts for CAN
-	ZwCANa_InitInterrupts(TRUE);
-	ZwCANa_EnableInterrupts(TRUE);
+	ZwCANb_InitInterrupts(TRUE);
+	ZwCANb_EnableInterrupts(TRUE);
 }
 // -----------------------------------------
 
