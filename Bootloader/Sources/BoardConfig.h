@@ -24,6 +24,7 @@
 
 // Peripheral options
 #define HWUSE_SCI_A
+#define HWUSE_CAN_B
 
 // IO debug LED
 #define DBG_LED				34
