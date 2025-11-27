@@ -33,7 +33,7 @@ static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FA
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static volatile Boolean TQ_MaxTimeActive = FALSE;
 static Int16U K_Unit, DC_Current, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
-static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, RC_CurrentMaxPoint;
+static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, DC_CurrentZeroPointTq, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
 static volatile Int16U CROVU_TrigTime, CROVU_TrigTime_LastHalf;
@@ -201,8 +201,11 @@ void LOGIC_TrimTrigTime(Boolean Increase)
 		CROVU_TrigTime -= CROVU_TrigTime_LastHalf;
 	
 	CROVU_TrigTime_LastHalf >>= 1;
+
+	DataTable[REG_DBG] = CROVU_TrigTime;
+
 	if(TqFastThyristor)
-	    CROVU_TrigTime_LastHalf = (CROVU_TrigTime_LastHalf < DC_CurrentZeroPoint * 10) ? DC_CurrentZeroPoint * 10 : CROVU_TrigTime_LastHalf;
+	    CROVU_TrigTime = (CROVU_TrigTime < (DC_CurrentZeroPoint * 10)) ? (DC_CurrentZeroPoint * 10) : CROVU_TrigTime;
 }
 // ----------------------------------------
 
@@ -325,7 +328,7 @@ void LOGIC_CacheVariables()
 
 		DC_CurrentZeroPoint = ((Int32U)DC_Current * 10000 / ((Int32U)DC_CurrentFallRate * 10 * K_Unit));
 		if(MeasurementMode != MODE_QRR_ONLY)
-			DC_CurrentZeroPoint = (DC_CurrentZeroPoint > TQ_ZeroOffset) ? (DC_CurrentZeroPoint - TQ_ZeroOffset) : 0;
+			DC_CurrentZeroPointTq = (DC_CurrentZeroPoint > TQ_ZeroOffset) ? (DC_CurrentZeroPoint - TQ_ZeroOffset) : 0;
 
 		RC_CurrentMaxPoint = (DC_CurrentZeroPoint > FALL_MAX_TIME) ? (DC_CurrentZeroPoint + FALL_MAX_TIME) : (DC_CurrentZeroPoint * 2 + FALL_DOP_TIME);
 		RC_CurrentMaxPoint = (RC_CurrentMaxPoint > FALL_MIN_TIME) ? RC_CurrentMaxPoint : FALL_MIN_TIME;
@@ -367,19 +370,19 @@ void LOGIC_CacheVariables()
 				if(CacheSinglePulse)
 				{
 					LOGIC_PulseNumRemain = 1;
-					CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
+					CROVU_TrigTime = DC_CurrentZeroPointTq + DataTable[REG_TRIG_TIME];
 				}
 				else
 				{
 					LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
-					 CROVU_TrigTime = DC_CurrentZeroPoint + TQ_FIRST_PROBE;
+					 CROVU_TrigTime = DC_CurrentZeroPointTq + TQ_FIRST_PROBE;
 				}
 
 			}
 			else
 			{
 				LOGIC_PulseNumRemain = 1;
-				CROVU_TrigTime = DC_CurrentZeroPoint + DataTable[REG_TRIG_TIME];
+				CROVU_TrigTime = DC_CurrentZeroPointTq + DataTable[REG_TRIG_TIME];
 			}
 			LOGIC_PreciseEventInit(CROVU_TrigTime);
 		}
@@ -1059,10 +1062,9 @@ void LOGIC_ReadDataSequence()
 
 							if(DataTable[REG_SCOPE_TRIG])
 							{
-								Results[ResultsCounter].DeviceTriggered = (Results[ResultsCounter].Vd > CROVU_Voltage / 100 * VD_HYST_MIN ) &&
-										(Results[ResultsCounter].Vd < CROVU_Voltage / 100 * VD_HYST_MAX ) ? FALSE : TRUE;
-								DataTable[REG_DBG] = Results[ResultsCounter].Vd;
-								DataTable[REG_DBG2] = Results[ResultsCounter].DeviceTriggered;
+//							    if(Result) Result &= HLI_RS232_Read16(REG_REG_RESULT_DUT_TRIG, &Results[ResultsCounter].DeviceTriggered);
+								Results[ResultsCounter].DeviceTriggered = (Results[ResultsCounter].Vd > CROVU_Voltage / 100 * VD_HYST_MIN ) ? FALSE : TRUE;
+//								 && (Results[ResultsCounter].Vd < CROVU_Voltage / 100 * VD_HYST_MAX )
 							}
 							if(!Result)
 							{
@@ -1192,7 +1194,7 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 			if(DeviceTriggered)
 			{
 				// Init slow thyristors measurement (max-time probe)
-				CROVU_TrigTime = DC_CurrentZeroPoint + TQ_MAX_TIME;
+				CROVU_TrigTime = DC_CurrentZeroPointTq + TQ_MAX_TIME;
 				CROVU_TrigTime_LastHalf = TQ_MAX_TIME >> 1;
 				TQ_MaxTimeActive = TRUE;
 			}
@@ -1202,7 +1204,7 @@ void LOGIC_TqExtraLogic(Boolean DeviceTriggered)
 				TqFastThyristor = TRUE;
 				--LOGIC_PulseNumRemain;
 				
-				CROVU_TrigTime = DC_CurrentZeroPoint * 10 + TQ_FIRST_PROBE * 10;
+				CROVU_TrigTime = DC_CurrentZeroPointTq * 10 + TQ_FIRST_PROBE * 10;
 				CROVU_TrigTime_LastHalf = (TQ_FIRST_PROBE * 10) >> 1;
 				LOGIC_TrimTrigTime(FALSE);
 			}

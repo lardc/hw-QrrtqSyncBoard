@@ -363,6 +363,7 @@
 #define REG_SCOPE_RESULT_TS         210 // Time ts (in us x10)
 #define REG_SCOPE_RESULT_TF         211 // Time tf (in us x10)
 #define REG_RESULT_TIME_0_90        212 // Time 0 - 90 Irr (in us x100)
+#define REG_REG_RESULT_DUT_TRIG     213 // обозначение открывания прибора
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
