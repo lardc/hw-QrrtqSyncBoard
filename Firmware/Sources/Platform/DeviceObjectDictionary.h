@@ -205,6 +205,7 @@
 #define REG_CSU_VOLTAGE_THRE		138	// CSU voltage set (in V x10)
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
 #define REG_CALIBRATION_PROCESS		140	// Флаг процесса калибровки
+#define REG_RCU_CURRENT_CALIBRATION 141 // Время обратного тока для калибровки Irr
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1
@@ -220,6 +221,8 @@
 #define REG_DBG_READ_CURRENT_SCALE	172	// Отладочный регистр Значения Irr для корректировки скейла в SCOPE
 #define REG_DBG_WRITE_CURRENT_SCALE	173 // Отладочный регистр значения скейла записанный в SCOPE
 #define REG_DBG_WRITE_SAMLING_TIME  174 // Отладочный регистр значения времени записанный в SCOPE
+#define REG_DBG_DC_ZERO             175
+#define REG_DBG_RC_MAX              176
 //
 #define REG_PWD_1					180	// Unlock password location 1
 #define REG_PWD_2					181	// Unlock password location 2
