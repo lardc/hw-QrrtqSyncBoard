@@ -116,6 +116,9 @@ typedef struct __TableItemConstraint
 #define CSU_VOLTAGE_HYST_MIN		1		// in V x10
 #define CSU_VOLTAGE_HYST_MAX		50		// in V x10
 #define CSU_VOLTAGE_HYST_DEF		5		// in V x10
+//
+
+#define PULSE_TO_PULSE_DEF          5000    // in ms
 
 // Variables
 //

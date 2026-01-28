@@ -1306,7 +1306,7 @@ void LOGIC_ResultToDataTable()
 			DataTable[REG_RES_VD] = Results[ResultsCounter - 1].Vd;
 
 		case MODE_QRR_ONLY:
-			CalcQrr = (Irr * (Trr / 10)) >> 1;
+			CalcQrr = ((Irr * 10 * Trr) >> 1) / 100;
 			DataTable[REG_RES_QRR] = CalcQrr & 0xFFFF;
 			DataTable[REG_RES_QRR_32B] = CalcQrr >> 16;
 			DataTable[REG_RES_IRR] = Irr;

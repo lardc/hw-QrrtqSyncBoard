@@ -43,8 +43,7 @@
 #define TIMEOUT_HL_LOGIC_SHORT			2000	// in ms
 //
 #define UNIT_PULSE_TO_PULSE_FAST		700		// in ms
-#define UNIT_PULSE_TO_PULSE_PAUSE		500		// in ms
-#define UNIT_PULSE_TO_PULSE_LONG		1400	// in ms
+#define UNIT_PULSE_TO_PULSE_PAUSE		1500	// in ms
 //
 #define DELAY_COMMUTATION				500		// in ms
 //--------------------------------------------------------

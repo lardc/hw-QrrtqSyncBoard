@@ -134,7 +134,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, INT16U_MAX, I_TO_DAC_P0_DEF},										// 118
 											   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 119
 											   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 120
-                                    		   {0, 0, 0},																// 121
+                                    		   {0, INT16U_MAX, PULSE_TO_PULSE_DEF},										// 121
                                     		   {0, 0, 0},																// 122
                                     		   {0, 0, 0},																// 123
                                     		   {0, 0, 0},																// 124
