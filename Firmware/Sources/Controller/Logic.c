@@ -160,7 +160,7 @@ Int16U LOGIC_GetOpResult()
 
 Boolean LOGIC_DUTTriggered()
 {
-	return (ResultsCounter > 0) ? Results[ResultsCounter - 1].DeviceTriggered : TRUE;
+	return Results[ResultsCounter - 1].DeviceTriggered;
 }
 // ----------------------------------------
 
