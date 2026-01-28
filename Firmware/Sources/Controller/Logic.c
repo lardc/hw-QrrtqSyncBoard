@@ -29,7 +29,7 @@ static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 volatile Int16U ResultsCounter, MeasurementMode;
 //
 static Boolean MuteCROVU, MuteFCROVU;
-static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, DCPulseFormed = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
+static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static volatile Boolean TQ_MaxTimeActive = FALSE;
 static Int16U K_Unit, DC_Current, RC_CurrentTime, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
@@ -139,7 +139,6 @@ void LOGIC_RealTime()
 
 			LOGIC_ReadDataPrepare();
 			LOGIC_StateRealTime = LSRT_None;
-			DCPulseFormed = TRUE;
 		}
 
 		++LOGIC_RealTimeCounter;
@@ -156,12 +155,6 @@ Int16U LOGIC_GetPulsesRemain()
 Int16U LOGIC_GetOpResult()
 {
 	return LOGIC_OperationResult;
-}
-// ----------------------------------------
-
-Boolean LOGIC_DCPulseFormed()
-{
-	return DCPulseFormed;
 }
 // ----------------------------------------
 
@@ -260,8 +253,6 @@ void LOGIC_ResetState()
 
 void LOGIC_CacheVariables()
 {
-	DCPulseFormed = FALSE;
-
 	CSUVoltageSet = DataTable[REG_CSU_VOLTAGE_THRE];
 	CSUVoltageHigh = DataTable[REG_CSU_VOLTAGE_THRE] + DataTable[REG_CSU_VOLTAGE_HYST] / 2;
 	CSUVoltageLow = DataTable[REG_CSU_VOLTAGE_THRE] - DataTable[REG_CSU_VOLTAGE_HYST] / 2;

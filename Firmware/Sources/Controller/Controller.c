@@ -358,9 +358,7 @@ void CONTROL_SubProcessStateMachine()
 			else
 			{
 				CONTROL_PulseToPulsePause = CONTROL_TimeCounter
-						+ (LOGIC_DCPulseFormed() ?
-								(LOGIC_DUTTriggered() ? DataTable[REG_PULSE_TO_PULSE_LONG] : UNIT_PULSE_TO_PULSE_FAST) :
-								UNIT_PULSE_TO_PULSE_PAUSE);
+						+ (LOGIC_DUTTriggered() ? DataTable[REG_PULSE_TO_PULSE_LONG] : UNIT_PULSE_TO_PULSE_FAST);
 				
 				LOGIC_StateRealTime = LSRT_WaitForConfig;
 				LOGIC_ConfigurePrepare();
