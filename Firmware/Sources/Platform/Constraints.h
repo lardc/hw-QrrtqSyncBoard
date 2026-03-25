@@ -103,9 +103,9 @@ typedef struct __TableItemConstraint
 #define OSV_RATE_MAX				200		// in V/us
 #define OSV_RATE_DEF				50		// in V/us
 
-#define OSV_CURRENT_MIN				400		// in A
+#define OSV_CURRENT_MIN				0		// in A
 #define OSV_CURRENT_MAX				1600	// in A
-#define OSV_CURRENT_DEF				1600	// in A
+#define OSV_CURRENT_DEF				0       // in A
 
 // CSU
 //

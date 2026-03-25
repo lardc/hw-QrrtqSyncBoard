@@ -337,8 +337,10 @@ void LOGIC_CacheVariables()
 		CROVU_SyncTime = CROVU_Voltage / DataTable[REG_OSV_RATE] + PRE_PROBE_TIME_US_CROVU;
 
 		LOGIC_FCROVUOnSync(LOGIC_FindFCROVUTrigOffset(CROVU_VoltageRate));
-		FCROVU_IShortCircuit = (DC_Current / 2);
-		DataTable[REG_FCROVU_I_SHORT] = FCROVU_IShortCircuit;
+		if(!DataTable[REG_FCROVU_I_SHORT])
+		    FCROVU_IShortCircuit = (DC_Current / 2);
+		else
+		    FCROVU_IShortCircuit = DataTable[REG_FCROVU_I_SHORT];
 
 		LOGIC_DriverOffTicks = (
 				((DC_Current / DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
