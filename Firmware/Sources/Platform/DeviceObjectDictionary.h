@@ -189,6 +189,7 @@
 #define REG_I_TO_DAC_P1				119	// Добавочный коэффициент компенсации амплитуды прямого тока
 #define REG_I_TO_DAC_P2				120	// Добавочный квадратичный коэффициент компенсации амплитуды прямого тока
 //
+#define REG_PULSE_TO_PULSE_LONG     121 // Время паузы в мс при открытия прибора на tq
 
 // ----------------------------------------
 //
@@ -205,6 +206,7 @@
 #define REG_CSU_VOLTAGE_THRE		138	// CSU voltage set (in V x10)
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
 #define REG_CALIBRATION_PROCESS		140	// Флаг процесса калибровки
+#define REG_RCU_CURRENT_CALIBRATION 141 // Время обратного тока для калибровки Irr
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1
@@ -220,6 +222,8 @@
 #define REG_DBG_READ_CURRENT_SCALE	172	// Отладочный регистр Значения Irr для корректировки скейла в SCOPE
 #define REG_DBG_WRITE_CURRENT_SCALE	173 // Отладочный регистр значения скейла записанный в SCOPE
 #define REG_DBG_WRITE_SAMLING_TIME  174 // Отладочный регистр значения времени записанный в SCOPE
+#define REG_DBG_DC_ZERO             175
+#define REG_DBG_RC_MAX              176
 //
 #define REG_PWD_1					180	// Unlock password location 1
 #define REG_PWD_2					181	// Unlock password location 2
@@ -363,6 +367,7 @@
 #define REG_SCOPE_RESULT_TS         210 // Time ts (in us x10)
 #define REG_SCOPE_RESULT_TF         211 // Time tf (in us x10)
 #define REG_RESULT_TIME_0_90        212 // Time 0 - 90 Irr (in us x100)
+#define REG_REG_RESULT_DUT_TRIG     213 // обозначение открывания прибора
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step

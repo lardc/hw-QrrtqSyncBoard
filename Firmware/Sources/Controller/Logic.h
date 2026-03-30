@@ -127,8 +127,6 @@ void LOGIC_RealTime();
 Int16U LOGIC_GetPulsesRemain();
 // Get logic operation result
 Int16U LOGIC_GetOpResult();
-// Check if DC pulse was formed
-Boolean LOGIC_DCPulseFormed();
 // Check if DUT was triggered
 Boolean LOGIC_DUTTriggered();
 // Read current state

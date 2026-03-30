@@ -25,7 +25,7 @@
 #define VALUES_x_SIZE					2000
 
 #define VD_HYST_MIN						95 		// in %
-#define VD_HYST_MAX						110 	// in %
+//#define VD_HYST_MAX						110 	// in %
 
 #define IRR_TO_HIGH                     9       // in %*10
 #define ID_TO_HIGH                      120     // in %
@@ -43,8 +43,6 @@
 #define TIMEOUT_HL_LOGIC_SHORT			2000	// in ms
 //
 #define UNIT_PULSE_TO_PULSE_FAST		700		// in ms
-#define UNIT_PULSE_TO_PULSE_PAUSE		500		// in ms
-#define UNIT_PULSE_TO_PULSE_LONG		1400	// in ms
 //
 #define DELAY_COMMUTATION				500		// in ms
 //--------------------------------------------------------

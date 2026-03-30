@@ -56,6 +56,10 @@ typedef struct __TableItemConstraint
 #define DIRECT_CURRENT_MAX			3300	// in A
 #define DIRECT_CURRENT_DEF			300		// in A
 
+#define REVERSE_CURRENT_MIN         0      // в А
+#define REVERSE_CURRENT_MAX         3300    // в А
+#define REVERSE_CURRENT_DEF         0     // в А
+
 #define IDC_PULSE_WIDTH_MIN			100		// in us
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
 #define IDC_PULSE_WIDTH_DEF			2000	// in us
@@ -99,9 +103,9 @@ typedef struct __TableItemConstraint
 #define OSV_RATE_MAX				200		// in V/us
 #define OSV_RATE_DEF				50		// in V/us
 
-#define OSV_CURRENT_MIN				400		// in A
+#define OSV_CURRENT_MIN				0		// in A
 #define OSV_CURRENT_MAX				1600	// in A
-#define OSV_CURRENT_DEF				1600	// in A
+#define OSV_CURRENT_DEF				0       // in A
 
 // CSU
 //
@@ -112,6 +116,9 @@ typedef struct __TableItemConstraint
 #define CSU_VOLTAGE_HYST_MIN		1		// in V x10
 #define CSU_VOLTAGE_HYST_MAX		50		// in V x10
 #define CSU_VOLTAGE_HYST_DEF		5		// in V x10
+//
+
+#define PULSE_TO_PULSE_DEF          5000    // in ms
 
 // Variables
 //
