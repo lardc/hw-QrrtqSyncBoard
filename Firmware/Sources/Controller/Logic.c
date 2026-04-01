@@ -1044,7 +1044,7 @@ void LOGIC_ReadDataSequence()
 						
 						if(LOGIC_ExtDeviceState.SCOPE.State == CDS_None)
 						{
-							Int16U Qrr = 0, Qrr32b = 0;
+							Int16U Qrr = 0, Qrr32b = 0, RawRevVolt = 0;
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_OP_RESULT, &Register);
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_PROBLEM, &Problem);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IRR, &Results[ResultsCounter].Irr);
@@ -1060,7 +1060,9 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TF, &Results[ResultsCounter].tf);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt);
+							if(Result) Result &= HLI_RS232_Read16(REG_RESULT_REV_VOLT, &RawRevVolt);
 							Results[ResultsCounter].Qrr = ((Int32U)Qrr32b << 16) | Qrr;
+							Results[ResultsCounter].RevVolt = (Int16S)RawRevVolt;
 
 							if(DataTable[REG_SCOPE_TRIG])
 							{
@@ -1092,6 +1094,10 @@ void LOGIC_ReadDataSequence()
 								else if(Results[ResultsCounter].Idc > DC_Current * ID_TO_HIGH)
 								{
 								    LOGIC_AbortMeasurement(PROBLEM_ID_TO_HIGH);
+								}
+								else if(Results[ResultsCounter].RevVolt < REVV_TO_LOW)
+								{
+								    LOGIC_AbortMeasurement(PROBLEM_LOW_REV_VOLT);
 								}
 								else
 								{
@@ -1297,6 +1303,7 @@ void LOGIC_ResultToDataTable()
 		case MODE_QRR_TQ:
 			DataTable[REG_RES_TQ] = Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
 			DataTable[REG_RES_VD] = Results[ResultsCounter - 1].Vd;
+			DataTable[REG_RES_REVVOLT] = (Int16U)Results[ResultsCounter - 1].RevVolt;
 
 		case MODE_QRR_ONLY:
 			CalcQrr = ((Irr * 10 * Trr) >> 1) / 100;

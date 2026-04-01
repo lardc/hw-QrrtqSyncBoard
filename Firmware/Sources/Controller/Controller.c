@@ -228,6 +228,7 @@ void CONTROL_FillWPPartDefault()
 	DataTable[REG_RES_QRR_INT] = 0;
 	DataTable[REG_RES_QRR_INT_32B] = 0;
 	DataTable[REG_RES_VD] = 0;
+	DataTable[REG_RES_REVVOLT] = 0;
 
 	DataTable[REG_EP_ELEMENT_FRACT] = 0;
 	DataTable[REG_EP_STEP_FRACT_CNT] = 0;

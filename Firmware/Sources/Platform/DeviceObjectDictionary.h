@@ -283,6 +283,8 @@
 #define REG_EP_ELEMENT_FRACT		235	// Elementary fraction length (in ns)
 #define REG_EP_STEP_FRACT_CNT		236	// Number of elementary fractions in the EP single step
 //
+#define REG_RES_REVVOLT				238	// Reverse voltage amplitude (in V)
+//
 #define REG_PRESSURE				240	// Pressure flag
 #define REG_CSU_VOLTAGE				241	// CSU voltage (V*10)
 //
@@ -368,6 +370,7 @@
 #define REG_SCOPE_RESULT_TF         211 // Time tf (in us x10)
 #define REG_RESULT_TIME_0_90        212 // Time 0 - 90 Irr (in us x100)
 #define REG_REG_RESULT_DUT_TRIG     213 // обозначение открывания прибора
+#define REG_RESULT_REV_VOLT			214	// Reverse voltage amplitude (in V)
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
@@ -458,6 +461,7 @@
 #define PROBLEM_IRR_TO_LOW			6	// Обратный ток слишком маленький
 #define PROBLEM_SAFETY				8	// Problem safety
 #define PROBLEM_ID_TO_HIGH          9   // Прямой ток выше задаваемого
+#define PROBLEM_LOW_REV_VOLT		10	// Обратное напряжение ниже порога
 
 // DISABLE CODES
 //
