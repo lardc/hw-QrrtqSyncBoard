@@ -461,7 +461,7 @@
 #define PROBLEM_IRR_TO_LOW			6	// Обратный ток слишком маленький
 #define PROBLEM_SAFETY				8	// Problem safety
 #define PROBLEM_ID_TO_HIGH          9   // Прямой ток выше задаваемого
-#define PROBLEM_LOW_REV_VOLT		10	// Обратное напряжение ниже порога
+#define PROBLEM_HIGH_REV_VOLT		10	// Обратное напряжение выше порога
 
 // DISABLE CODES
 //

@@ -1095,9 +1095,9 @@ void LOGIC_ReadDataSequence()
 								{
 								    LOGIC_AbortMeasurement(PROBLEM_ID_TO_HIGH);
 								}
-								else if(Results[ResultsCounter].RevVolt < REVV_TO_LOW)
+								else if(Results[ResultsCounter].RevVolt > REVV_TO_HIGH)
 								{
-								    LOGIC_AbortMeasurement(PROBLEM_LOW_REV_VOLT);
+								    LOGIC_AbortMeasurement(PROBLEM_HIGH_REV_VOLT);
 								}
 								else
 								{
