@@ -140,9 +140,18 @@ void ZbGPIO_DUT_Control(Boolean Set)
 
 void ZbGPIO_PC_TurnOn()
 {
-	ZwGPIO_WritePin(PIN_PC_PWR, TRUE);
-	DELAY_US(500000);
-	ZwGPIO_WritePin(PIN_PC_PWR, FALSE);
+	pInt16U TurnFlagPointer = (pInt16U)0x3FE;
+	const Int16U TurnFlagValue = 0xA5A5;
+
+	// Включение ПК только при отсутствии выставленного в памяти флага
+	if(TurnFlagValue != *TurnFlagPointer)
+	{
+		*TurnFlagPointer = TurnFlagValue;
+
+		ZwGPIO_WritePin(PIN_PC_PWR, TRUE);
+		DELAY_US(500000);
+		ZwGPIO_WritePin(PIN_PC_PWR, FALSE);
+	}
 }
 // ----------------------------------------
 
