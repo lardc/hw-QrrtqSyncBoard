@@ -138,6 +138,14 @@ void ZbGPIO_DUT_Control(Boolean Set)
 }
 // ----------------------------------------
 
+void ZbGPIO_PC_Pulse()
+{
+	ZwGPIO_WritePin(PIN_PC_PWR, TRUE);
+	DELAY_US(500000);
+	ZwGPIO_WritePin(PIN_PC_PWR, FALSE);
+}
+// ----------------------------------------
+
 void ZbGPIO_PC_TurnOn()
 {
 	pInt16U TurnFlagPointer = (pInt16U)0x3FE;
@@ -147,10 +155,7 @@ void ZbGPIO_PC_TurnOn()
 	if(TurnFlagValue != *TurnFlagPointer)
 	{
 		*TurnFlagPointer = TurnFlagValue;
-
-		ZwGPIO_WritePin(PIN_PC_PWR, TRUE);
-		DELAY_US(500000);
-		ZwGPIO_WritePin(PIN_PC_PWR, FALSE);
+		ZbGPIO_PC_Pulse();
 	}
 }
 // ----------------------------------------

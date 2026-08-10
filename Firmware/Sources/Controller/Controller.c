@@ -544,7 +544,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 			
 		case ACT_DIAG_TURN_ON_PC:
 			{
-				ZbGPIO_PC_TurnOn();
+				ZbGPIO_PC_Pulse();
 			}
 			break;
 			
