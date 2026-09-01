@@ -96,7 +96,8 @@ PAGE 1 :   /* Data Memory */
            /* Memory (RAM/FLASH/OTP) blocks can be moved to PAGE0 for program allocation */
            /* Registers remain on PAGE1                                                  */
 
-   RAMM0       : origin = 0x000000, length = 0x0003FF     /* on-chip RAM block M0 */
+   RAMM0       : origin = 0x000000, length = 0x0003FE     /* on-chip RAM block M0 */
+   RAMM0_PC_FL : origin = 0x0003FE, length = 0x000001     /* on-chip RAM block M0 for PC turn-on control */
    RAMM0_FL    : origin = 0x0003FF, length = 0x000001     /* on-chip RAM block M0 for boot flag */
    RAMM1       : origin = 0x000480, length = 0x000380     /* on-chip RAM block M1 */
    BOOT_RSVD   : origin = 0x000400, length = 0x000080     /* Part of M1, BOOT rom will use this for stack */
