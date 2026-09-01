@@ -802,11 +802,17 @@ void CONTROL_Commutation(Boolean State)
 
 void CONTROL_SafetyHandler()
 {
-	if((CONTROL_State == DS_InProcess) && ZbGPIO_SafetyCheck() && !SafetyCheck)
+	if((CONTROL_State == DS_InProcess) && ZbGPIO_SafetyCheck())
 	{
-		SafetyCheck = TRUE;
-		LOGIC_SafetyProblem();
+		if(!SafetyCheck)
+		{
+			SafetyCheck = TRUE;
+			LOGIC_SafetyProblem();
+		}
 	}
+	else
+		SafetyCheck = FALSE;
+
 	// Safety system enable
 	ZbGPIO_SafetyEnable(DataTable[REG_SAFETY_EN]);
 }
