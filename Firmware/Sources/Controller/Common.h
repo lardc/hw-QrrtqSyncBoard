@@ -40,7 +40,8 @@ void CMN_NodePowerOn(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 void CMN_NodePowerOff(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity,
 		volatile LogicState *CurrentLogicState, Int16U FaultCode, LogicState NextLogicState);
 void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDRCUConfig Config,
-		volatile LogicState *CurrentLogicState, LogicState NextLogicState);
+		volatile LogicState *CurrentLogicState, LogicState NextLogicState,
+		Int64U TimeCounter, Int64U Timeout, Int16U Fault);
 //Boolean CMN_StartVoltageCROVU(Int16U CSUVoltageSet);
 void CMN_WaitNodesReadyPreConfig(Int64U TimeCounter, Int64U Timeout, volatile ExternalDeviceState *FullStateStorage,
 		volatile LogicState *CurrentLogicState, LogicState NewState);

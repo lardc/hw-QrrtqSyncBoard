@@ -379,7 +379,6 @@ void LOGIC_CacheVariables()
 					LOGIC_PulseNumRemain = UNIT_TQ_MEASURE_PULSES;
 					 CROVU_TrigTime = DC_CurrentZeroPointTq + TQ_FIRST_PROBE;
 				}
-
 			}
 			else
 			{
@@ -741,31 +740,40 @@ void LOGIC_ConfigureSequence()
 					{
 						LOGIC_State = LS_CFG_DCU1;
 					}
+
+					if(LOGIC_State == LS_CFG_DCU1)
+						Timeout = CONTROL_TimeCounter + TIMEOUT_HL_LOGIC;
 				}
 				break;
 				
 			case LS_CFG_DCU1:
-				CMN_ConfigDRCU(REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DCU1, &DCUConfig, &LOGIC_State, LS_CFG_DCU2);
+				CMN_ConfigDRCU(REG_DCU1_NODE_ID, &LOGIC_ExtDeviceState.DCU1, &DCUConfig, &LOGIC_State, LS_CFG_DCU2,
+						CONTROL_TimeCounter, Timeout, FAULT_LOGIC_DCU1);
 				break;
 
 			case LS_CFG_DCU2:
-				CMN_ConfigDRCU(REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DCU2, &DCUConfig, &LOGIC_State, LS_CFG_DCU3);
+				CMN_ConfigDRCU(REG_DCU2_NODE_ID, &LOGIC_ExtDeviceState.DCU2, &DCUConfig, &LOGIC_State, LS_CFG_DCU3,
+						CONTROL_TimeCounter, Timeout, FAULT_LOGIC_DCU2);
 				break;
 
 			case LS_CFG_DCU3:
-				CMN_ConfigDRCU(REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DCU3, &DCUConfig, &LOGIC_State, LS_CFG_RCU1);
+				CMN_ConfigDRCU(REG_DCU3_NODE_ID, &LOGIC_ExtDeviceState.DCU3, &DCUConfig, &LOGIC_State, LS_CFG_RCU1,
+						CONTROL_TimeCounter, Timeout, FAULT_LOGIC_DCU3);
 				break;
 
 			case LS_CFG_RCU1:
-				CMN_ConfigDRCU(REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.RCU1, &RCUConfig, &LOGIC_State, LS_CFG_RCU2);
+				CMN_ConfigDRCU(REG_RCU1_NODE_ID, &LOGIC_ExtDeviceState.RCU1, &RCUConfig, &LOGIC_State, LS_CFG_RCU2,
+						CONTROL_TimeCounter, Timeout, FAULT_LOGIC_RCU1);
 				break;
 
 			case LS_CFG_RCU2:
-				CMN_ConfigDRCU(REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.RCU2, &RCUConfig, &LOGIC_State, LS_CFG_RCU3);
+				CMN_ConfigDRCU(REG_RCU2_NODE_ID, &LOGIC_ExtDeviceState.RCU2, &RCUConfig, &LOGIC_State, LS_CFG_RCU3,
+						CONTROL_TimeCounter, Timeout, FAULT_LOGIC_RCU2);
 				break;
 				
 			case LS_CFG_RCU3:
-				CMN_ConfigDRCU(REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.RCU3, &RCUConfig, &LOGIC_State, LS_CFG_SCOPE);
+				CMN_ConfigDRCU(REG_RCU3_NODE_ID, &LOGIC_ExtDeviceState.RCU3, &RCUConfig, &LOGIC_State, LS_CFG_SCOPE,
+						CONTROL_TimeCounter, Timeout, FAULT_LOGIC_RCU3);
 				break;
 				
 			case LS_CFG_SCOPE:
@@ -776,6 +784,7 @@ void LOGIC_ConfigureSequence()
 						{
 							case CDS_InProcess:
 								HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
+								/* no break */
 
 							case CDS_None:
 								{
@@ -1304,6 +1313,7 @@ void LOGIC_ResultToDataTable()
 			DataTable[REG_RES_TQ] = Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
 			DataTable[REG_RES_VD] = Results[ResultsCounter - 1].Vd;
 			DataTable[REG_RES_REVVOLT] = (Int16U)Results[ResultsCounter - 1].RevVolt;
+			/* no break */
 
 		case MODE_QRR_ONLY:
 			CalcQrr = ((Irr * 10 * Trr) >> 1) / 100;
@@ -1771,7 +1781,4 @@ Int16U LOGIC_FCROVUOnSync(Int16U Delay)
 
 	return FCROVUTrigOffset;
 }
-// ----------------------------------------
-
-
 // ----------------------------------------
