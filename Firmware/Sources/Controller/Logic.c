@@ -62,6 +62,7 @@ void LOGIC_CorrRCUCurrent(Int16U NamberFallRate);
 Boolean LOGIC_UpdateDeviceState();
 Boolean LOGIC_UpdateDeviceStateErrReset();
 Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error);
+static void LOGIC_StopScopeDPC();
 
 // Functions
 //
@@ -93,9 +94,13 @@ void LOGIC_RealTime()
 			ZbGPIO_CSU_Sync(FALSE);
 			ZbGPIO_DUT_Control(FALSE);
 			ZbGPIO_DUT_Switch(FALSE);
-			LOGIC_StateRealTime = LSRT_None;
 
-			LOGIC_AbortMeasurement(PROBLEM_NO_DIRECT_CURRENT);
+			DataTable[REG_PROBLEM] = PROBLEM_NO_DIRECT_CURRENT;
+			LOGIC_OperationResult = OPRESULT_FAIL;
+			LOGIC_PulseNumRemain = 0;
+			LOGIC_StateRealTime = LSRT_None;
+			LOGIC_State = LS_None;
+			CONTROL_RequestDPC(&LOGIC_Halt);
 		}
 		
 		// Start reverse current pulse and on-state voltage timer
@@ -167,10 +172,7 @@ Boolean LOGIC_DUTTriggered()
 void LOGIC_Halt()
 {
 	LOGIC_PulseNumRemain = 0;
-	
-	if(LOGIC_StateRealTime == LSRT_WaitForConfig)
-		LOGIC_StateRealTime = LSRT_None;
-
+	LOGIC_StateRealTime = LSRT_None;
 	LOGIC_State = LS_None;
 
 	// Выключение всех синхронизаций
@@ -181,8 +183,17 @@ void LOGIC_Halt()
 	ZbGPIO_RCU_Sync(FALSE);
 	ZbGPIO_FCROVU_Sync(FALSE);
 	ZbGPIO_CROVU_Sync(FALSE);
+
+	CONTROL_RequestDPC(&LOGIC_StopScopeDPC);
+}
+// ----------------------------------------
+
+static void LOGIC_StopScopeDPC()
+{
 	if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
 		HLI_RS232_CallAction(ACT_SCOPE_STOP_TEST);
+
+	CONTROL_RequestDPC(DPC_NO_ACTION);
 }
 // ----------------------------------------
 
