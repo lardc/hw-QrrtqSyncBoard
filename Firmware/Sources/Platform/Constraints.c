@@ -63,74 +63,74 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, MAX_TQ_OFFSET, 0},													// 47
 											   {0, MAX_TQ_OFFSET, 0},													// 48
 											   {0, MAX_TQ_OFFSET, 0},													// 49
-											   {0, MAX_FALL_RATE, FALL_RATE_R0_DEF},									// 50
-											   {0, MAX_FALL_RATE, FALL_RATE_R1_DEF},									// 51
-											   {0, MAX_FALL_RATE, FALL_RATE_R2_DEF},									// 52
-											   {0, MAX_FALL_RATE, FALL_RATE_R3_DEF},									// 53
-											   {0, MAX_FALL_RATE, FALL_RATE_R4_DEF},									// 54
-											   {0, MAX_FALL_RATE, FALL_RATE_R5_DEF},									// 55
-											   {0, MAX_FALL_RATE, FALL_RATE_R6_DEF},									// 56
-											   {0, MAX_FALL_RATE, FALL_RATE_R7_DEF},									// 57
-											   {0, MAX_FALL_RATE, FALL_RATE_R8_DEF},									// 58
-											   {0, MAX_FALL_RATE, FALL_RATE_R9_DEF},									// 59
-											   {0, MAX_FALL_RATE, FALL_RATE_R10_DEF},									// 60
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R0_DEF},						// 50
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R1_DEF},						// 51
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R2_DEF},						// 52
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R3_DEF},						// 53
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R4_DEF},						// 54
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R5_DEF},						// 55
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R6_DEF},						// 56
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R7_DEF},						// 57
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R8_DEF},						// 58
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R9_DEF},						// 59
+											   {FALL_RATE_MIN, MAX_FALL_RATE, FALL_RATE_R10_DEF},						// 60
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 61
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 62
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 62
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 63
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 64
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 65
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 65
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 66
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 67
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 68
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 68
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 69
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 70
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 71
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 71
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 72
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 73
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 74
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 74
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 75
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 76
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 77
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 77
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 78
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 79
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 80
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 80
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 81
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 82
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 83
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 83
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 84
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 85
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 86
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 86
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 87
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 88
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 89
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 89
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 90
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 91
-											   {0, INT16U_MAX, I_TO_V_K_DEF},											// 92
+											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 92
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 93
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 94
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 95
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 95
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 96
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 97
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 97
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 98
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 99
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 99
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 100
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 101
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 101
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 102
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 103
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 103
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 104
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 105
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 105
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 106
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 107
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 107
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 108
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 109
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 109
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 110
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 111
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 111
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 112
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 113
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 113
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 114
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 115
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 115
 											   {0, INT16U_MAX, CTRL_OFFSET_DEF},										// 116
-											   {0, INT16U_MAX, CTRL_K_DEF},												// 117
+											   {K_COEF_MIN, INT16U_MAX, CTRL_K_DEF},									// 117
 											   {0, INT16U_MAX, I_TO_DAC_P0_DEF},										// 118
 											   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 119
 											   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 120

@@ -72,6 +72,7 @@ typedef struct __TableItemConstraint
 #define REVERSE_RATE_MAX			10		// in A/us x10
 #define REVERSE_RATE_DEF			4		// in A/us x10
 
+#define FALL_RATE_MIN				1		// A/мкс x10
 #define MAX_FALL_RATE				1000	// A/мкс x10
 #define FALL_RATE_R0_DEF			10		// A/мкс x10
 #define FALL_RATE_R1_DEF			15		// A/мкс x10
@@ -86,7 +87,8 @@ typedef struct __TableItemConstraint
 #define FALL_RATE_R10_DEF			1000	// A/мкс x10
 //
 #define I_TO_V_OFFSET_DEF			0
-#define I_TO_V_K_DEF				0
+#define K_COEF_MIN					1
+#define I_TO_V_K_DEF				1
 #define I_TO_V_K2_DEF				0
 #define CTRL_OFFSET_DEF				0
 #define CTRL_K_DEF					1000

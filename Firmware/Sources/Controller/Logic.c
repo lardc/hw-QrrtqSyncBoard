@@ -1429,7 +1429,6 @@ Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulatio
 
 	return K_Unit;
 }
-
 // ----------------------------------------
 
 void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
@@ -1478,9 +1477,7 @@ void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U 
 	}
 	else
 		Config->ScopeCurrentScaleResult = DC_Current;
-
 }
-
 // ----------------------------------------
 
 Int16U LOGIC_FindRCUTrigOffset(Int16U NamberFallRate)
@@ -1524,7 +1521,6 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U NamberFallRate)
 			return DataTable[REG_RCU_TOFFS_R10];
 	}
 }
-
 // ----------------------------------------
 
 Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate)
@@ -1612,7 +1608,6 @@ Int16U LOGIC_FindFallRate(Int16U NamberFallRate)
 			return DataTable[REG_FALL_RATE_R10];
 	}
 }
-
 // ----------------------------------------
 
 void LOGIC_CorrFallRate(Int16U NamberFallRate)
@@ -1692,8 +1687,8 @@ void LOGIC_CorrFallRate(Int16U NamberFallRate)
 			break;
 	}
 }
-
 // ----------------------------------------
+
 void LOGIC_CorrRCUCurrent(Int16U NamberFallRate)
 {
 	switch(NamberFallRate)
@@ -1759,7 +1754,6 @@ void LOGIC_CorrRCUCurrent(Int16U NamberFallRate)
 			break;
 	}
 }
-
 // ----------------------------------------
 
 void LOGIC_GenerateSyncSequence()
