@@ -535,7 +535,7 @@ void LOGIC_FaultResetSequence()
 		LOGIC_HandleCommunicationError();
 	}
 	else
-		CONTROL_RequestDPC(NULL);
+		CONTROL_RequestDPC(DPC_NO_ACTION);
 }
 // ----------------------------------------
 
@@ -660,7 +660,7 @@ void LOGIC_PowerOnSequence()
 		LOGIC_HandleCommunicationError();
 	}
 	else
-		CONTROL_RequestDPC(NULL);
+		CONTROL_RequestDPC(DPC_NO_ACTION);
 }
 // ----------------------------------------
 
@@ -816,7 +816,7 @@ void LOGIC_ConfigureSequence()
 		LOGIC_HandleCommunicationError();
 	}
 	else
-		CONTROL_RequestDPC(NULL);
+		CONTROL_RequestDPC(DPC_NO_ACTION);
 }
 // ----------------------------------------
 
@@ -907,7 +907,7 @@ void LOGIC_PowerOffSequence()
 		LOGIC_HandleCommunicationError();
 	}
 	else
-		CONTROL_RequestDPC(NULL);
+		CONTROL_RequestDPC(DPC_NO_ACTION);
 }
 // ----------------------------------------
 
@@ -1178,7 +1178,7 @@ void LOGIC_ReadDataSequence()
 		LOGIC_HandleCommunicationError();
 	}
 	else
-		CONTROL_RequestDPC(NULL);
+		CONTROL_RequestDPC(DPC_NO_ACTION);
 }
 // ----------------------------------------
 
