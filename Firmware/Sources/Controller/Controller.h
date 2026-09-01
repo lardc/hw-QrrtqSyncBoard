@@ -25,7 +25,7 @@ typedef enum __DeviceState
 } DeviceState;
 //
 typedef void (*FUNC_AsyncDelegate)();
-
+#define DPC_NO_ACTION ((FUNC_AsyncDelegate)NULL)
 
 // Variables
 //

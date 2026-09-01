@@ -21,6 +21,7 @@
 // Definitions
 //
 #define PRESSURE_FAULT_COUNTER_MAX			1000
+
 // Variables
 //
 volatile DeviceState CONTROL_State = DS_None;
@@ -54,7 +55,6 @@ void CONTROL_SetDeviceState(DeviceState NewState);
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError);
 void CONTROL_StatusHLI();
 void CONTROL_FillWPPartDefault();
-void CONTROL_SwitchToReverseCurrent();
 void CONTROL_SubProcessStateMachine();
 void CONTROL_ReinitRS232();
 void CONTROL_SwitchToReady();
@@ -436,7 +436,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 		case ACT_CLR_FAULT:
 			if(CONTROL_State == DS_Fault || CONTROL_State == DS_None)
 			{
-				CONTROL_RequestDPC(NULL);
+				CONTROL_RequestDPC(DPC_NO_ACTION);
 				LOGIC_ResetState();
 				HLI_ResetError();
 				CONTROL_FillWPPartDefault();
@@ -785,7 +785,7 @@ void CONTROL_SlowEPRead()
 		DataTable[REG_DIAG_OUT_1] = err.ErrorCode;
 	}
 
-	CONTROL_RequestDPC(NULL);
+	CONTROL_RequestDPC(DPC_NO_ACTION);
 }
 // ----------------------------------------
 

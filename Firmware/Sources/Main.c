@@ -50,9 +50,6 @@ void main()
 	// Boot process
 	clockInitResult = InitializeCPU();
 
-	// PC turn-on patch
-	DELAY_US(500000);
-
 	// Only if good clocking was established
 	if(clockInitResult)
 	{
