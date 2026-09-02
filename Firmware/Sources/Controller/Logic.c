@@ -121,7 +121,7 @@ void LOGIC_RealTime()
 		// Stop process
 		if(LOGIC_StateRealTime == LSRT_ReversePulseStart && LOGIC_RealTimeCounter >= TimeReverseStop)
 		{
-			DataTable[REG_RCU_SYNC_WIDTH] = TimeReverseStop;
+			DataTable[REG_DBG2] = TimeReverseStop;
 			ZbGPIO_FCROVU_Sync(FALSE);
 			ZbGPIO_SCOPE_Sync(FALSE);
 			//

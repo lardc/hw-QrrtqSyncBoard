@@ -64,10 +64,6 @@ typedef struct __TableItemConstraint
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
 #define IDC_PULSE_WIDTH_DEF			2000	// in us
 
-#define IRC_SYNC_WIDTH_MIN			500		// in us
-#define IRC_SYNC_WIDTH_MAX 			2000	// in us
-#define IRC_SYNC_WIDTH_DEF			500		// in us
-
 #define REVERSE_RATE_MIN			0		// in A/us x10
 #define REVERSE_RATE_MAX			10		// in A/us x10
 #define REVERSE_RATE_DEF			4		// in A/us x10

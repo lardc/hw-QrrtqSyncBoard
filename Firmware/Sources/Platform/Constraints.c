@@ -35,10 +35,10 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, 50, 0},																// 19
 											   {0, INT16U_MAX, 0},														// 20
 											   {0, INT16U_MAX, 0},														// 21
-											   {0, DRCU_CURRENT_MAX, 0},												// 22
-											   {0, DRCU_CURRENT_MAX, 0},												// 23
+											   {0, 0, 0},																// 22
+											   {0, 0, 0},																// 23
 											   {0, 0, 0},																// 24
-											   {IRC_SYNC_WIDTH_MIN, IRC_SYNC_WIDTH_MAX, IRC_SYNC_WIDTH_DEF},			// 25
+											   {0, 0, 0},																// 25
 											   {0, MAX_GATE_DRV_TURN_ON_DELAY, 0},										// 26
 											   {0, INT16U_MAX, 0},														// 27
 											   {0, MAX_UNIT_DRCU, DEF_UNIT_DRCU},										// 28

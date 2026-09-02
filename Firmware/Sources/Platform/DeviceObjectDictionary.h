@@ -80,10 +80,7 @@
 
 #define REG_SAFETY_EN				20	// Safety enable
 #define REG_CSU_VOLTAGE_K			21 	// CSU voltage coefficient
-#define REG_DCU_CURRENT_PER_UNIT	22	// Максимальный ток DCU на блок (в А)
-#define REG_RCU_CURRENT_PER_UNIT	23	// Максимальный ток RCU на блок (в А)
-#define REG_RCU_DEF_FALL_RATE		24	// Скорость спада тока RCU на блок (в А/мкс х10)
-#define REG_RCU_SYNC_WIDTH			25	// Длина импульса синхронизации RCU
+// 22 - 25
 #define REG_GATE_DRV_TURNON_DELAY	26	// Задержка формирования импульса управления (в мкс)
 #define REG_CSU_VOLTAGE_OFFSET		27	// Оффсет при пересчете напряжения CSU
 #define REG_UNIT_DRCU				28  // Количество блоков в комплексе
