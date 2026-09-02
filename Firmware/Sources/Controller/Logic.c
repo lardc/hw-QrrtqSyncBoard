@@ -1317,7 +1317,14 @@ void LOGIC_ResultToDataTable()
 	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0,  AvgTs = 0, AvgTf = 0, Idc, dIdt, Irr, Trr, CalcQrr, ts, tf;
 
 	if(ResultsCounter == 0)
+	{
+		if(DataTable[REG_PROBLEM] == PROBLEM_NONE && LOGIC_OperationResult != OPRESULT_FAIL)
+		{
+			DataTable[REG_PROBLEM] = PROBLEM_NO_RESULT;
+			LOGIC_OperationResult = OPRESULT_FAIL;
+		}
 		return;
+	}
 
 	// Значения Idc и dIdt берется из первого формирования
 	Idc = Results[0].Idc;

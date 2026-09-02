@@ -459,6 +459,7 @@
 #define PROBLEM_SAFETY				8	// Problem safety
 #define PROBLEM_ID_TO_HIGH          9   // Прямой ток выше задаваемого
 #define PROBLEM_HIGH_VR_MIN			10	// Обратное напряжение выше порога
+#define PROBLEM_NO_RESULT			11	// Нет сохранённых результатов измерения
 //
 #define PROBLEM_CALC_NONE			20	// Default offset
 #define PROBLEM_CALC_IRR			21	// Problem calculating Irr
