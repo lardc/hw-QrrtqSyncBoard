@@ -1316,6 +1316,9 @@ void LOGIC_ResultToDataTable()
 	Int16U i, AvgCounter = 0;
 	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0,  AvgTs = 0, AvgTf = 0, Idc, dIdt, Irr, Trr, CalcQrr, ts, tf;
 
+	if(ResultsCounter == 0)
+		return;
+
 	// Значения Idc и dIdt берется из первого формирования
 	Idc = Results[0].Idc;
 	dIdt = Results[0].dIdt;
