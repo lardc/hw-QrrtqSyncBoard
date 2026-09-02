@@ -1139,7 +1139,7 @@ void LOGIC_ReadDataSequence()
 							{
 								LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
 							}
-							else if(Results[ResultsCounter].Idc > DC_Current * ID_TO_HIGH)
+							else if(Results[ResultsCounter].Idc > (Int32U)DC_Current * ID_TO_HIGH / 100)
 							{
 								LOGIC_AbortMeasurement(PROBLEM_ID_TO_HIGH);
 							}
