@@ -28,13 +28,10 @@ typedef struct __TableItemConstraint
 #define X_D_DEF2					1000
 #define X_D_DEF3					10000
 
-// in us/10
+#define MAX_RCU_TRIG_OFFSET			27000	// in us x10
+#define MAX_GATE_DRV_TURN_ON_DELAY	500		// in us
 
-#define MAX_RCU_TRIG_OFFSET			27000
-#define MAX_GATE_DRV_TURN_ON_DELAY	500
-
-// in us/10
-#define MAX_FCROVU_TRIG_OFFSET		500
+#define MAX_FCROVU_TRIG_OFFSET		500		// in us x10
 
 // in us
 #define MAX_TQ_OFFSET				15
@@ -64,9 +61,9 @@ typedef struct __TableItemConstraint
 #define IDC_PULSE_WIDTH_MAX			5000	// in us
 #define IDC_PULSE_WIDTH_DEF			2000	// in us
 
-#define REVERSE_RATE_MIN			0		// in A/us x10
-#define REVERSE_RATE_MAX			10		// in A/us x10
-#define REVERSE_RATE_DEF			4		// in A/us x10
+#define REVERSE_RATE_MIN			0		// номер скорости спада 0…10
+#define REVERSE_RATE_MAX			10		// номер скорости спада 0…10
+#define REVERSE_RATE_DEF			4		// номер скорости спада 0…10
 
 #define FALL_RATE_MIN				1		// A/мкс x10
 #define MAX_FALL_RATE				1000	// A/мкс x10

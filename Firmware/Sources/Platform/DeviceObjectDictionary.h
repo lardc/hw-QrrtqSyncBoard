@@ -86,24 +86,24 @@
 #define REG_UNIT_DRCU				28  // Количество блоков в комплексе
 #define REG_DUT_TRIG_SOURCE			29	// Источник определения отпирания DUT
 //
-#define REG_RCU_TOFFS_R0			30	// Сдвиг срабатывания синхронизации RCU при 0 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R1			31	// Сдвиг срабатывания синхронизации RCU при 1 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R2			32	// Сдвиг срабатывания синхронизации RCU при 2 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R3			33	// Сдвиг срабатывания синхронизации RCU при 3 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R4			34	// Сдвиг срабатывания синхронизации RCU при 4 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R5			35	// Сдвиг срабатывания синхронизации RCU при 5 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R6			36	// Сдвиг срабатывания синхронизации RCU при 6 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R7			37	// Сдвиг срабатывания синхронизации RCU при 7 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R8			38	// Сдвиг срабатывания синхронизации RCU при 8 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R9   			39	// Сдвиг срабатывания синхронизации RCU при 9 скорости спада (в нс x10)
-#define REG_RCU_TOFFS_R10			40	// Сдвиг срабатывания синхронизации RCU при 10 скорости спада (в нс x10)
+#define REG_RCU_TOFFS_R0			30	// Сдвиг срабатывания синхронизации RCU при 0 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R1			31	// Сдвиг срабатывания синхронизации RCU при 1 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R2			32	// Сдвиг срабатывания синхронизации RCU при 2 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R3			33	// Сдвиг срабатывания синхронизации RCU при 3 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R4			34	// Сдвиг срабатывания синхронизации RCU при 4 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R5			35	// Сдвиг срабатывания синхронизации RCU при 5 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R6			36	// Сдвиг срабатывания синхронизации RCU при 6 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R7			37	// Сдвиг срабатывания синхронизации RCU при 7 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R8			38	// Сдвиг срабатывания синхронизации RCU при 8 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R9   			39	// Сдвиг срабатывания синхронизации RCU при 9 скорости спада (в мкс x10)
+#define REG_RCU_TOFFS_R10			40	// Сдвиг срабатывания синхронизации RCU при 10 скорости спада (в мкс x10)
 //
 #define REG_IRR_MIN					41	// Минимальное измеряемое значение Irr в А
 //
-#define	REG_FCROVU_TOFFS_20			42	// Сдвиг срабатывания синхронизации FCROVU при 20В/мкс
-#define REG_FCROVU_TOFFS_50			43	// Сдвиг срабатывания синхронизации FCROVU при 50В/мкс
-#define REG_FCROVU_TOFFS_100		44	// Сдвиг срабатывания синхронизации FCROVU при 100В/мкс
-#define REG_FCROVU_TOFFS_200		45	// Сдвиг срабатывания синхронизации FCROVU при 200В/мкс
+#define	REG_FCROVU_TOFFS_20			42	// Сдвиг срабатывания синхронизации FCROVU при 20В/мкс (в мкс x10)
+#define REG_FCROVU_TOFFS_50			43	// Сдвиг срабатывания синхронизации FCROVU при 50В/мкс (в мкс x10)
+#define REG_FCROVU_TOFFS_100		44	// Сдвиг срабатывания синхронизации FCROVU при 100В/мкс (в мкс x10)
+#define REG_FCROVU_TOFFS_200		45	// Сдвиг срабатывания синхронизации FCROVU при 200В/мкс (в мкс x10)
 //
 #define REG_TQ_TOFFS_20				46	// Оффсет задания Tq при 20В/мкс
 #define REG_TQ_TOFFS_50				47	// Оффсет задания Tq при 50В/мкс
@@ -194,7 +194,7 @@
 #define REG_DIRECT_CURRENT			129	// Direct current amplitude (in A)
 #define REG_DCU_PULSE_WIDTH			130	// Direct current pulse duration (in us)
 #define REG_DCU_I_RISE_RATE			131	// Скорость нарастания тока в DCU (в А/мкс x10)
-#define REG_CURRENT_FALL_RATE		132 // Direct current fall rate (in Namber)
+#define REG_CURRENT_FALL_RATE		132 // Номер скорости спада комплекса (0…10)
 #define REG_OFF_STATE_VOLTAGE		133 // Off-state voltage (in V)
 #define REG_OSV_RATE				134 // Off-state voltage rise rate (in V/us)
 #define REG_TRIG_TIME				135	// Time to apply on-state voltage in single-pulse mode (in us)
@@ -255,7 +255,7 @@
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)
 #define REG_RES_TQ					213	// Turn-off time (in us x10)
 #define REG_RES_IDC					214	// Actual DC current value (in A)
-#define REG_RES_DIDT				215	// Actual dI/dt value (in A/us x100)
+#define REG_RES_DIDT				215	// Actual dI/dt value (in A/us x10)
 #define REG_RES_QRR_INT				216	// Reverse recovery charge (integration mode) (in uC x10)
 #define REG_RES_VD					217	// Actual direct voltage value (in V)
 #define REG_RES_QRR_32B				218	// Reverse recovery charge (in uC x100) (Calculation defined by GOST) 32bit part
@@ -343,7 +343,7 @@
 #define REG_SCOPE_MEASURE_MODE		129	// Select sampling mode (Qrr or Qrr-tq)
 #define REG_SCOPE_TR_050_METHOD		130	// Use 50% level of Irr to detect tr time
 #define REG_SCOPE_VOLTAGE_AMPL		131	// Voltage amplitude (in V)
-#define REG_DC_FALL_TIME            132 // Current fall rate
+#define REG_DC_FALL_TIME            132 // Время окна оцифровки спада тока (в мкс)
 //
 // Results
 #define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A x10)

@@ -6,7 +6,7 @@
 
 // Registers
 #define DRCU_REG_I_MAX_VALUE				128	// Direct current value A
-#define DRCU_REG_I_RATE						129	// Direct current rise rate A/us
+#define DRCU_REG_I_RATE_INDEX				129	// Номер скорости спада комплекса (0…10)
 
 #define DRCU_REG_CURRENT					202	// Sampled current value
 

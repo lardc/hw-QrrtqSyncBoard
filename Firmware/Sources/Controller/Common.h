@@ -11,7 +11,7 @@
 typedef struct __DRCUConfig
 {
 	Int16U Current;
-	Int16U CurrentRate;
+	Int16U CurrentRateIndex;
 	Int32U RCUTrigOffsetTicks;
 	Int16S V_Offset;
 	Int16S V_K;

@@ -1485,7 +1485,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 	{
 		Config->Current = Current / BlockCounter;
 
-		Config->CurrentRate = NamberFallRate;
+		Config->CurrentRateIndex = NamberFallRate;
 
 		Config->V_Offset = I_To_V_Offset;
 		Config->V_K = I_To_V_K;
