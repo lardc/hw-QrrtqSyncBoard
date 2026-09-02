@@ -325,7 +325,7 @@ void LOGIC_CacheVariables()
 		CROVU_VoltageRate = DataTable[REG_OSV_RATE] * 10;
 		TQ_ZeroOffset = LOGIC_FindTQZeroOffset(CROVU_VoltageRate);
 
-		ScopeCurrentConfig.ScopeCurrentSamplingTime = TrigOffset / 10 + DC_Current / DC_CurrentFallRate * 10;
+		ScopeCurrentConfig.ScopeCurrentSamplingTime = TrigOffset / 10 + (Int32U)DC_Current * 10 / DC_CurrentFallRate;
 
 		DataTable[REG_DBG_WRITE_SAMLING_TIME] = ScopeCurrentConfig.ScopeCurrentSamplingTime;
 
