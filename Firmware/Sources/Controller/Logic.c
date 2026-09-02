@@ -353,12 +353,15 @@ void LOGIC_CacheVariables()
 		    FCROVU_IShortCircuit = (DC_Current / 2);
 		else
 		    FCROVU_IShortCircuit = DataTable[REG_FCROVU_I_SHORT];
-
-		LOGIC_DriverOffTicks = (
-				((DC_Current / DC_CurrentRiseRate / 2) > DC_DRIVER_OFF_DELAY_MIN) ?
-						(DC_Current / DC_CurrentRiseRate / 2) : DC_DRIVER_OFF_DELAY_MIN) / TIMER2_PERIOD;
 		
-		DC_CurrentPlateTicks = (DataTable[REG_DCU_PULSE_WIDTH] - DC_TIME_DRU - LOGIC_DriverOffTicks) / TIMER2_PERIOD;
+		Int32U DriverOffTimeUs = DC_Current / DC_CurrentRiseRate / 2;
+		if(DriverOffTimeUs < DC_DRIVER_OFF_DELAY_MIN)
+			DriverOffTimeUs = DC_DRIVER_OFF_DELAY_MIN;
+		LOGIC_DriverOffTicks = DriverOffTimeUs / TIMER2_PERIOD;
+
+		Int32U PlateTimeUs = (Int32U)DataTable[REG_DCU_PULSE_WIDTH];
+		Int32U SubtractUs = DC_TIME_DRU + DriverOffTimeUs;
+		DC_CurrentPlateTicks = (PlateTimeUs > SubtractUs) ? ((PlateTimeUs - SubtractUs) / TIMER2_PERIOD) : 0;
 
 		if(LOGIC_StateRealTime == LSRT_WaitForConfig)
 		{
