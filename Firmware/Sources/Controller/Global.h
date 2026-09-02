@@ -79,8 +79,10 @@
 #define DC_READY_TIMEOUT_DELAY			5000	// in us
 #define DC_READY_TIMEOUT_TICK			(DC_READY_TIMEOUT_DELAY / TIMER2_PERIOD)
 #define DC_DRIVER_OFF_DELAY_MIN			200		// in us
-
 #define DC_TIME_DRU						100		// in us
+// Вклад снятия управления в длительность полки: как в 1708e9e, из ширины
+// импульса (мкс) вычитается число тиков T2, а не DriverOff в микросекундах.
+#define DC_PLATE_DRIVER_OFF_US(us)		((us) / TIMER2_PERIOD)
 //
 #define RT_DATA_READ_DELAY				500000	// in us
 #define RT_DATA_READ_DELAY_TICK			(RT_DATA_READ_DELAY / TIMER2_PERIOD)

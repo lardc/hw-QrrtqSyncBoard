@@ -42,7 +42,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, MAX_GATE_DRV_TURN_ON_DELAY, 0},										// 26
 											   {0, INT16U_MAX, 0},														// 27
 											   {0, MAX_UNIT_DRCU, DEF_UNIT_DRCU},										// 28
-											   {DUT_TRIG_SCOPE, DUT_TRIG_CROVU, DUT_TRIG_SCOPE},						// 29
+											   {DUT_TRIG_CROVU, DUT_TRIG_SCOPE, DUT_TRIG_SCOPE},						// 29
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 30
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 31
 											   {0, MAX_RCU_TRIG_OFFSET, 0},												// 32
@@ -96,7 +96,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 80
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 81
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 82
-											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 83
+					/* исключение --> */	   {0, INT16U_MAX, I_TO_V_K_DEF},											// 83
 											   {0, INT16U_MAX, I_TO_V_K2_DEF},											// 84
 											   {0, INT16U_MAX, I_TO_V_OFFSET_DEF},										// 85
 											   {K_COEF_MIN, INT16U_MAX, I_TO_V_K_DEF},									// 86

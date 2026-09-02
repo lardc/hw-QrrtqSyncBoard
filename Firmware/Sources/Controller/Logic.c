@@ -360,7 +360,7 @@ void LOGIC_CacheVariables()
 		LOGIC_DriverOffTicks = DriverOffTimeUs / TIMER2_PERIOD;
 
 		Int32U PlateTimeUs = (Int32U)DataTable[REG_DCU_PULSE_WIDTH];
-		Int32U SubtractUs = DC_TIME_DRU + DriverOffTimeUs;
+		Int32U SubtractUs = DC_TIME_DRU + DC_PLATE_DRIVER_OFF_US(DriverOffTimeUs);	// Для совместимости
 		DC_CurrentPlateTicks = (PlateTimeUs > SubtractUs) ? ((PlateTimeUs - SubtractUs) / TIMER2_PERIOD) : 0;
 
 		if(LOGIC_StateRealTime == LSRT_WaitForConfig)

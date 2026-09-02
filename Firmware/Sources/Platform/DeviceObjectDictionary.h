@@ -387,9 +387,9 @@
 #define EP_SlaveData				12	// Data obtained from slave device
 
 // DUT_TRIG_SOURCE
-#define DUT_TRIG_SCOPE				0
+#define DUT_TRIG_CROVU				0
 #define DUT_TRIG_QSU				1
-#define DUT_TRIG_CROVU				2
+#define DUT_TRIG_SCOPE				2
 
 // OPRESULTS
 //
