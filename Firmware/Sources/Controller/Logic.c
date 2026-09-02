@@ -285,6 +285,7 @@ void LOGIC_CacheVariables()
 	{
 		TqFastThyristor = FALSE;
 		DUTFinalIncrease = FALSE;
+		TQ_MaxTimeActive = FALSE;
 		LOGIC_OperationResult = OPRESULT_OK;
 		LOGIC_IsFirstQrrPulse = TRUE;
 		
