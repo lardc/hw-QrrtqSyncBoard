@@ -1071,7 +1071,7 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TRR, &Results[ResultsCounter].Trr);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR, &Qrr);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR_32B, &Qrr32b);
-							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO, &Results[ResultsCounter].ZeroI);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_I, &Results[ResultsCounter].ZeroI);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IDC, &Results[ResultsCounter].Idc);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);

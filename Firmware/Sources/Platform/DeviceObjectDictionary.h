@@ -360,7 +360,7 @@
 #define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A x10)
 #define REG_SCOPE_RESULT_TRR		202	// Reverse recovery time (in us x10)
 #define REG_SCOPE_RESULT_QRR		203	// Reverse recovery charge (in uQ x10)
-#define REG_SCOPE_RESULT_ZERO		204	// Zero-cross time (in us x10)
+#define REG_SCOPE_RESULT_ZERO_I		204	// Zero-cross time for current (in us x10)
 #define REG_SCOPE_RESULT_ZERO_V		205	// Zero-cross time for on-state voltage (in us x10)
 #define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x10)
 #define REG_SCOPE_RESULT_IDC		207	// Actual value of Idc (in A)
