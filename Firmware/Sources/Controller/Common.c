@@ -117,14 +117,14 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 			case CDS_Ready:
 				if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_MAX_VALUE, Config->Current))
 					if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE, Config->CurrentRate))
-						if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_OFFSET, Config->V_Offset))
-							if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K, Config->V_K))
-								if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_V_INTPS_EXT_K2, Config->V_K2))
-									if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL_EXT_OFFSET, Config->I_Ctrl_Offset))
-										if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_CTRL_EXT_K, Config->I_Ctrl_K))
-											if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P0, Config->I_P0))
-												if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P1, Config->I_P1))
-													if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_I_TO_DAC_EXT_P2, Config->I_P2))
+						if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_V_INTPS_EXT_OFFSET, Config->V_Offset))
+							if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_V_INTPS_EXT_K, Config->V_K))
+								if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_V_INTPS_EXT_K2, Config->V_K2))
+									if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_CTRL_EXT_OFFSET, Config->I_Ctrl_Offset))
+										if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_CTRL_EXT_K, Config->I_Ctrl_K))
+											if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_DAC_EXT_P0, Config->I_P0))
+												if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_DAC_EXT_P1, Config->I_P1))
+													if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_DAC_EXT_P2, Config->I_P2))
 														if(HLI_CAN_CallAction(DataTable[NodeIDReg], DCRU_ACT_CONFIG))
 															*CurrentLogicState = NextLogicState;
 				break;
