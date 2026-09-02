@@ -364,14 +364,6 @@
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
 //
-// Problems
-#define PROBLEM_SCOPE_NONE			0	// No problem
-#define PROBLEM_SCOPE_CALC_IRR		1	// Problem calculating Irr
-#define PROBLEM_SCOPE_CALC_IRR_025	2	// Problem calculating 25% fraction Irr
-#define PROBLEM_SCOPE_CALC_IRR_090	3	// Problem calculating 90% fraction Irr
-#define PROBLEM_SCOPE_CALC_VZ		4	// Problem calculating V zero crossing
-#define PROBLEM_SCOPE_CALC_DIDT		5	// Problem calculating actual dIdt
-//
 // Endpoints
 #define EP_SCOPE_IDC				1	// Scope current data
 #define EP_SCOPE_VD					2	// Scope voltage data
