@@ -1143,7 +1143,7 @@ void LOGIC_ReadDataSequence()
 							{
 								LOGIC_AbortMeasurement(PROBLEM_ID_TO_HIGH);
 							}
-							else if(MeasurementMode == MODE_QRR_TQ && Results[ResultsCounter].Vr_min > REVV_TO_HIGH)
+							else if(MeasurementMode == MODE_QRR_TQ && Results[ResultsCounter].Vr_min > VR_MIN_HIGH)
 							{
 								LOGIC_AbortMeasurement(PROBLEM_HIGH_VR_MIN);
 							}

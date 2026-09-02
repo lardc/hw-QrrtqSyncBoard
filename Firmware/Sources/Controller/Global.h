@@ -28,7 +28,7 @@
 
 #define IRR_TO_HIGH                     9       // in % * 10
 #define ID_TO_HIGH                      120     // in %
-#define REVV_TO_HIGH					-100	// in V
+#define VR_MIN_HIGH						-100	// in V
 //
 #define	SCCI_MASTER_TIMEOUT_TICKS_MS	500		// in ms
 #define	SCCI_SLAVE_TIMEOUT_TICKS_MS		100		// in ms
