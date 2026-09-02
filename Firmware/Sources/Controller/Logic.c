@@ -1107,6 +1107,10 @@ void LOGIC_ReadDataSequence()
 													FALSE : TRUE;
 									break;
 
+								case DUT_TRIG_CROVU:
+									// Значение уже записано в состоянии LS_READ_CROVU
+									break;
+
 								case DUT_TRIG_SCOPE:
 								default:
 									Results[ResultsCounter].DeviceTriggered = DUTTrigged;
