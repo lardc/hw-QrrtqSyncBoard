@@ -32,7 +32,7 @@ static Boolean MuteCROVU, MuteFCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static volatile Boolean TQ_MaxTimeActive = FALSE;
-static Int16U K_Unit, DC_Current, RC_CurrentTime, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
+static Int16U DC_Current, RC_CurrentTime, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, DC_CurrentZeroPointTq, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
@@ -309,7 +309,7 @@ void LOGIC_CacheVariables()
 
 		// Подготовка конфигурации DCU и RCU
 
-		K_Unit = LOGIC_EnableUnit(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate, LOGIC_ExtDeviceState.DCU3.Emulate,
+		Int16U K_Unit = LOGIC_EnableUnit(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate, LOGIC_ExtDeviceState.DCU3.Emulate,
 				LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate, LOGIC_ExtDeviceState.RCU3.Emulate);
 
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate,LOGIC_ExtDeviceState.DCU3.Emulate,
@@ -1457,7 +1457,6 @@ void LOGIC_VoltageMeasuringCSU(Int16U * const restrict pResults)
 
 Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Boolean Emulation4, Boolean Emulation5, Boolean Emulation6)
 {
-
 	Int16U EnableUnit = 0;
 
 	EnableUnit += Emulation1 ? 0 : 1;
@@ -1467,13 +1466,8 @@ Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulatio
 	EnableUnit += Emulation5 ? 0 : 1;
 	EnableUnit += Emulation6 ? 0 : 1;
 
-	K_Unit = EnableUnit * 100 / DataTable[REG_UNIT_DRCU];
-	if (K_Unit == 0)
-	{
-		K_Unit = 100;
-	}
-
-	return K_Unit;
+	return (EnableUnit == 0 || DataTable[REG_UNIT_DRCU] == 0) ?
+			100 : (EnableUnit * 100 / DataTable[REG_UNIT_DRCU]);
 }
 // ----------------------------------------
 
