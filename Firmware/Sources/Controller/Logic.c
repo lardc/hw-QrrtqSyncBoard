@@ -1484,8 +1484,13 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 		Config->I_P1 = I_To_Dac_P1;
 		Config->I_P2 = I_To_Dac_P2;
 
-		Int32U Ticks = ((Int32U)RCUTrigOffset  * 100 * CPU_FRQ_MHZ / 1000 - 9) / 5;
-		Config->RCUTrigOffsetTicks = (Ticks > 0) ? Ticks : 0;
+		if(RCUTrigOffset == 0)
+			Config->RCUTrigOffsetTicks = 0;
+		else
+		{
+			Int32U Raw = (Int32U)RCUTrigOffset * 100 * CPU_FRQ_MHZ / 1000;
+			Config->RCUTrigOffsetTicks = (Raw > 9) ? ((Raw - 9) / 5) : 0;
+		}
 	}
 	else
 		Config->RCUTrigOffsetTicks = 0;
