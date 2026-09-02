@@ -117,7 +117,7 @@ typedef struct __MeasurementResult
 	Int16U EPTimeFractCnt;		// Number of time fractions in data step
     Int16U ts;                  // Time ts
     Int16U tf;                  // Time tf
-    Int16S RevVolt;				// Reverse voltage amplitude (in V)
+    Int16S Vr_min;				// Reverse voltage amplitude (in V)
 } MeasurementResult;
 
 // Functions

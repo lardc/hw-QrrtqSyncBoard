@@ -963,7 +963,7 @@ void LOGIC_ReadDataSequence()
 									else
 									{
 										LOGIC_State = LS_READ_FCROVU;
-										if(!DataTable[REG_SCOPE_TRIG])
+										if(DataTable[REG_DUT_TRIG_SOURCE] == DUT_TRIG_CROVU)
 											Results[ResultsCounter].DeviceTriggered = (Register == OPRESULT_OK) ? FALSE : TRUE;
 									}
 								}
@@ -1059,14 +1059,28 @@ void LOGIC_ReadDataSequence()
 				{
 					if(!LOGIC_ExtDeviceState.SCOPE.Emulate)
 					{
-						Int16U Problem;
-						Boolean Result = TRUE;
-						
 						if(LOGIC_ExtDeviceState.SCOPE.State == CDS_None)
 						{
-							Int16U Qrr = 0, Qrr32b = 0, RawRevVolt = 0;
-							if(Result) Result &= HLI_RS232_Read16(COMM_REG_OP_RESULT, &Register);
+							// Проверка на проблему в расчёте
+							Boolean Result = TRUE;
+							Int16U Problem;
+
+							Result &= HLI_RS232_Read16(COMM_REG_OP_RESULT, &Register);
 							if(Result) Result &= HLI_RS232_Read16(COMM_REG_PROBLEM, &Problem);
+							if(!Result)
+							{
+								LOGIC_State = LS_Error;
+								CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_TIMEOUT);
+								return;
+							}
+							else if(Problem > 0)
+							{
+								LOGIC_AbortMeasurement(PROBLEM_CALC_NONE + Problem);
+								return;
+							}
+
+							// Вычитывание остальных результатов
+							Int16U Qrr = 0, Qrr32b = 0, DUTTrigged = 0;
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IRR, &Results[ResultsCounter].Irr);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TRR, &Results[ResultsCounter].Trr);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_QRR, &Qrr);
@@ -1080,75 +1094,82 @@ void LOGIC_ReadDataSequence()
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TF, &Results[ResultsCounter].tf);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract);
 							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt);
-							if(Result) Result &= HLI_RS232_Read16(REG_RESULT_REV_VOLT, &RawRevVolt);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DUT_TRIG, &DUTTrigged);
+							if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VR_MIN, (pInt16U)&Results[ResultsCounter].Vr_min);
 							Results[ResultsCounter].Qrr = ((Int32U)Qrr32b << 16) | Qrr;
-							Results[ResultsCounter].RevVolt = (Int16S)RawRevVolt;
 
-							if(DataTable[REG_SCOPE_TRIG])
+							// Определение отпирания прибора
+							switch(DataTable[REG_DUT_TRIG_SOURCE])
 							{
-//							    if(Result) Result &= HLI_RS232_Read16(REG_REG_RESULT_DUT_TRIG, &Results[ResultsCounter].DeviceTriggered);
-								Results[ResultsCounter].DeviceTriggered = (Results[ResultsCounter].Vd > CROVU_Voltage / 100 * VD_HYST_MIN ) ? FALSE : TRUE;
-//								 && (Results[ResultsCounter].Vd < CROVU_Voltage / 100 * VD_HYST_MAX )
+								case DUT_TRIG_QSU:
+									Results[ResultsCounter].DeviceTriggered =
+											(Results[ResultsCounter].Vd > (Int32U)CROVU_Voltage * VD_HYST_MIN / 100) ?
+													FALSE : TRUE;
+									break;
+
+								case DUT_TRIG_SCOPE:
+								default:
+									Results[ResultsCounter].DeviceTriggered = DUTTrigged;
+									break;
 							}
+
 							if(!Result)
 							{
 								LOGIC_State = LS_Error;
 								CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_TIMEOUT);
+								return;
+							}
+
+							// Дополнительные проверки на ошибки
+							if(Results[ResultsCounter].Irr > (Results[ResultsCounter].Idc * IRR_TO_HIGH)
+									&& !DataTable[REG_CALIBRATION_PROCESS])
+							{
+								LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
+							}
+							else if(Results[ResultsCounter].Irr
+									< DataTable[REG_IRR_MIN] * 10&& MeasurementMode == MODE_QRR_ONLY)
+							{
+								LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
+							}
+							else if(Results[ResultsCounter].Idc > DC_Current * ID_TO_HIGH)
+							{
+								LOGIC_AbortMeasurement(PROBLEM_ID_TO_HIGH);
+							}
+							else if(MeasurementMode == MODE_QRR_TQ && Results[ResultsCounter].Vr_min > REVV_TO_HIGH)
+							{
+								LOGIC_AbortMeasurement(PROBLEM_HIGH_VR_MIN);
 							}
 							else
 							{
-								if((Register == OPRESULT_FAIL && Problem != PROBLEM_SCOPE_CALC_VZ)
-										|| (Register == OPRESULT_FAIL && Problem == PROBLEM_SCOPE_CALC_VZ
-												&& !Results[ResultsCounter].DeviceTriggered))
+								// Save results
+								Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
+								LOGIC_LogData(Results[ResultsCounter]);
+
+								// Apply extended Tq logic
+								if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
+									LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
+
+								// Read data plots
+								if(DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0
+										&& ((LOGIC_PulseNumRemain == 0 && MeasurementMode == MODE_QRR_TQ)
+												|| (LOGIC_IsFirstQrrPulse && MeasurementMode == MODE_QRR_ONLY)))
 								{
-									LOGIC_AbortMeasurement(PROBLEM_SCOPE_CALC_FAILED);
-								}
-								else if(Results[ResultsCounter].Irr > (Results[ResultsCounter].Idc * IRR_TO_HIGH) && !DataTable[REG_CALIBRATION_PROCESS])
-								{
-									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
-								}
-								else if(Results[ResultsCounter].Irr < DataTable[REG_IRR_MIN] * 10 && MeasurementMode == MODE_QRR_ONLY)
-								{
-									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
-								}
-								else if(Results[ResultsCounter].Idc > DC_Current * ID_TO_HIGH)
-								{
-								    LOGIC_AbortMeasurement(PROBLEM_ID_TO_HIGH);
-								}
-								else if(MeasurementMode == MODE_QRR_TQ && Results[ResultsCounter].RevVolt > REVV_TO_HIGH)
-								{
-								    LOGIC_AbortMeasurement(PROBLEM_HIGH_REV_VOLT);
+									LOGIC_IsFirstQrrPulse = FALSE;
+									if(HLI_RS232_ReadArray16CB(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE,
+											(pInt16U)&CONTROL_Values_1_Counter))
+										if(MeasurementMode == MODE_QRR_TQ)
+										{
+											if(HLI_RS232_ReadArray16CB(EP_SCOPE_VD, CONTROL_Values_2, VALUES_x_SIZE,
+													(pInt16U)&CONTROL_Values_2_Counter))
+												LOGIC_State = LS_None;
+										}
+										else
+											LOGIC_State = LS_None;
 								}
 								else
-								{
-									// Save results
-									Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
-									LOGIC_LogData(Results[ResultsCounter]);
+									LOGIC_State = LS_None;
 
-									// Apply extended Tq logic
-									if(MeasurementMode == MODE_QRR_TQ && !CacheSinglePulse)
-										LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
-
-									// Read data plots
-									if(DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0 &&
-											((LOGIC_PulseNumRemain == 0 && MeasurementMode == MODE_QRR_TQ) ||
-													(LOGIC_IsFirstQrrPulse && MeasurementMode == MODE_QRR_ONLY)))
-									{
-										LOGIC_IsFirstQrrPulse = FALSE;
-										if (HLI_RS232_ReadArray16CB(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_1_Counter))
-											if (MeasurementMode == MODE_QRR_TQ)
-											{
-												if (HLI_RS232_ReadArray16CB(EP_SCOPE_VD, CONTROL_Values_2, VALUES_x_SIZE, (pInt16U)&CONTROL_Values_2_Counter))
-													LOGIC_State = LS_None;
-											}
-											else
-												LOGIC_State = LS_None;
-									}
-									else
-										LOGIC_State = LS_None;
-
-									DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
-								}
+								DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
 							}
 						}
 					}
@@ -1158,7 +1179,6 @@ void LOGIC_ReadDataSequence()
 						LOGIC_State = LS_None;
 					}
 				}
-
 				break;
 		}
 
@@ -1298,15 +1318,12 @@ void LOGIC_ResultToDataTable()
 
 	for(i = CacheSinglePulse ? 0 : 1; i < ResultsCounter; ++i)
 	{
-	    if(Results[i].Irr && Results[i].Trr && Results[i].Qrr && Results[i].ts && Results[i].tf)
-		{
-			AvgIrr += Results[i].Irr;
-			AvgTrr += Results[i].Trr;
-			AvgQrr += Results[i].Qrr;
-			AvgTs += Results[i].ts;
-			AvgTf += Results[i].tf;
-			++AvgCounter;
-		}
+		AvgIrr += Results[i].Irr;
+		AvgTrr += Results[i].Trr;
+		AvgQrr += Results[i].Qrr;
+		AvgTs += Results[i].ts;
+		AvgTf += Results[i].tf;
+		++AvgCounter;
 	}
 
 	// Prevent division by zero
@@ -1323,7 +1340,7 @@ void LOGIC_ResultToDataTable()
 		case MODE_QRR_TQ:
 			DataTable[REG_RES_TQ] = Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
 			DataTable[REG_RES_VD] = Results[ResultsCounter - 1].Vd;
-			DataTable[REG_RES_REVVOLT] = (Int16U)Results[ResultsCounter - 1].RevVolt;
+			DataTable[REG_RES_REVVOLT] = (Int16U)Results[ResultsCounter - 1].Vr_min;
 			/* no break */
 
 		case MODE_QRR_ONLY:

@@ -87,7 +87,7 @@
 #define REG_GATE_DRV_TURNON_DELAY	26	// Задержка формирования импульса управления (в мкс)
 #define REG_CSU_VOLTAGE_OFFSET		27	// Оффсет при пересчете напряжения CSU
 #define REG_UNIT_DRCU				28  // Количество блоков в комплексе
-#define REG_SCOPE_TRIG				29	// Тригер отпирания прибора с QSU
+#define REG_DUT_TRIG_SOURCE			29	// Источник определения отпирания DUT
 //
 #define REG_RCU_TOFFS_R0			30	// Сдвиг срабатывания синхронизации RCU при 0 скорости спада (в нс x10)
 #define REG_RCU_TOFFS_R1			31	// Сдвиг срабатывания синхронизации RCU при 1 скорости спада (в нс x10)
@@ -368,9 +368,9 @@
 #define REG_SCOPE_RESULT_QRR_32B	209	// Reverse recovery charge (in uQ x10) 32bit part
 #define REG_SCOPE_RESULT_TS         210 // Time ts (in us x10)
 #define REG_SCOPE_RESULT_TF         211 // Time tf (in us x10)
-#define REG_RESULT_TIME_0_90        212 // Time 0 - 90 Irr (in us x100)
-#define REG_REG_RESULT_DUT_TRIG     213 // обозначение открывания прибора
-#define REG_RESULT_REV_VOLT			214	// Reverse voltage amplitude (in V)
+#define REG_SCOPE_RESULT_TIME_0_90	212 // Time 0 - 90 Irr (in us x100)
+#define REG_SCOPE_RESULT_DUT_TRIG	213 // DUT trig flag
+#define REG_SCOPE_RESULT_VR_MIN		214	// Reverse voltage amplitude (in V)
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
@@ -404,6 +404,11 @@
 #define EP_DIAG9_dIdt				11	//
 //
 #define EP_SlaveData				12	// Data obtained from slave device
+
+// DUT_TRIG_SOURCE
+#define DUT_TRIG_SCOPE				0
+#define DUT_TRIG_QSU				1
+#define DUT_TRIG_CROVU				2
 
 // OPRESULTS
 //
@@ -455,13 +460,22 @@
 #define PROBLEM_NONE				0
 #define PROBLEM_MANUAL_STOP			1	// Requested manual stop of the measurement
 #define PROBLEM_NO_DIRECT_CURRENT	2	// No direct current
-#define PROBLEM_SCOPE_CALC_FAILED	3	// Calculations on scope node are failed
+// 3
 #define PROBLEM_IRR_TO_HIGH			4	// Reverse current is too high
 #define PROBLEM_DEVICE_TRIGGERED	5	// Device remains in trigged state
 #define PROBLEM_IRR_TO_LOW			6	// Обратный ток слишком маленький
 #define PROBLEM_SAFETY				8	// Problem safety
 #define PROBLEM_ID_TO_HIGH          9   // Прямой ток выше задаваемого
-#define PROBLEM_HIGH_REV_VOLT		10	// Обратное напряжение выше порога
+#define PROBLEM_HIGH_VR_MIN			10	// Обратное напряжение выше порога
+//
+#define PROBLEM_CALC_NONE			20	// Default offset
+#define PROBLEM_CALC_IRR			21	// Problem calculating Irr
+#define PROBLEM_CALC_IRR_025		22	// Problem calculating 25% fraction Irr
+#define PROBLEM_CALC_IRR_090		23	// Problem calculating 90% fraction Irr
+// 24
+#define PROBLEM_CALC_DIDT			25	// Problem calculating actual dIdt
+#define PROBLEM_CALC_TRR			26	// Problem calculating trr
+#define PROBLEM_CALC_QRR			27	// Problem calculating Qrr
 
 // DISABLE CODES
 //
