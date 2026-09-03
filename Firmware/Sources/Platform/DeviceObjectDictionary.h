@@ -343,7 +343,7 @@
 #define REG_SCOPE_MEASURE_MODE		129	// Select sampling mode (Qrr or Qrr-tq)
 #define REG_SCOPE_TR_050_METHOD		130	// Use 50% level of Irr to detect tr time
 #define REG_SCOPE_VOLTAGE_AMPL		131	// Voltage amplitude (in V)
-#define REG_DC_FALL_TIME            132 // Время окна оцифровки спада тока (в мкс)
+#define REG_SCOPE_DC_FALL_TIME		132 // Время окна оцифровки спада тока (в мкс)
 //
 // Results
 #define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A x10)
@@ -458,6 +458,7 @@
 #define PROBLEM_CALC_DIDT			25	// Problem calculating actual dIdt
 #define PROBLEM_CALC_TRR			26	// Problem calculating trr
 #define PROBLEM_CALC_QRR			27	// Problem calculating Qrr
+#define PROBLEM_CALC_VD_TRIG		28	// Problem calculating DUT trig based on Vd
 
 // DISABLE CODES
 //

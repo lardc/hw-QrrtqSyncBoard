@@ -808,7 +808,7 @@ void LOGIC_ConfigureSequence()
 											if(HLI_RS232_Write16(REG_SCOPE_TR_050_METHOD,
 													DataTable[REG_TRR_DETECTION_MODE]))
 												if(HLI_RS232_Write16(REG_SCOPE_VOLTAGE_AMPL, DataTable[REG_OFF_STATE_VOLTAGE]))
-												    if(HLI_RS232_Write16(REG_DC_FALL_TIME, ScopeCurrentConfig.ScopeCurrentSamplingTime))
+												    if(HLI_RS232_Write16(REG_SCOPE_DC_FALL_TIME, ScopeCurrentConfig.ScopeCurrentSamplingTime))
 												        if(HLI_RS232_CallAction(ACT_SCOPE_START_TEST))
 												            LOGIC_State = LS_CFG_WaitStates;
 								}
