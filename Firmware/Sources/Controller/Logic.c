@@ -29,7 +29,7 @@ static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 volatile Int16U ResultsCounter, MeasurementMode;
 //
 static Boolean MuteCROVU, MuteFCROVU;
-static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE, LOGIC_IsFirstQrrPulse = FALSE;
+static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static volatile Boolean TQ_MaxTimeActive = FALSE;
 static Int16U DC_Current, RC_CurrentTime, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
@@ -287,7 +287,6 @@ void LOGIC_CacheVariables()
 		DUTFinalIncrease = FALSE;
 		TQ_MaxTimeActive = FALSE;
 		LOGIC_OperationResult = OPRESULT_OK;
-		LOGIC_IsFirstQrrPulse = TRUE;
 		
 		ResultsCounter = 0;
 		MeasurementMode = DataTable[REG_MODE];
@@ -1158,11 +1157,8 @@ void LOGIC_ReadDataSequence()
 									LOGIC_TqExtraLogic(Results[ResultsCounter].DeviceTriggered);
 
 								// Read data plots
-								if(DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0
-										&& ((LOGIC_PulseNumRemain == 0 && MeasurementMode == MODE_QRR_TQ)
-												|| (LOGIC_IsFirstQrrPulse && MeasurementMode == MODE_QRR_ONLY)))
+								if(DataTable[REG_DIAG_DISABLE_PLOT_READ] == 0 && LOGIC_PulseNumRemain == 0)
 								{
-									LOGIC_IsFirstQrrPulse = FALSE;
 									if(HLI_RS232_ReadArray16CB(EP_SCOPE_IDC, CONTROL_Values_1, VALUES_x_SIZE,
 											(pInt16U)&CONTROL_Values_1_Counter))
 										if(MeasurementMode == MODE_QRR_TQ)
