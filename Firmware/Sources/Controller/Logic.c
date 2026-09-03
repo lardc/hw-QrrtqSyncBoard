@@ -1135,7 +1135,7 @@ void LOGIC_ReadDataSequence()
 								LOGIC_AbortMeasurement(PROBLEM_IRR_TO_HIGH);
 							}
 							else if(Results[ResultsCounter].Irr
-									< DataTable[REG_IRR_MIN] * 10&& MeasurementMode == MODE_QRR_ONLY)
+									< DataTable[REG_IRR_MIN] * 10 && MeasurementMode == MODE_QRR_ONLY)
 							{
 								LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
 							}
