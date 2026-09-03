@@ -82,7 +82,7 @@
 								<inputType id="com.ti.ccstudio.buildDefinitions.C2000_6.4.exeLinker.inputType__CMD2_SRCS.1631497845" name="Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.4.exeLinker.inputType__CMD2_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.C2000_6.4.exeLinker.inputType__GEN_CMDS.600333874" name="Generated Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.4.exeLinker.inputType__GEN_CMDS"/>
 							</tool>
-							<tool id="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.663407533" name="C2000 Hex Utility" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex">
+							<tool command="${PROJECT_LOC}/gen_fw_name.bat ${CG_TOOL_HEX}" commandLinePattern="${command} &quot;${flags} ${output_flag}&quot; ${output} ${inputs}" id="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.663407533" name="C2000 Hex Utility" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex">
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.TOOL_ENABLE.1356783765" name="Enable tool" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.TOOL_ENABLE" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.BYTE.64569669" name="Output as bytes rather than target addressing (--byte, -byte)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.BYTE" value="false" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.OUTPUT_FORMAT.344433204" name="Output format" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.OUTPUT_FORMAT" value="com.ti.ccstudio.buildDefinitions.C2000_6.4.hex.OUTPUT_FORMAT.ASCII" valueType="enumerated"/>
