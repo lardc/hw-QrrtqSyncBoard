@@ -32,7 +32,7 @@ static Boolean MuteCROVU, MuteFCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static volatile Boolean TQ_MaxTimeActive = FALSE;
-static Int16U DC_Current, RC_CurrentTime, DC_CurrentRiseRate, DC_NamberFallRate, DC_CurrentFallRate;
+static Int16U DC_Current, RC_CurrentTime, DC_CurrentRiseRate, DC_NumberFallRate, DC_CurrentFallRate;
 static Int32U DC_CurrentPlateTicks, DC_CurrentZeroPoint, DC_CurrentZeroPointTq, RC_CurrentMaxPoint;
 static Int16S I_To_V_Offset, I_To_V_K, I_To_V_K2, Ctrl2_Offset,	Ctrl2_K, Ctrl1_Offset, Ctrl1_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2;
 static Int16U CROVU_Voltage, CROVU_VoltageRate, FCROVU_IShortCircuit;
@@ -49,7 +49,7 @@ void LOGIC_PreciseEventStart();
 void LOGIC_TqExtraLogic(Boolean DeviceTriggered);
 Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Boolean Emulation4, Boolean Emulation5,
 		Boolean Emulation6);
-void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NumberFallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset, Int16S I_To_V_Offset, Int16S I_To_V_K, Int16S I_To_V_K2,
 			Int16S Ctrl_Offset,	Int16S Ctrl_K, Int16S I_To_Dac_P0, Int16S I_To_Dac_P1, Int16S I_To_Dac_P2);
 void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, pScopeConfig Config);
@@ -57,8 +57,8 @@ Int16U LOGIC_FindRCUTrigOffset(Int16U FallRate);
 Int16U LOGIC_FindFCROVUTrigOffset(Int16U RiseRate);
 Int16U LOGIC_FindTQZeroOffset(Int16U RiseRate);
 Int16U LOGIC_FindFallRate(Int16U FallRate);
-void LOGIC_CorrFallRate(Int16U NamberFallRate);
-void LOGIC_CorrRCUCurrent(Int16U NamberFallRate);
+void LOGIC_CorrFallRate(Int16U NumberFallRate);
+void LOGIC_CorrRCUCurrent(Int16U NumberFallRate);
 Boolean LOGIC_UpdateDeviceState();
 Boolean LOGIC_UpdateDeviceStateErrReset();
 Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error);
@@ -294,12 +294,12 @@ void LOGIC_CacheVariables()
 		
 		DC_Current = DataTable[REG_DIRECT_CURRENT];
 		DC_CurrentRiseRate = DataTable[REG_DCU_I_RISE_RATE];
-		DC_NamberFallRate = DataTable[REG_CURRENT_FALL_RATE];
-		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NamberFallRate);
+		DC_NumberFallRate = DataTable[REG_CURRENT_FALL_RATE];
+		DC_CurrentFallRate = LOGIC_FindFallRate(DC_NumberFallRate);
 		ScopeCurrentConfig.ScopeCurrentScaleResult = DC_Current;
 		// Correct Reg
-		LOGIC_CorrFallRate(DC_NamberFallRate);
-		LOGIC_CorrRCUCurrent(DC_NamberFallRate);
+		LOGIC_CorrFallRate(DC_NumberFallRate);
+		LOGIC_CorrRCUCurrent(DC_NumberFallRate);
 		Ctrl2_Offset = DataTable[REG_CTRL2_OFFSET];
 		Ctrl2_K = DataTable[REG_CTRL2_K];
 		I_To_Dac_P0 = DataTable[REG_I_TO_DAC_P0];
@@ -312,12 +312,12 @@ void LOGIC_CacheVariables()
 				LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate, LOGIC_ExtDeviceState.RCU3.Emulate);
 
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.DCU1.Emulate, LOGIC_ExtDeviceState.DCU2.Emulate,LOGIC_ExtDeviceState.DCU3.Emulate,
-				DC_Current, DC_NamberFallRate, &DCUConfig, 0, I_To_V_Offset, I_To_V_K, I_To_V_K2,
+				DC_Current, DC_NumberFallRate, &DCUConfig, 0, I_To_V_Offset, I_To_V_K, I_To_V_K2,
 					Ctrl2_Offset, Ctrl2_K, I_To_Dac_P0, I_To_Dac_P1, I_To_Dac_P2);
 
-		Int16U TrigOffset = (Int32S)LOGIC_FindRCUTrigOffset(DC_NamberFallRate);
+		Int16U TrigOffset = (Int32S)LOGIC_FindRCUTrigOffset(DC_NumberFallRate);
 		LOGIC_PrepareDRCUConfig(LOGIC_ExtDeviceState.RCU1.Emulate, LOGIC_ExtDeviceState.RCU2.Emulate, LOGIC_ExtDeviceState.RCU3.Emulate,
-				DC_Current, DC_NamberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2,
+				DC_Current, DC_NumberFallRate, &RCUConfig, TrigOffset, I_To_V_Offset, I_To_V_K, I_To_V_K2,
 					Ctrl1_Offset, Ctrl1_K, 0, 0, 0);
 
 		CROVU_Voltage = DataTable[REG_OFF_STATE_VOLTAGE];
@@ -1467,7 +1467,7 @@ Int16U LOGIC_EnableUnit(Boolean Emulation1, Boolean Emulation2, Boolean Emulatio
 }
 // ----------------------------------------
 
-void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NamberFallRate,
+void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emulation3, Int16U Current, Int16U NumberFallRate,
 		pDRCUConfig Config, Int16U RCUTrigOffset, Int16S I_To_V_Offset, Int16S I_To_V_K, Int16S I_To_V_K2,
 			Int16S Ctrl_Offset,	Int16S Ctrl_K, Int16S I_To_Dac_P0, Int16S I_To_Dac_P1, Int16S I_To_Dac_P2)
 {
@@ -1481,7 +1481,7 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 	{
 		Config->Current = Current / BlockCounter;
 
-		Config->CurrentRateIndex = NamberFallRate;
+		Config->CurrentRateNum = NumberFallRate;
 
 		Config->V_Offset = I_To_V_Offset;
 		Config->V_K = I_To_V_K;
@@ -1521,9 +1521,9 @@ void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U 
 }
 // ----------------------------------------
 
-Int16U LOGIC_FindRCUTrigOffset(Int16U NamberFallRate)
+Int16U LOGIC_FindRCUTrigOffset(Int16U NumberFallRate)
 {
-	switch(NamberFallRate)
+	switch(NumberFallRate)
 	{
 		case 0:
 			return DataTable[REG_RCU_TOFFS_R0];
@@ -1608,9 +1608,9 @@ Int16U LOGIC_FindTQZeroOffset(Int16U RiseRate)
 }
 // ----------------------------------------
 
-Int16U LOGIC_FindFallRate(Int16U NamberFallRate)
+Int16U LOGIC_FindFallRate(Int16U NumberFallRate)
 {
-	switch(NamberFallRate)
+	switch(NumberFallRate)
 	{
 		case 0:
 			return DataTable[REG_FALL_RATE_R0];
@@ -1651,9 +1651,9 @@ Int16U LOGIC_FindFallRate(Int16U NamberFallRate)
 }
 // ----------------------------------------
 
-void LOGIC_CorrFallRate(Int16U NamberFallRate)
+void LOGIC_CorrFallRate(Int16U NumberFallRate)
 {
-	switch(NamberFallRate)
+	switch(NumberFallRate)
 	{
 		case 0:
 			I_To_V_Offset = DataTable[REG_I_TO_V_OFFSET_R0];
@@ -1730,9 +1730,9 @@ void LOGIC_CorrFallRate(Int16U NamberFallRate)
 }
 // ----------------------------------------
 
-void LOGIC_CorrRCUCurrent(Int16U NamberFallRate)
+void LOGIC_CorrRCUCurrent(Int16U NumberFallRate)
 {
-	switch(NamberFallRate)
+	switch(NumberFallRate)
 	{
 		case 0:
 			Ctrl1_Offset = DataTable[REG_CTRL1_OFFSET_R0];

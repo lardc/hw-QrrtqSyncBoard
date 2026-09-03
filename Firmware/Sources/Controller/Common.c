@@ -116,7 +116,7 @@ void CMN_ConfigDRCU(Int16U NodeIDReg, volatile DeviceStateEntity *DevEntity, pDR
 
 			case CDS_Ready:
 				if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_MAX_VALUE, Config->Current))
-					if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE_INDEX, Config->CurrentRateIndex))
+					if(HLI_CAN_Write16(DataTable[NodeIDReg], DRCU_REG_I_RATE_INDEX, Config->CurrentRateNum))
 						if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_V_INTPS_EXT_OFFSET, Config->V_Offset))
 							if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_V_INTPS_EXT_K, Config->V_K))
 								if(HLI_CAN_Write16(DataTable[NodeIDReg], REG_DRCU_I_TO_V_INTPS_EXT_K2, Config->V_K2))
