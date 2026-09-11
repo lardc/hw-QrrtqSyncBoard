@@ -377,6 +377,10 @@ void CONTROL_SubProcessStateMachine()
 	}
 	else if(CONTROL_State == DS_InProcess && CONTROL_GeneralTimeout < CONTROL_TimeCounter)
 	{
+		DataTable[REG_LOGIC_STATE] = LOGIC_GetState();
+		if(DataTable[REG_DIAG_ALLOW])
+			STF_SaveDiagData();
+
 		LOGIC_AbortMeasurement(0);
 		CONTROL_SwitchToFault(FAULT_TIMEOUT_GENERAL, 0);
 	}
