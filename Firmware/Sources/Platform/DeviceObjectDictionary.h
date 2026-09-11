@@ -51,6 +51,12 @@
 //
 #define ACT_BOOT_LOADER_REQUEST		320	// Request reboot to bootloader
 //
+#define ACT_FLASH_DIAG_INIT_READ	331	// Инициализировать начало считывания отладочной информации
+#define ACT_FLASH_DIAG_SAVE			332	// Сохранение блока отладочной информации во флэш
+#define ACT_FLASH_DIAG_ERASE		333	// Стирание области отладочной информации
+//
+#define ACT_FLASH_DIAG_TO_EP		340	// Выполнить чтение массива из памяти отладочной информации в EP
+//
 // ----------------------------------------
 
 // REGISTERS
@@ -387,6 +393,8 @@
 #define EP_DIAG9_dIdt				11	//
 //
 #define EP_SlaveData				12	// Data obtained from slave device
+//
+#define EP_ExtInfoData				20	// External information from flash
 
 // DUT_TRIG_SOURCE
 #define DUT_TRIG_CROVU				0
