@@ -394,6 +394,14 @@
 //
 #define EP_SlaveData				12	// Data obtained from slave device
 //
+#define EP_Dummy13					13	// 
+#define EP_Dummy14					14
+#define EP_Dummy15					15
+#define EP_Dummy16					16
+#define EP_Dummy17					17
+#define EP_Dummy18					18
+#define EP_Dummy19					19
+//
 #define EP_ExtInfoData				20	// External information from flash
 
 // DUT_TRIG_SOURCE

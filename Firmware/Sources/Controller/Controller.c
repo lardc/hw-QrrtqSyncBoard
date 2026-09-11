@@ -37,6 +37,8 @@ Int16U CONTROL_Values_Slave[VALUES_x_SIZE];
 Int16U CONTROL_ExtInfoData[VALUES_EXT_INFO_SIZE];
 volatile Int16U CONTROL_Values_1_Counter = 0, CONTROL_Values_2_Counter = 0, CONTROL_Values_Slave_Counter = 0, Test = 0;
 volatile Int16U CONTROL_ExtInfoCounter = 0;
+static Int16U CONTROL_EPDummy = 0;
+static Int16U CONTROL_EPDummy_Counter = 0;
 //
 Int16U CONTROL_ValDiag1[UNIT_MAX_NUM_OF_PULSES];
 Int16U CONTROL_ValDiag2[UNIT_MAX_NUM_OF_PULSES];
@@ -77,22 +79,31 @@ void CONTROL_Init(Boolean BadClockDetected)
 	Int16U EPIndexes[EP_COUNT] = {EP_Current, EP_Voltage,
 	EP_DIAG1_DevTrig, EP_DIAG2_OSVTime, EP_DIAG3_Irr, EP_DIAG4_Trr,
 	EP_DIAG5_Qrr, EP_DIAG6_Idc, EP_DIAG7_ZeroI, EP_DIAG8_ZeroV, EP_DIAG9_dIdt, EP_SlaveData,
+	EP_Dummy13, EP_Dummy14, EP_Dummy15, EP_Dummy16, EP_Dummy17, EP_Dummy18, EP_Dummy19,
 	EP_ExtInfoData};
 	
 	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE,
 	UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES,
 	UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES,
-			UNIT_MAX_NUM_OF_PULSES, VALUES_x_SIZE, VALUES_EXT_INFO_SIZE};
+			UNIT_MAX_NUM_OF_PULSES, VALUES_x_SIZE,
+			1, 1, 1, 1, 1, 1, 1,
+			VALUES_EXT_INFO_SIZE};
 	
 	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_1_Counter, (pInt16U)&CONTROL_Values_2_Counter,
 			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
 			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
 			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
-			(pInt16U)&CONTROL_Values_Slave_Counter, (pInt16U)&CONTROL_ExtInfoCounter};
+			(pInt16U)&CONTROL_Values_Slave_Counter,
+			&CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter,
+			&CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter,
+			(pInt16U)&CONTROL_ExtInfoCounter};
 	
 	pInt16U EPDatas[EP_COUNT] = {CONTROL_Values_1, CONTROL_Values_2, CONTROL_ValDiag1, CONTROL_ValDiag2,
 			CONTROL_ValDiag3, CONTROL_ValDiag4, CONTROL_ValDiag5, CONTROL_ValDiag6, CONTROL_ValDiag7, CONTROL_ValDiag8,
-			CONTROL_ValDiag9, CONTROL_Values_Slave, CONTROL_ExtInfoData};
+			CONTROL_ValDiag9, CONTROL_Values_Slave,
+			&CONTROL_EPDummy, &CONTROL_EPDummy, &CONTROL_EPDummy, &CONTROL_EPDummy,
+			&CONTROL_EPDummy, &CONTROL_EPDummy, &CONTROL_EPDummy,
+			CONTROL_ExtInfoData};
 	
 	// Data-table EPROM service configuration
 	EPROMServiceConfig EPROMService = {&ZbMemory_WriteValuesEPROM, &ZbMemory_ReadValuesEPROM};
@@ -289,7 +300,7 @@ void CONTROL_ReinitRS232()
 void CONTROL_Start(Boolean SinglePulse)
 {
 	DEVPROFILE_ResetEPReadState();
-	DEVPROFILE_ResetScopes(0, 0xFFFF);
+	DEVPROFILE_ResetScopes(0, 0xFFFFFFFF);
 	
 	CONTROL_FillWPPartDefault();
 	
@@ -542,7 +553,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				MeasurementResult Result;
 				
 				DEVPROFILE_ResetEPReadState();
-				DEVPROFILE_ResetScopes(0, 0xFFFF);
+				DEVPROFILE_ResetScopes(0, 0xFFFFFFFF);
 				
 				for(i = 0; i < UNIT_MAX_NUM_OF_PULSES; ++i)
 				{

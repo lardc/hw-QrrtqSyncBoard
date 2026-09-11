@@ -21,7 +21,7 @@
 //
 #define EP_MIN_SCALE					50		// A
 #define EP_MAX_SCALE					3200	// А
-#define EP_COUNT						13
+#define EP_COUNT						20
 #define VALUES_x_SIZE					2000
 #define VALUES_EXT_INFO_SIZE			500
 
