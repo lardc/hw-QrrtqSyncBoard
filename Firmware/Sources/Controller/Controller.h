@@ -35,7 +35,9 @@ extern volatile DeviceState CONTROL_State;
 extern Int16U CONTROL_Values_1[VALUES_x_SIZE];
 extern Int16U CONTROL_Values_2[VALUES_x_SIZE];
 extern Int16U CONTROL_Values_Slave[VALUES_x_SIZE];
+extern Int16U CONTROL_ExtInfoData[VALUES_EXT_INFO_SIZE];
 extern volatile Int16U CONTROL_Values_1_Counter, CONTROL_Values_2_Counter, CONTROL_Values_Slave_Counter;
+extern volatile Int16U CONTROL_ExtInfoCounter;
 extern volatile Int16U CONTROL_BootLoaderRequest;
 //
 extern Int16U CONTROL_ValDiag1[UNIT_MAX_NUM_OF_PULSES];

@@ -17,6 +17,8 @@
 #include "HighLevelInterface.h"
 #include "Logic.h"
 #include "CommonDictionary.h"
+#include "SaveToFlash.h"
+#include "StorageDescription.h"
 
 // Definitions
 //
@@ -25,14 +27,18 @@
 // Variables
 //
 volatile DeviceState CONTROL_State = DS_None;
-volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause, CONTROL_CommutationDelay;
+volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause, CONTROL_CommutationDelay, CONTROL_GeneralTimeout;
 static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE, CommutationForcedOn = FALSE, SafetyCheck = FALSE;
 static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 //
 Int16U CONTROL_Values_1[VALUES_x_SIZE];
 Int16U CONTROL_Values_2[VALUES_x_SIZE];
 Int16U CONTROL_Values_Slave[VALUES_x_SIZE];
+Int16U CONTROL_ExtInfoData[VALUES_EXT_INFO_SIZE];
 volatile Int16U CONTROL_Values_1_Counter = 0, CONTROL_Values_2_Counter = 0, CONTROL_Values_Slave_Counter = 0, Test = 0;
+volatile Int16U CONTROL_ExtInfoCounter = 0;
+static Int16U CONTROL_EPDummy = 0;
+static Int16U CONTROL_EPDummy_Counter = 0;
 //
 Int16U CONTROL_ValDiag1[UNIT_MAX_NUM_OF_PULSES];
 Int16U CONTROL_ValDiag2[UNIT_MAX_NUM_OF_PULSES];
@@ -63,6 +69,7 @@ void CONTROL_Commutation(Boolean State);
 void CONTROL_SafetyHandler();
 void CONTROL_PressureHandler();
 Boolean CONTROL_CurrentFallRateOk();
+static void CONTROL_InitStoragePointers();
 
 // Functions
 //
@@ -71,22 +78,32 @@ void CONTROL_Init(Boolean BadClockDetected)
 	// Variables for endpoint configuration
 	Int16U EPIndexes[EP_COUNT] = {EP_Current, EP_Voltage,
 	EP_DIAG1_DevTrig, EP_DIAG2_OSVTime, EP_DIAG3_Irr, EP_DIAG4_Trr,
-	EP_DIAG5_Qrr, EP_DIAG6_Idc, EP_DIAG7_ZeroI, EP_DIAG8_ZeroV, EP_DIAG9_dIdt, EP_SlaveData};
+	EP_DIAG5_Qrr, EP_DIAG6_Idc, EP_DIAG7_ZeroI, EP_DIAG8_ZeroV, EP_DIAG9_dIdt, EP_SlaveData,
+	EP_Dummy13, EP_Dummy14, EP_Dummy15, EP_Dummy16, EP_Dummy17, EP_Dummy18, EP_Dummy19,
+	EP_ExtInfoData};
 	
 	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE,
 	UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES,
 	UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES, UNIT_MAX_NUM_OF_PULSES,
-			UNIT_MAX_NUM_OF_PULSES, VALUES_x_SIZE};
+			UNIT_MAX_NUM_OF_PULSES, VALUES_x_SIZE,
+			1, 1, 1, 1, 1, 1, 1,
+			VALUES_EXT_INFO_SIZE};
 	
 	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_1_Counter, (pInt16U)&CONTROL_Values_2_Counter,
 			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
 			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
 			(pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter, (pInt16U)&CONTROL_ValDiag_Counter,
-			(pInt16U)&CONTROL_Values_Slave_Counter};
+			(pInt16U)&CONTROL_Values_Slave_Counter,
+			&CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter,
+			&CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter, &CONTROL_EPDummy_Counter,
+			(pInt16U)&CONTROL_ExtInfoCounter};
 	
 	pInt16U EPDatas[EP_COUNT] = {CONTROL_Values_1, CONTROL_Values_2, CONTROL_ValDiag1, CONTROL_ValDiag2,
 			CONTROL_ValDiag3, CONTROL_ValDiag4, CONTROL_ValDiag5, CONTROL_ValDiag6, CONTROL_ValDiag7, CONTROL_ValDiag8,
-			CONTROL_ValDiag9, CONTROL_Values_Slave};
+			CONTROL_ValDiag9, CONTROL_Values_Slave,
+			&CONTROL_EPDummy, &CONTROL_EPDummy, &CONTROL_EPDummy, &CONTROL_EPDummy,
+			&CONTROL_EPDummy, &CONTROL_EPDummy, &CONTROL_EPDummy,
+			CONTROL_ExtInfoData};
 	
 	// Data-table EPROM service configuration
 	EPROMServiceConfig EPROMService = {&ZbMemory_WriteValuesEPROM, &ZbMemory_ReadValuesEPROM};
@@ -102,6 +119,8 @@ void CONTROL_Init(Boolean BadClockDetected)
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
+
+	CONTROL_InitStoragePointers();
 	
 	if(!BadClockDetected)
 	{
@@ -281,7 +300,7 @@ void CONTROL_ReinitRS232()
 void CONTROL_Start(Boolean SinglePulse)
 {
 	DEVPROFILE_ResetEPReadState();
-	DEVPROFILE_ResetScopes(0, 0xFFFF);
+	DEVPROFILE_ResetScopes(0, 0xFFFFFFFF);
 	
 	CONTROL_FillWPPartDefault();
 	
@@ -290,6 +309,8 @@ void CONTROL_Start(Boolean SinglePulse)
 	
 	CONTROL_Commutation(TRUE);
 	CONTROL_CommutationDelay = CONTROL_TimeCounter + DELAY_COMMUTATION;
+
+	CONTROL_GeneralTimeout = CONTROL_TimeCounter + (Int64U)DataTable[REG_LONG_TIMEOUT_IN_PROCESS] * 1000;
 
 	CONTROL_SetDeviceState(DS_InProcess);
 	LOGIC_SetState(LS_WaitCommutation);
@@ -304,7 +325,7 @@ void CONTROL_SubProcessStateMachine()
 			CONTROL_SetDeviceState(DS_Ready);
 	}
 	
-	if(CONTROL_State == DS_InProcess)
+	if(CONTROL_State == DS_InProcess && CONTROL_GeneralTimeout >= CONTROL_TimeCounter)
 	{
 		if(LOGIC_GetState() == LS_WaitCommutation && CONTROL_TimeCounter > CONTROL_CommutationDelay)
 		{
@@ -364,6 +385,15 @@ void CONTROL_SubProcessStateMachine()
 				LOGIC_ConfigurePrepare();
 			}
 		}
+	}
+	else if(CONTROL_State == DS_InProcess && CONTROL_GeneralTimeout < CONTROL_TimeCounter)
+	{
+		DataTable[REG_LOGIC_STATE] = LOGIC_GetState();
+		if(DataTable[REG_DIAG_ALLOW])
+			STF_SaveDiagData();
+
+		LOGIC_AbortMeasurement(0);
+		CONTROL_SwitchToFault(FAULT_TIMEOUT_GENERAL, 0);
 	}
 }
 // ----------------------------------------
@@ -523,7 +553,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U UserError)
 				MeasurementResult Result;
 				
 				DEVPROFILE_ResetEPReadState();
-				DEVPROFILE_ResetScopes(0, 0xFFFF);
+				DEVPROFILE_ResetScopes(0, 0xFFFFFFFF);
 				
 				for(i = 0; i < UNIT_MAX_NUM_OF_PULSES; ++i)
 				{
@@ -832,5 +862,25 @@ void CONTROL_PressureHandler()
 		PressureFaultCounter = 0;
 
 	DataTable[REG_PRESSURE] = ZbGPIO_PressureCheck();
+}
+// ----------------------------------------
+
+static void CONTROL_InitStoragePointers()
+{
+	Int16U i;
+
+	for(i = 0; i < 9; ++i)
+		STF_AssignPointer(i, (Int32U)&DataTable[i + REG_DEV_STATE]);
+
+	STF_AssignPointer(9, (Int32U)&LOGIC_ExtDeviceState);
+	STF_AssignPointer(10, (Int32U)CONTROL_ValDiag1);
+	STF_AssignPointer(11, (Int32U)CONTROL_ValDiag2);
+	STF_AssignPointer(12, (Int32U)CONTROL_ValDiag3);
+	STF_AssignPointer(13, (Int32U)CONTROL_ValDiag4);
+	STF_AssignPointer(14, (Int32U)CONTROL_ValDiag5);
+	STF_AssignPointer(15, (Int32U)CONTROL_ValDiag6);
+	STF_AssignPointer(16, (Int32U)CONTROL_ValDiag7);
+	STF_AssignPointer(17, (Int32U)CONTROL_ValDiag8);
+	STF_AssignPointer(18, (Int32U)CONTROL_ValDiag9);
 }
 // ----------------------------------------

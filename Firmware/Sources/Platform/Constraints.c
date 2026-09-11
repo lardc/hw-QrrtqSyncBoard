@@ -139,8 +139,8 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
                                     		   {0, 0, 0},																// 123
                                     		   {0, 0, 0},																// 124
                                     		   {0, 0, 0},																// 125
-                                    		   {0, 0, 0},																// 126
-                                    		   {0, 0, 0}																// 127
+                                    		   {LONG_TIMEOUT_MIN, LONG_TIMEOUT_MAX, LONG_TIMEOUT_DEF},					// 126
+                                    		   {NO, YES, NO}															// 127
                                        };
 
 const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START] =
