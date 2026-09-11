@@ -187,7 +187,9 @@
 #define REG_I_TO_DAC_P2				120	// Добавочный квадратичный коэффициент компенсации амплитуды прямого тока
 //
 #define REG_PULSE_TO_PULSE_LONG     121 // Время паузы в мс при открытия прибора на tq
-
+//
+#define REG_LONG_TIMEOUT_IN_PROCESS	126	// Общий таймаут состояния InProcess (в с)
+#define REG_DIAG_ALLOW				127	// Разрешить сохранение диагностических данных во flash
 // ----------------------------------------
 //
 #define REG_MODE					128	// Measurement mode
@@ -418,6 +420,7 @@
 #define FAULT_LOGIC_RCU3			10	// RCU3 node error
 #define FAULT_LOGIC_SCOPE			11	// SCOPE node error
 #define FAULT_PRESSURE				12	// No pressure
+#define FAULT_TIMEOUT_GENERAL		13	// General InProcess timeout
 
 // FAULT EXTENDED CODES
 //

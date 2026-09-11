@@ -33,6 +33,10 @@ typedef struct __TableItemConstraint
 
 #define MAX_FCROVU_TRIG_OFFSET		500		// in us x10
 
+#define LONG_TIMEOUT_MIN			10		// in s
+#define LONG_TIMEOUT_MAX			1000
+#define LONG_TIMEOUT_DEF			180
+
 // in us
 #define MAX_TQ_OFFSET				15
 

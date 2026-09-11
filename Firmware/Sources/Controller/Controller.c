@@ -25,7 +25,7 @@
 // Variables
 //
 volatile DeviceState CONTROL_State = DS_None;
-volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause, CONTROL_CommutationDelay;
+volatile Int64U CONTROL_TimeCounter = 0, CONTROL_PulseToPulsePause, CONTROL_CommutationDelay, CONTROL_GeneralTimeout;
 static volatile Boolean CycleActive = FALSE, ReinitRS232 = FALSE, CommutationForcedOn = FALSE, SafetyCheck = FALSE;
 static volatile FUNC_AsyncDelegate DPCDelegate = NULL;
 //
@@ -291,6 +291,8 @@ void CONTROL_Start(Boolean SinglePulse)
 	CONTROL_Commutation(TRUE);
 	CONTROL_CommutationDelay = CONTROL_TimeCounter + DELAY_COMMUTATION;
 
+	CONTROL_GeneralTimeout = CONTROL_TimeCounter + (Int64U)DataTable[REG_LONG_TIMEOUT_IN_PROCESS] * 1000;
+
 	CONTROL_SetDeviceState(DS_InProcess);
 	LOGIC_SetState(LS_WaitCommutation);
 }
@@ -304,7 +306,7 @@ void CONTROL_SubProcessStateMachine()
 			CONTROL_SetDeviceState(DS_Ready);
 	}
 	
-	if(CONTROL_State == DS_InProcess)
+	if(CONTROL_State == DS_InProcess && CONTROL_GeneralTimeout >= CONTROL_TimeCounter)
 	{
 		if(LOGIC_GetState() == LS_WaitCommutation && CONTROL_TimeCounter > CONTROL_CommutationDelay)
 		{
@@ -364,6 +366,11 @@ void CONTROL_SubProcessStateMachine()
 				LOGIC_ConfigurePrepare();
 			}
 		}
+	}
+	else if(CONTROL_State == DS_InProcess && CONTROL_GeneralTimeout < CONTROL_TimeCounter)
+	{
+		LOGIC_AbortMeasurement(0);
+		CONTROL_SwitchToFault(FAULT_TIMEOUT_GENERAL, 0);
 	}
 }
 // ----------------------------------------
