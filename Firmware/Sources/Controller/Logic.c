@@ -23,7 +23,7 @@ volatile Int32U FCROVUTrigOffset = 0, TQ_ZeroOffset = 0, CROVU_SyncTime = 0, FCR
 static volatile Int64U Timeout;
 static volatile Int64U CSU_FanTimeout;
 volatile LogicState LOGIC_State = LS_None;
-static volatile ExternalDeviceState LOGIC_ExtDeviceState;
+volatile ExternalDeviceState LOGIC_ExtDeviceState;
 //
 static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 volatile Int16U ResultsCounter, MeasurementMode;

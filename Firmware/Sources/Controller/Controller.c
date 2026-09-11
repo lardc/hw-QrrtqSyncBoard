@@ -17,6 +17,8 @@
 #include "HighLevelInterface.h"
 #include "Logic.h"
 #include "CommonDictionary.h"
+#include "SaveToFlash.h"
+#include "StorageDescription.h"
 
 // Definitions
 //
@@ -63,6 +65,7 @@ void CONTROL_Commutation(Boolean State);
 void CONTROL_SafetyHandler();
 void CONTROL_PressureHandler();
 Boolean CONTROL_CurrentFallRateOk();
+static void CONTROL_InitStoragePointers();
 
 // Functions
 //
@@ -102,6 +105,8 @@ void CONTROL_Init(Boolean BadClockDetected)
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	// Reset control values
 	DEVPROFILE_ResetControlSection();
+
+	CONTROL_InitStoragePointers();
 	
 	if(!BadClockDetected)
 	{
@@ -839,5 +844,25 @@ void CONTROL_PressureHandler()
 		PressureFaultCounter = 0;
 
 	DataTable[REG_PRESSURE] = ZbGPIO_PressureCheck();
+}
+// ----------------------------------------
+
+static void CONTROL_InitStoragePointers()
+{
+	Int16U i;
+
+	for(i = 0; i < 9; ++i)
+		STF_AssignPointer(i, (Int32U)&DataTable[i + REG_DEV_STATE]);
+
+	STF_AssignPointer(9, (Int32U)&LOGIC_ExtDeviceState);
+	STF_AssignPointer(10, (Int32U)CONTROL_ValDiag1);
+	STF_AssignPointer(11, (Int32U)CONTROL_ValDiag2);
+	STF_AssignPointer(12, (Int32U)CONTROL_ValDiag3);
+	STF_AssignPointer(13, (Int32U)CONTROL_ValDiag4);
+	STF_AssignPointer(14, (Int32U)CONTROL_ValDiag5);
+	STF_AssignPointer(15, (Int32U)CONTROL_ValDiag6);
+	STF_AssignPointer(16, (Int32U)CONTROL_ValDiag7);
+	STF_AssignPointer(17, (Int32U)CONTROL_ValDiag8);
+	STF_AssignPointer(18, (Int32U)CONTROL_ValDiag9);
 }
 // ----------------------------------------
