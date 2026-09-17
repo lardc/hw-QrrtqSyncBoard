@@ -212,6 +212,7 @@
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
 #define REG_CALIBRATION_PROCESS		140	// Флаг процесса калибровки
 #define REG_RCU_CURRENT_CALIBRATION 141 // Время обратного тока для калибровки Irr
+#define REG_SCOPE_IRR_LOW_AMPL		142	// Амплитуда тока в HSS при Irr слишком мал. на 1-м импульсе (в А)
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1

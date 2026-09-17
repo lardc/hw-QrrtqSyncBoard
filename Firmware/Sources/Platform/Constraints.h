@@ -57,6 +57,10 @@ typedef struct __TableItemConstraint
 #define DIRECT_CURRENT_MAX			3300	// in A
 #define DIRECT_CURRENT_DEF			300		// in A
 
+#define SCOPE_IRR_LOW_AMPL_MIN		10		// in A
+#define SCOPE_IRR_LOW_AMPL_MAX		300		// in A
+#define SCOPE_IRR_LOW_AMPL_DEF		75		// in A
+
 #define REVERSE_CURRENT_MIN         0      // в А
 #define REVERSE_CURRENT_MAX         3300    // в А
 #define REVERSE_CURRENT_DEF         0     // в А

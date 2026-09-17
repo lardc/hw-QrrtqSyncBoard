@@ -30,6 +30,7 @@ volatile Int16U ResultsCounter, MeasurementMode;
 //
 static Boolean MuteCROVU, MuteFCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE;
+static Boolean ScopeUseIrrLowAmpl = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static volatile Boolean TQ_MaxTimeActive = FALSE;
 static Int16U DC_Current, RC_CurrentTime, DC_CurrentRiseRate, DC_NumberFallRate, DC_CurrentFallRate;
@@ -286,6 +287,7 @@ void LOGIC_CacheVariables()
 		TqFastThyristor = FALSE;
 		DUTFinalIncrease = FALSE;
 		TQ_MaxTimeActive = FALSE;
+		ScopeUseIrrLowAmpl = FALSE;
 		LOGIC_OperationResult = OPRESULT_OK;
 		
 		ResultsCounter = 0;
@@ -1136,7 +1138,21 @@ void LOGIC_ReadDataSequence()
 							else if(Results[ResultsCounter].Irr
 									< DataTable[REG_IRR_MIN] * 10 && MeasurementMode == MODE_QRR_ONLY)
 							{
-								LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
+								// Первый импульс: сохранить Idc/dIdt и продолжить со шкалой REG_SCOPE_IRR_LOW_AMPL
+								if(ResultsCounter == 0 && !CacheSinglePulse && LOGIC_PulseNumRemain > 0)
+								{
+									Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
+									LOGIC_LogData(Results[ResultsCounter]);
+
+									ScopeUseIrrLowAmpl = TRUE;
+									ScopeCurrentConfig.ScopeCurrentScaleResult = DataTable[REG_SCOPE_IRR_LOW_AMPL];
+									DataTable[REG_DBG_WRITE_CURRENT_SCALE] = ScopeCurrentConfig.ScopeCurrentScaleResult;
+
+									DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
+									LOGIC_State = LS_None;
+								}
+								else
+									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
 							}
 							else if(Results[ResultsCounter].Idc > (Int32U)DC_Current * ID_TO_HIGH / 100)
 							{
@@ -1509,11 +1525,20 @@ void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U 
 {
 	if(!Emulation && MeasurementMode == MODE_QRR_ONLY)
 	{
-		ScopeCurrent = ScopeCurrent / 10;
-		Config->ScopeCurrentScaleResult = (ScopeCurrent < EP_MIN_SCALE) ? EP_MIN_SCALE :
-			(ScopeCurrent > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrent;
+		if(ScopeUseIrrLowAmpl)
+		{
+			// Шкала HSS из REG_SCOPE_IRR_LOW_AMPL (без clamp EP_MIN/MAX)
+			Config->ScopeCurrentScaleResult = DataTable[REG_SCOPE_IRR_LOW_AMPL];
+			DataTable[REG_DBG_READ_CURRENT_SCALE] = Config->ScopeCurrentScaleResult;
+		}
+		else
+		{
+			ScopeCurrent = ScopeCurrent / 10;
+			Config->ScopeCurrentScaleResult = (ScopeCurrent < EP_MIN_SCALE) ? EP_MIN_SCALE :
+				(ScopeCurrent > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrent;
+			DataTable[REG_DBG_READ_CURRENT_SCALE] = ScopeCurrent;
+		}
 
-		DataTable[REG_DBG_READ_CURRENT_SCALE] = ScopeCurrent;
 		DataTable[REG_DBG_WRITE_CURRENT_SCALE] = Config->ScopeCurrentScaleResult;
 	}
 	else
