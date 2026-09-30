@@ -1568,10 +1568,16 @@ void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U 
 		}
 		else
 		{
+			// ScopeCurrent = Results[0].Irr (А×10) → шкала в А
 			ScopeCurrent = ScopeCurrent / 10;
-			Config->ScopeCurrentScaleResult = (ScopeCurrent < EP_MIN_SCALE) ? EP_MIN_SCALE :
-				(ScopeCurrent > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrent;
 			DataTable[REG_DBG_READ_CURRENT_SCALE] = ScopeCurrent;
+
+			// Irr ≤ REG_SCOPE_IRR_LOW_AMPL → фиксированная шкала из регистра
+			if(ScopeCurrent <= DataTable[REG_SCOPE_IRR_LOW_AMPL])
+				Config->ScopeCurrentScaleResult = DataTable[REG_SCOPE_IRR_LOW_AMPL];
+			else
+				Config->ScopeCurrentScaleResult = (ScopeCurrent < EP_MIN_SCALE) ? EP_MIN_SCALE :
+					(ScopeCurrent > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrent;
 		}
 
 		DataTable[REG_DBG_WRITE_CURRENT_SCALE] = Config->ScopeCurrentScaleResult;

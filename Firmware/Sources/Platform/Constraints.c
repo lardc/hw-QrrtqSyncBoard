@@ -135,7 +135,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, INT16U_MAX, I_TO_DAC_P1_DEF},										// 119
 											   {0, INT16U_MAX, I_TO_DAC_P2_DEF},										// 120
                                     		   {0, INT16U_MAX, PULSE_TO_PULSE_DEF},										// 121
-                                    		   {0, 0, 0},																// 122
+											   {SCOPE_IRR_LOW_AMPL_MIN, SCOPE_IRR_LOW_AMPL_MAX, SCOPE_IRR_LOW_AMPL_DEF},// 122
                                     		   {0, 0, 0},																// 123
                                     		   {0, 0, 0},																// 124
                                     		   {0, 0, 0},																// 125
@@ -159,7 +159,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 											   {CSU_VOLTAGE_HYST_MIN, CSU_VOLTAGE_HYST_MAX, CSU_VOLTAGE_HYST_DEF},		// 139
                                     		   {NO, YES, NO},															// 140
                                     		   {REVERSE_CURRENT_MIN, REVERSE_CURRENT_MAX, REVERSE_CURRENT_DEF},			// 141
-                                    		   {SCOPE_IRR_LOW_AMPL_MIN, SCOPE_IRR_LOW_AMPL_MAX, SCOPE_IRR_LOW_AMPL_DEF},	// 142
+											   {0, 0, 0},																// 142
                                     		   {0, 0, 0},																// 143
                                     		   {0, 0, 0},																// 144
                                     		   {0, 0, 0},																// 145

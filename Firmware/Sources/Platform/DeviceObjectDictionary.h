@@ -192,7 +192,8 @@
 #define REG_I_TO_DAC_P1				119	// Добавочный коэффициент компенсации амплитуды прямого тока
 #define REG_I_TO_DAC_P2				120	// Добавочный квадратичный коэффициент компенсации амплитуды прямого тока
 //
-#define REG_PULSE_TO_PULSE_LONG     121 // Время паузы в мс при открытия прибора на tq
+#define REG_PULSE_TO_PULSE_LONG		121 // Время паузы в мс при открытия прибора на tq
+#define REG_SCOPE_IRR_LOW_AMPL		122	// Амплитуда тока в HSS при Irr слишком мал. на 1-м импульсе (в А)
 //
 #define REG_LONG_TIMEOUT_IN_PROCESS	126	// Общий таймаут состояния InProcess (в с)
 #define REG_DIAG_ALLOW				127	// Разрешить сохранение диагностических данных во flash
@@ -212,7 +213,6 @@
 #define REG_CSU_VOLTAGE_HYST		139 // CSU voltage hysteresis (in V x10)
 #define REG_CALIBRATION_PROCESS		140	// Флаг процесса калибровки
 #define REG_RCU_CURRENT_CALIBRATION 141 // Время обратного тока для калибровки Irr
-#define REG_SCOPE_IRR_LOW_AMPL		142	// Амплитуда тока в HSS при Irr слишком мал. на 1-м импульсе (в А)
 //
 #define REG_DIAG_NID				150	// Node-id diagnostic register
 #define REG_DIAG_IN_1				151	// Input diagnostic register 1
