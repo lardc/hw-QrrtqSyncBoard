@@ -51,6 +51,12 @@
 //
 #define ACT_BOOT_LOADER_REQUEST		320	// Request reboot to bootloader
 //
+#define ACT_FLASH_DIAG_INIT_READ	331	// Инициализировать начало считывания отладочной информации
+#define ACT_FLASH_DIAG_SAVE			332	// Сохранение блока отладочной информации во флэш
+#define ACT_FLASH_DIAG_ERASE		333	// Стирание области отладочной информации
+//
+#define ACT_FLASH_DIAG_TO_EP		340	// Выполнить чтение массива из памяти отладочной информации в EP
+//
 // ----------------------------------------
 
 // REGISTERS
@@ -186,8 +192,11 @@
 #define REG_I_TO_DAC_P1				119	// Добавочный коэффициент компенсации амплитуды прямого тока
 #define REG_I_TO_DAC_P2				120	// Добавочный квадратичный коэффициент компенсации амплитуды прямого тока
 //
-#define REG_PULSE_TO_PULSE_LONG     121 // Время паузы в мс при открытия прибора на tq
-
+#define REG_PULSE_TO_PULSE_LONG		121 // Время паузы в мс при открытия прибора на tq
+#define REG_SCOPE_IRR_LOW_AMPL		122	// Амплитуда тока в HSS при Irr слишком мал. на 1-м импульсе (в А)
+//
+#define REG_LONG_TIMEOUT_IN_PROCESS	126	// Общий таймаут состояния InProcess (в с)
+#define REG_DIAG_ALLOW				127	// Разрешить сохранение диагностических данных во flash
 // ----------------------------------------
 //
 #define REG_MODE					128	// Measurement mode
@@ -385,6 +394,16 @@
 #define EP_DIAG9_dIdt				11	//
 //
 #define EP_SlaveData				12	// Data obtained from slave device
+//
+#define EP_Dummy13					13	// 
+#define EP_Dummy14					14
+#define EP_Dummy15					15
+#define EP_Dummy16					16
+#define EP_Dummy17					17
+#define EP_Dummy18					18
+#define EP_Dummy19					19
+//
+#define EP_ExtInfoData				20	// External information from flash
 
 // DUT_TRIG_SOURCE
 #define DUT_TRIG_CROVU				0
@@ -418,6 +437,7 @@
 #define FAULT_LOGIC_RCU3			10	// RCU3 node error
 #define FAULT_LOGIC_SCOPE			11	// SCOPE node error
 #define FAULT_PRESSURE				12	// No pressure
+#define FAULT_TIMEOUT_GENERAL		13	// General InProcess timeout
 
 // FAULT EXTENDED CODES
 //

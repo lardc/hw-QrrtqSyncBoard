@@ -31,7 +31,7 @@ void DEVPROFILE_ResetEPReadState();
 // Reset user control (WR) section of data table
 void DEVPROFILE_ResetControlSection();
 // Reset scopes
-void DEVPROFILE_ResetScopes(Int16U ResetPosition, Int16U ScopeMask);
+void DEVPROFILE_ResetScopes(Int16U ResetPosition, Int32U ScopeMask);
 // Notify that CANa system fault occurs
 void DEVPROFILE_NotifyCANaFault(ZwCAN_SysFlags Flag);
 // Notify that CANb system fault occurs

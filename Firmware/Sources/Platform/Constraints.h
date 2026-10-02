@@ -33,6 +33,10 @@ typedef struct __TableItemConstraint
 
 #define MAX_FCROVU_TRIG_OFFSET		500		// in us x10
 
+#define LONG_TIMEOUT_MIN			10		// in s
+#define LONG_TIMEOUT_MAX			1000
+#define LONG_TIMEOUT_DEF			180
+
 // in us
 #define MAX_TQ_OFFSET				15
 
@@ -52,6 +56,10 @@ typedef struct __TableItemConstraint
 #define DIRECT_CURRENT_MIN			100		// in A
 #define DIRECT_CURRENT_MAX			3300	// in A
 #define DIRECT_CURRENT_DEF			300		// in A
+
+#define SCOPE_IRR_LOW_AMPL_MIN		10		// in A
+#define SCOPE_IRR_LOW_AMPL_MAX		300		// in A
+#define SCOPE_IRR_LOW_AMPL_DEF		75		// in A
 
 #define REVERSE_CURRENT_MIN         0      // в А
 #define REVERSE_CURRENT_MAX         3300    // в А

@@ -177,4 +177,5 @@ extern volatile DeviceSubState LOGIC_StateRealTime;
 extern volatile Int32U LOGIC_RealTimeCounter;
 extern volatile Int16U MeasurementMode;
 extern volatile Int32U FCROVUTrigOffset, CROVU_SyncTime;
+extern volatile ExternalDeviceState LOGIC_ExtDeviceState;
 #endif // __LOGIC_H

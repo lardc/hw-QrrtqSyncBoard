@@ -74,10 +74,10 @@ PAGE 0:    /* Program Memory */
            /* Memory (RAM/FLASH/OTP) blocks can be moved to PAGE1 for data allocation */
 
    OTP          : origin = 0x3D7800, length = 0x000400     /* on-chip OTP */
-   FLASHH       : origin = 0x3D8000, length = 0x004000     /* on-chip FLASH */
-   FLASHG       : origin = 0x3DC000, length = 0x004000     /* on-chip FLASH */
-   FLASHF       : origin = 0x3E0000, length = 0x004000     /* on-chip FLASH */
-   FLASHE       : origin = 0x3E4000, length = 0x004000     /* on-chip FLASH */
+   FLASHH       : origin = 0x3D8000, length = 0x004000     /* on-chip FLASH (reserved / unused) */
+   FLASHG       : origin = 0x3DC000, length = 0x004000     /* on-chip FLASH — diag data start */
+   FLASHF       : origin = 0x3E0000, length = 0x004000     /* on-chip FLASH — diag data */
+   FLASHE       : origin = 0x3E4000, length = 0x004000     /* on-chip FLASH — diag data end */
    FLASHD       : origin = 0x3E8000, length = 0x004000     /* on-chip FLASH */
    BEGIN        : origin = 0x3EC000, length = 0x000002     /* Part of FLASHC. Entry point for main firmware */
    FLASHC       : origin = 0x3EC002, length = 0x003ffe     /* on-chip FLASH */
@@ -112,7 +112,17 @@ PAGE 1 :   /* Data Memory */
  
 SECTIONS
 {
- 
+Flash28_API:
+   {
+        -lFlash2809_API_V100.lib(.econst)
+        -lFlash2809_API_V100.lib(.text)
+   }                   LOAD = FLASHC,
+                       RUN = RAM,
+                       LOAD_START(_Flash28_API_LoadStart),
+                       LOAD_END(_Flash28_API_LoadEnd),
+                       RUN_START(_Flash28_API_RunStart),
+                       PAGE = 0
+
    /* Allocate program areas: */
    .cinit              : > FLASHC      PAGE = 0
    .pinit              : > FLASHC      PAGE = 0

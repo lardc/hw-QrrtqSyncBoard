@@ -23,13 +23,14 @@ volatile Int32U FCROVUTrigOffset = 0, TQ_ZeroOffset = 0, CROVU_SyncTime = 0, FCR
 static volatile Int64U Timeout;
 static volatile Int64U CSU_FanTimeout;
 volatile LogicState LOGIC_State = LS_None;
-static volatile ExternalDeviceState LOGIC_ExtDeviceState;
+volatile ExternalDeviceState LOGIC_ExtDeviceState;
 //
 static MeasurementResult Results[UNIT_MAX_NUM_OF_PULSES];
 volatile Int16U ResultsCounter, MeasurementMode;
 //
 static Boolean MuteCROVU, MuteFCROVU;
 static Boolean CacheUpdate = FALSE, CacheSinglePulse = FALSE;
+static Boolean ScopeUseIrrLowAmpl = FALSE;
 static volatile Boolean TqFastThyristor = FALSE, DUTFinalIncrease = FALSE;
 static volatile Boolean TQ_MaxTimeActive = FALSE;
 static Int16U DC_Current, RC_CurrentTime, DC_CurrentRiseRate, DC_NumberFallRate, DC_CurrentFallRate;
@@ -63,6 +64,7 @@ Boolean LOGIC_UpdateDeviceState();
 Boolean LOGIC_UpdateDeviceStateErrReset();
 Boolean LOGIC_UpdateDeviceStateX(Boolean ResetRS232Error);
 static void LOGIC_StopScopeDPC();
+static void LOGIC_ContinueWithIrrLowAmpl();
 
 // Functions
 //
@@ -286,6 +288,7 @@ void LOGIC_CacheVariables()
 		TqFastThyristor = FALSE;
 		DUTFinalIncrease = FALSE;
 		TQ_MaxTimeActive = FALSE;
+		ScopeUseIrrLowAmpl = FALSE;
 		LOGIC_OperationResult = OPRESULT_OK;
 		
 		ResultsCounter = 0;
@@ -1078,7 +1081,37 @@ void LOGIC_ReadDataSequence()
 							}
 							else if(Problem > 0)
 							{
-								LOGIC_AbortMeasurement(PROBLEM_CALC_NONE + Problem);
+								// Нет пересечения с 0: сохранить Id/dIdt и повторить со шкалой REG_SCOPE_IRR_LOW_AMPL
+								if((PROBLEM_CALC_NONE + Problem) == PROBLEM_CALC_IRR
+										&& ResultsCounter == 0 && !CacheSinglePulse && LOGIC_PulseNumRemain > 0
+										&& MeasurementMode == MODE_QRR_ONLY)
+								{
+									Results[ResultsCounter].Irr = 0;
+									Results[ResultsCounter].Trr = 0;
+									Results[ResultsCounter].Qrr = 0;
+									Results[ResultsCounter].ZeroI = 0;
+									Results[ResultsCounter].ZeroV = 0;
+									Results[ResultsCounter].Vd = 0;
+									Results[ResultsCounter].ts = 0;
+									Results[ResultsCounter].tf = 0;
+									Results[ResultsCounter].Vr_min = 0;
+									Results[ResultsCounter].DeviceTriggered = FALSE;
+									Results[ResultsCounter].EPTimeFract = 0;
+									Results[ResultsCounter].EPTimeFractCnt = 0;
+
+									Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_IDC, &Results[ResultsCounter].Idc);
+									if(Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &Results[ResultsCounter].dIdt);
+									if(!Result)
+									{
+										LOGIC_State = LS_Error;
+										CONTROL_SwitchToFault(FAULT_LOGIC_SCOPE, FAULTEX_READ_TIMEOUT);
+										return;
+									}
+
+									LOGIC_ContinueWithIrrLowAmpl();
+								}
+								else
+									LOGIC_AbortMeasurement(PROBLEM_CALC_NONE + Problem);
 								return;
 							}
 
@@ -1136,7 +1169,11 @@ void LOGIC_ReadDataSequence()
 							else if(Results[ResultsCounter].Irr
 									< DataTable[REG_IRR_MIN] * 10 && MeasurementMode == MODE_QRR_ONLY)
 							{
-								LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
+								// Первый импульс: сохранить Idc/dIdt и продолжить со шкалой REG_SCOPE_IRR_LOW_AMPL
+								if(ResultsCounter == 0 && !CacheSinglePulse && LOGIC_PulseNumRemain > 0)
+									LOGIC_ContinueWithIrrLowAmpl();
+								else
+									LOGIC_AbortMeasurement(PROBLEM_IRR_TO_LOW);
 							}
 							else if(Results[ResultsCounter].Idc > (Int32U)DC_Current * ID_TO_HIGH / 100)
 							{
@@ -1505,15 +1542,44 @@ void LOGIC_PrepareDRCUConfig(Boolean Emulation1, Boolean Emulation2, Boolean Emu
 }
 // ----------------------------------------
 
+static void LOGIC_ContinueWithIrrLowAmpl()
+{
+	Results[ResultsCounter].OSVApplyTime = CROVU_TrigTime;
+	LOGIC_LogData(Results[ResultsCounter]);
+
+	ScopeUseIrrLowAmpl = TRUE;
+	ScopeCurrentConfig.ScopeCurrentScaleResult = DataTable[REG_SCOPE_IRR_LOW_AMPL];
+	DataTable[REG_DBG_WRITE_CURRENT_SCALE] = ScopeCurrentConfig.ScopeCurrentScaleResult;
+
+	DataTable[REG_PULSES_COUNTER] = ++ResultsCounter;
+	LOGIC_State = LS_None;
+}
+// ----------------------------------------
+
 void LOGIC_PrepareScopeConfig(Boolean Emulation, Int16U MeasurementMode, Int16U ScopeCurrent, pScopeConfig Config)
 {
 	if(!Emulation && MeasurementMode == MODE_QRR_ONLY)
 	{
-		ScopeCurrent = ScopeCurrent / 10;
-		Config->ScopeCurrentScaleResult = (ScopeCurrent < EP_MIN_SCALE) ? EP_MIN_SCALE :
-			(ScopeCurrent > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrent;
+		if(ScopeUseIrrLowAmpl)
+		{
+			// Шкала HSS из REG_SCOPE_IRR_LOW_AMPL (без clamp EP_MIN/MAX)
+			Config->ScopeCurrentScaleResult = DataTable[REG_SCOPE_IRR_LOW_AMPL];
+			DataTable[REG_DBG_READ_CURRENT_SCALE] = Config->ScopeCurrentScaleResult;
+		}
+		else
+		{
+			// ScopeCurrent = Results[0].Irr (А×10) → шкала в А
+			ScopeCurrent = ScopeCurrent / 10;
+			DataTable[REG_DBG_READ_CURRENT_SCALE] = ScopeCurrent;
 
-		DataTable[REG_DBG_READ_CURRENT_SCALE] = ScopeCurrent;
+			// Irr ≤ REG_SCOPE_IRR_LOW_AMPL → фиксированная шкала из регистра
+			if(ScopeCurrent <= DataTable[REG_SCOPE_IRR_LOW_AMPL])
+				Config->ScopeCurrentScaleResult = DataTable[REG_SCOPE_IRR_LOW_AMPL];
+			else
+				Config->ScopeCurrentScaleResult = (ScopeCurrent < EP_MIN_SCALE) ? EP_MIN_SCALE :
+					(ScopeCurrent > EP_MAX_SCALE) ? EP_MAX_SCALE : ScopeCurrent;
+		}
+
 		DataTable[REG_DBG_WRITE_CURRENT_SCALE] = Config->ScopeCurrentScaleResult;
 	}
 	else

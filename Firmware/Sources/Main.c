@@ -12,6 +12,7 @@
 //
 #include "Controller.h"
 #include "Logic.h"
+#include "Flash.h"
 
 // FORWARD FUNCTIONS
 // -----------------------------------------
@@ -62,6 +63,7 @@ void main()
 
 	// Try initialize SCI in spite of result of clock initialization
 	InitializeSCI();
+	FLASH_Init();
 
 	// Setup ISRs
 	BEGIN_ISR_MAP
