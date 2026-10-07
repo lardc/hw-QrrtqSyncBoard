@@ -242,25 +242,32 @@
 #define REG_SCOPE_CURRENT_AMPL		128	// Current amplitude (in A)
 #define REG_SCOPE_MEASURE_MODE		129	// Select sampling mode (Qrr or Qrr-tq)
 #define REG_SCOPE_TR_050_METHOD		130	// Use 50% level of Irr to detect tr time
+#define REG_SCOPE_VOLTAGE_AMPL		131	// Voltage amplitude (in V)
+#define REG_SCOPE_DC_FALL_TIME		132	// Current fall sampling window (in us)
 //
 #define REG_SCOPE_DEV_STATE			192	// Device state
 #define REG_SCOPE_FAULT_REASON		193	// Fault reason in the case DeviceState -> FAULT
 #define REG_SCOPE_DISABLE_REASON	194	// Disbale reason in the case DeviceState -> DISABLE
 #define REG_SCOPE_WARNING			195	// Warning if present
 #define REG_SCOPE_PROBLEM			196	// Problem if present
-#define REG_SCOPE_DF_REASON_EX		197	// Fault or disable extended reason
+#define REG_SCOPE_OP_RESULT			197	// Operation result
 //
 // Results
-#define REG_SCOPE_FINISHED			200	// Operation result
-#define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A)
-#define REG_SCOPE_RESULT_TRR		202	// Reverse recovery time (in us x10)
-#define REG_SCOPE_RESULT_QRR		203	// Reverse recovery charge (in uQ)
-#define REG_SCOPE_RESULT_ZERO		204	// Zero-cross time (in us x10)
+#define REG_SCOPE_DF_REASON_EX		200	// Fault or disable extended reason
+#define REG_SCOPE_RESULT_IRR		201	// Reverse recovery current amplitude (in A x10)
+#define REG_SCOPE_RESULT_TRR		202	// Reverse recovery time (in us x100)
+#define REG_SCOPE_RESULT_QRR		203	// Reverse recovery charge (in uQ x10) low 16 bit
+#define REG_SCOPE_RESULT_ZERO_I		204	// Zero-cross time for current (in us x10)
 #define REG_SCOPE_RESULT_ZERO_V		205	// Zero-cross time for on-state voltage (in us x10)
-#define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x10)
+#define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x100)
+#define REG_SCOPE_RESULT_QRR_32B	209	// Reverse recovery charge (in uQ x10) high 16 bit
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
+//
+// HSS constraints for REG_SCOPE_VOLTAGE_AMPL
+#define SCOPE_VOLTAGE_AMPL_MIN		100		// in V
+#define SCOPE_VOLTAGE_AMPL_MAX		4500	// in V
 //
 #define REG_FWINFO_SLAVE_NID		256	// Device CAN slave node ID
 #define REG_FWINFO_MASTER_NID		257	// Device CAN master node ID (if presented)
