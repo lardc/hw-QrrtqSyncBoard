@@ -275,11 +275,12 @@
 #define REG_FWINFO_STR_LEN			260	// Length of the information string record
 #define REG_FWINFO_STR_BEGIN		261	// Begining of the information string record
 
-// States
+// States 
 #define DS_SCOPE_NONE				0
 #define DS_SCOPE_FAULT				1
 #define DS_SCOPE_DISABLED			2
-#define DS_SCOPE_IN_PROCESS			3
+#define DS_SCOPE_READY				3
+#define DS_SCOPE_IN_PROCESS			4
 //
 // Problems
 #define PROBLEM_NONE				0	// No problem
