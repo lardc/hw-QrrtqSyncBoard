@@ -42,7 +42,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] =
 											   {0, 0, 0},																// 26
 											   {0, 0, 0},																// 27
 											   {0, 0, 0},																// 28
-											   {0, 0, 0},																// 29
+											   {DUT_TRIG_CROVU, DUT_TRIG_SCOPE, DUT_TRIG_QSU},							// 29
 											   {0, 0, 0},																// 30
 											   {0, 0, 0},																// 31
 											   {0, 0, 0},																// 32

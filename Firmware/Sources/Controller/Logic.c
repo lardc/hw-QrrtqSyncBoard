@@ -868,7 +868,7 @@ void LOGIC_ReadDataSequence()
 						{
 							Boolean Result = TRUE;
 							Int16U Problem;
-							Int16U IrrRaw = 0, TrrRaw = 0, QrrLo = 0, QrrHi = 0, dIdtRaw = 0;
+							Int16U IrrRaw = 0, TrrRaw = 0, QrrLo = 0, QrrHi = 0, dIdtRaw = 0, DUTTrigged = 0;
 
 							Result &= HLI_RS232_Read16(REG_SCOPE_OP_RESULT, &Register);
 							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_PROBLEM, &Problem);
@@ -879,8 +879,26 @@ void LOGIC_ReadDataSequence()
 							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_I, &Results[ResultsCounter].ZeroI);
 							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_ZERO_V, &Results[ResultsCounter].ZeroV);
 							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DIDT, &dIdtRaw);
+							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VD, &Results[ResultsCounter].Vd);
+							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TS, &Results[ResultsCounter].ts);
+							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_TF, &Results[ResultsCounter].tf);
 							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_ELEMENT_FRACT, &Results[ResultsCounter].EPTimeFract);
 							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_EP_STEP_FRACT_CNT, &Results[ResultsCounter].EPTimeFractCnt);
+							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DUT_TRIG, &DUTTrigged);
+							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VR_MIN, (pInt16U)&Results[ResultsCounter].Vr_min);
+
+							// Определение отпирания прибора
+							switch(DataTable[REG_DUT_TRIG_SOURCE])
+							{
+								case DUT_TRIG_SCOPE:
+									Results[ResultsCounter].DeviceTriggered = DUTTrigged;
+									break;
+								case DUT_TRIG_CROVU:
+								case DUT_TRIG_QSU:
+								default:
+									// Значение уже записано в состоянии LS_READ_FCROVU
+									break;
+							}
 
 							if (Result)
 							{
@@ -1054,7 +1072,7 @@ void LOGIC_LogData(MeasurementResult Result)
 void LOGIC_ResultToDataTable()
 {
 	Int16U i, AvgCounter = 0;
-	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, AvgIdc = 0, AvgdIdt = 0, Irr, Trr;
+	Int32U AvgIrr = 0, AvgTrr = 0, AvgQrr = 0, AvgIdc = 0, AvgdIdt = 0, AvgTs = 0, AvgTf = 0, Irr, Trr, CalcQrr, ts, tf;
 
 	for (i = 0; i < ResultsCounter; ++i)
 	{
@@ -1065,6 +1083,8 @@ void LOGIC_ResultToDataTable()
 			AvgQrr	+= Results[i].Qrr;
 			AvgIdc	+= Results[i].Idc;
 			AvgdIdt	+= Results[i].dIdt;
+			AvgTs	+= Results[i].ts;
+			AvgTf	+= Results[i].tf;
 
 			++AvgCounter;
 		}
@@ -1075,15 +1095,25 @@ void LOGIC_ResultToDataTable()
 
 	Trr = AvgTrr / AvgCounter;
 	Irr = AvgIrr / AvgCounter;
+	ts = AvgTs / AvgCounter;
+	tf = AvgTf / AvgCounter;
 
 	DataTable[REG_RES_QRR]		= (Irr * Trr) >> 1;
+	CalcQrr = ((Irr * 10 * Trr) >> 1) / 100;
+	DataTable[REG_RES_QRR_32B]	= CalcQrr >> 16;
 	DataTable[REG_RES_TRR]		= Trr;
 	DataTable[REG_RES_IRR]		= Irr;
 	DataTable[REG_RES_IDC]		= AvgIdc / AvgCounter;
 	DataTable[REG_RES_TQ]		= Results[ResultsCounter - 1].ZeroV - Results[ResultsCounter - 1].ZeroI;
+	DataTable[REG_RES_VD]		= Results[ResultsCounter - 1].Vd;
+	DataTable[REG_RES_REVVOLT]	= (Int16U)Results[ResultsCounter - 1].Vr_min;
 	DataTable[REG_RES_DIDT]		= AvgdIdt / AvgCounter;
+    DataTable[REG_RES_TS]		= ts;
+    DataTable[REG_RES_TF]		= tf;
 	// HSS already returns Qrr in uC x10
-	DataTable[REG_RES_QRR_INT]	= (AvgQrr / AvgCounter > INT16U_MAX) ? INT16U_MAX : (Int16U)(AvgQrr / AvgCounter);
+	AvgQrr /= AvgCounter;
+	DataTable[REG_RES_QRR_INT]	= (AvgQrr > INT16U_MAX) ? INT16U_MAX : (Int16U)(AvgQrr);
+	DataTable[REG_RES_QRR_INT_32B] = AvgQrr >> 16;
 
 	DataTable[REG_EP_ELEMENT_FRACT] = Results[ResultsCounter - 1].EPTimeFract;
 	DataTable[REG_EP_STEP_FRACT_CNT] = Results[ResultsCounter - 1].EPTimeFractCnt;

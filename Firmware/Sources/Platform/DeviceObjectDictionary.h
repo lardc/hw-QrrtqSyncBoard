@@ -48,6 +48,8 @@
 //
 #define REG_DUT_I_SHORT_THR			5	// Уровень обратного тока от прямого тока для случая КЗ (в %)
 //
+#define REG_DUT_TRIG_SOURCE			29	// Источник определения отпирания DUT
+//
 #define REG_SP__1					127
 //
 // ----------------------------------------
@@ -92,7 +94,10 @@
 #define REG_SLAVE_EXTDATA			204	// Slave call extended data
 //
 #define REG_DC_READY_RETRIES		205	// Number of attempts to start direct current
-//
+// 206
+#define REG_RES_TS					207 // Time ts (in us x10)
+#define REG_RES_TF					208 // Time tf (in us x10)
+// 209
 #define REG_RES_QRR					210	// Reverse recovery charge (in uC x10)
 #define REG_RES_IRR					211	// Reverse recovery current amplitude (in A)
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)
@@ -100,6 +105,9 @@
 #define REG_RES_IDC					214	// Actual DC current value (in A)
 #define REG_RES_DIDT				215	// Actual dI/dt value (in A/us x10)
 #define REG_RES_QRR_INT				216	// Reverse recovery charge (integration mode) (in uC x10)
+#define REG_RES_VD					217	// Actual direct voltage value (in V)
+#define REG_RES_QRR_32B				218	// Reverse recovery charge (in uC x100) (Calculation defined by GOST) 32bit part
+#define REG_RES_QRR_INT_32B			219	// Reverse recovery charge (integration mode) (in uC x10) 32bit part
 //
 #define REG_CANA_BUSOFF_COUNTER		220 // Counter of bus-off states
 #define REG_CANA_STATUS_REG			221	// CAN status register (32 bit)
@@ -119,6 +127,8 @@
 //
 #define REG_EP_ELEMENT_FRACT		235	// Elementary fraction length (in ns)
 #define REG_EP_STEP_FRACT_CNT		236	// Number of elementary fractions in the EP single step
+//
+#define REG_RES_REVVOLT				238	// Reverse voltage amplitude (in V)
 //
 #define REG_SP__3					255
 //
@@ -260,7 +270,14 @@
 #define REG_SCOPE_RESULT_ZERO_I		204	// Zero-cross time for current (in us x10)
 #define REG_SCOPE_RESULT_ZERO_V		205	// Zero-cross time for on-state voltage (in us x10)
 #define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x100)
-#define REG_SCOPE_RESULT_QRR_32B	209	// Reverse recovery charge (in uQ x10) high 16 bit
+#define REG_SCOPE_RESULT_IDC		207	// Actual value of Idc (in A)
+#define REG_SCOPE_RESULT_VD			208	// Actual value of Vd (in V)
+#define REG_SCOPE_RESULT_QRR_32B	209	// Reverse recovery charge (in uQ x10) 32bit part
+#define REG_SCOPE_RESULT_TS			210 // Time ts (in us x10)
+#define REG_SCOPE_RESULT_TF			211 // Time tf (in us x10)
+#define REG_SCOPE_RESULT_TIME_0_90	212 // Time 0 - 90 Irr (in us x100)
+#define REG_SCOPE_RESULT_DUT_TRIG	213 // DUT trig flag
+#define REG_SCOPE_RESULT_VR_MIN		214	// Reverse voltage amplitude (in V)
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
@@ -311,6 +328,12 @@
 //
 #define MODE_QRR_ONLY				0	// Measure only reverse recovery (Qrr) parameters
 #define MODE_QRR_TQ					1	// Measure Qrr-tq parameters
+
+// DUT_TRIG_SOURCE
+//
+#define DUT_TRIG_CROVU				0
+#define DUT_TRIG_QSU				1
+#define DUT_TRIG_SCOPE				2
 
 // FAULT CODES
 //
