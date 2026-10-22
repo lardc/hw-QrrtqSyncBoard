@@ -317,9 +317,12 @@
 #define FAULT_NONE					0	// No fault
 #define FAULT_PROTOCOL				1	// Error in communication protocol
 #define FAULT_LOGIC_GENERAL			2	// High-level logic state-machine error
-#define FAULT_LOGIC_FCROVU			3	// FCROVU node error
-#define FAULT_LOGIC_QPU				4	// QPU node error
-#define FAULT_LOGIC_SCOPE			5	// SCOPE node error
+// 3
+#define FAULT_LOGIC_FCROVU			4	// FCROVU node error
+// 5-10
+#define FAULT_LOGIC_SCOPE			11	// SCOPE node error
+// 12-13
+#define FAULT_LOGIC_QPU				14	// QPU node error
 
 // FAULT EXTENDED CODES
 //
