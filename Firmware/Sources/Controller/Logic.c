@@ -237,7 +237,7 @@ void LOGIC_CacheVariables()
 		QPU_CurrentZeroPoint = QPU_Current * 10 / QPU_CurrentFallRate;
 		QPU_CurrentZeroPoint = (QPU_CurrentZeroPoint > TQ_ZERO_OFFSET) ? (QPU_CurrentZeroPoint - TQ_ZERO_OFFSET) : 0;
 
-		// Ãðÿçíûé ïàò÷ äëÿ ðàáîòû íà íàïðÿæåíèÿõ âûøå 1798Â (ïî 899Â íà ÿ÷åéêó)
+		// Ð“Ñ€ÑÐ·Ð½Ñ‹Ð¹ Ð¿Ð°Ñ‚Ñ‡ Ð´Ð»Ñ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ð½Ð° Ð½Ð°Ð¿Ñ€ÑÐ¶ÐµÐ½Ð¸ÑÑ… Ð²Ñ‹ÑˆÐµ 1798Ð’ (Ð¿Ð¾ 899Ð’ Ð½Ð° ÑÑ‡ÐµÐ¹ÐºÑƒ)
 		FCROVU_Voltage = (DataTable[REG_OFF_STATE_VOLTAGE] > 1798) ? 1798 : DataTable[REG_OFF_STATE_VOLTAGE];
 		FCROVU_VoltageRate = DataTable[REG_OSV_RATE];
 
@@ -887,7 +887,7 @@ void LOGIC_ReadDataSequence()
 							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_DUT_TRIG, &DUTTrigged);
 							if (Result) Result &= HLI_RS232_Read16(REG_SCOPE_RESULT_VR_MIN, (pInt16U)&Results[ResultsCounter].Vr_min);
 
-							// Îïðåäåëåíèå îòïèðàíèÿ ïðèáîðà
+							// ÐžÐ¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ Ð¾Ñ‚Ð¿Ð¸Ñ€Ð°Ð½Ð¸Ñ Ð¿Ñ€Ð¸Ð±Ð¾Ñ€Ð°
 							switch(DataTable[REG_DUT_TRIG_SOURCE])
 							{
 								case DUT_TRIG_SCOPE:
@@ -896,7 +896,7 @@ void LOGIC_ReadDataSequence()
 								case DUT_TRIG_CROVU:
 								case DUT_TRIG_QSU:
 								default:
-									// Çíà÷åíèå óæå çàïèñàíî â ñîñòîÿíèè LS_READ_FCROVU
+									// Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ ÑƒÐ¶Ðµ Ð·Ð°Ð¿Ð¸ÑÐ°Ð½Ð¾ Ð² ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ð¸ LS_READ_FCROVU
 									break;
 							}
 
@@ -1097,9 +1097,9 @@ void LOGIC_ResultToDataTable()
 	Irr = AvgIrr / AvgCounter;
 	ts = AvgTs / AvgCounter;
 	tf = AvgTf / AvgCounter;
+	CalcQrr = (Irr * Trr) >> 1;
 
-	DataTable[REG_RES_QRR]		= (Irr * Trr) >> 1;
-	CalcQrr = ((Irr * 10 * Trr) >> 1) / 100;
+	DataTable[REG_RES_QRR]		= (Int16U)(CalcQrr & 0xFFFF);
 	DataTable[REG_RES_QRR_32B]	= CalcQrr >> 16;
 	DataTable[REG_RES_TRR]		= Trr;
 	DataTable[REG_RES_IRR]		= Irr;
@@ -1112,7 +1112,7 @@ void LOGIC_ResultToDataTable()
     DataTable[REG_RES_TF]		= tf;
 	// HSS already returns Qrr in uC x10
 	AvgQrr /= AvgCounter;
-	DataTable[REG_RES_QRR_INT]	= (AvgQrr > INT16U_MAX) ? INT16U_MAX : (Int16U)(AvgQrr);
+	DataTable[REG_RES_QRR_INT]	= (Int16U)(AvgQrr & 0xFFFF);
 	DataTable[REG_RES_QRR_INT_32B] = AvgQrr >> 16;
 
 	DataTable[REG_EP_ELEMENT_FRACT] = Results[ResultsCounter - 1].EPTimeFract;
