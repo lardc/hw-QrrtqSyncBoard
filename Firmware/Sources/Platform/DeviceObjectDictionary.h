@@ -48,6 +48,8 @@
 //
 #define REG_DUT_I_SHORT_THR			5	// Уровень обратного тока от прямого тока для случая КЗ (в %)
 //
+#define REG_DUT_TRIG_SOURCE			29	// Источник определения отпирания DUT
+//
 #define REG_SP__1					127
 //
 // ----------------------------------------
@@ -92,7 +94,10 @@
 #define REG_SLAVE_EXTDATA			204	// Slave call extended data
 //
 #define REG_DC_READY_RETRIES		205	// Number of attempts to start direct current
-//
+// 206
+#define REG_RES_TS					207 // Time ts (in us x10)
+#define REG_RES_TF					208 // Time tf (in us x10)
+// 209
 #define REG_RES_QRR					210	// Reverse recovery charge (in uC x10)
 #define REG_RES_IRR					211	// Reverse recovery current amplitude (in A)
 #define REG_RES_TRR					212	// Reverse recovery time (in us x10)
@@ -100,6 +105,9 @@
 #define REG_RES_IDC					214	// Actual DC current value (in A)
 #define REG_RES_DIDT				215	// Actual dI/dt value (in A/us x10)
 #define REG_RES_QRR_INT				216	// Reverse recovery charge (integration mode) (in uC x10)
+#define REG_RES_VD					217	// Actual direct voltage value (in V)
+#define REG_RES_QRR_32B				218	// Reverse recovery charge (in uC x10) 32bit part
+#define REG_RES_QRR_INT_32B			219	// Reverse recovery charge (integration mode) (in uC x10) 32bit part
 //
 #define REG_CANA_BUSOFF_COUNTER		220 // Counter of bus-off states
 #define REG_CANA_STATUS_REG			221	// CAN status register (32 bit)
@@ -119,6 +127,8 @@
 //
 #define REG_EP_ELEMENT_FRACT		235	// Elementary fraction length (in ns)
 #define REG_EP_STEP_FRACT_CNT		236	// Number of elementary fractions in the EP single step
+//
+#define REG_RES_REVVOLT				238	// Reverse voltage amplitude (in V)
 //
 #define REG_SP__3					255
 //
@@ -260,7 +270,14 @@
 #define REG_SCOPE_RESULT_ZERO_I		204	// Zero-cross time for current (in us x10)
 #define REG_SCOPE_RESULT_ZERO_V		205	// Zero-cross time for on-state voltage (in us x10)
 #define REG_SCOPE_RESULT_DIDT		206	// Actual value of dIdt (in A/us x100)
-#define REG_SCOPE_RESULT_QRR_32B	209	// Reverse recovery charge (in uQ x10) high 16 bit
+#define REG_SCOPE_RESULT_IDC		207	// Actual value of Idc (in A)
+#define REG_SCOPE_RESULT_VD			208	// Actual value of Vd (in V)
+#define REG_SCOPE_RESULT_QRR_32B	209	// Reverse recovery charge (in uQ x10) 32bit part
+#define REG_SCOPE_RESULT_TS			210 // Time ts (in us x10)
+#define REG_SCOPE_RESULT_TF			211 // Time tf (in us x10)
+#define REG_SCOPE_RESULT_TIME_0_90	212 // Time 0 - 90 Irr (in us x100)
+#define REG_SCOPE_RESULT_DUT_TRIG	213 // DUT trig flag
+#define REG_SCOPE_RESULT_VR_MIN		214	// Reverse voltage amplitude (in V)
 //
 #define REG_SCOPE_EP_ELEMENT_FRACT	220	// Elementary fraction length (in ns)
 #define REG_SCOPE_EP_STEP_FRACT_CNT	221	// Number of elementary fractions in the EP single step
@@ -275,24 +292,12 @@
 #define REG_FWINFO_STR_LEN			260	// Length of the information string record
 #define REG_FWINFO_STR_BEGIN		261	// Begining of the information string record
 
-// States
+// States 
 #define DS_SCOPE_NONE				0
 #define DS_SCOPE_FAULT				1
 #define DS_SCOPE_DISABLED			2
-#define DS_SCOPE_IN_PROCESS			3
-//
-// Problems
-#define PROBLEM_NONE				0	// No problem
-#define PROBLEM_SCOPE_CALC_IRR		1	// Problem calculating Irr
-#define PROBLEM_SCOPE_CALC_IRR_025	2	// Problem calculating 25% fraction Irr
-#define PROBLEM_SCOPE_CALC_IRR_090	3	// Problem calculating 90% fraction Irr
-#define PROBLEM_SCOPE_CALC_VZ		4	// Problem calculating V zero crossing
-#define PROBLEM_SCOPE_CALC_DIDT		5	// Problem calculating actual dIdt
-#define PROBLEM_MANUAL_STOP			6	// Requested manual stop of the measurement
-#define PROBLEM_NO_DIRECT_CURRENT	7	// No direct current
-#define PROBLEM_SCOPE_CALC_FAILED	8	// Calculations on scope node are failed
-#define PROBLEM_IRR_TO_HIGH			9	// Reverse current is too high
-#define PROBLEM_DEVICE_TRIGGERED	10	// Device remains in trigged state
+#define DS_SCOPE_READY				3
+#define DS_SCOPE_IN_PROCESS			4
 //
 // ----------------------------------------
 
@@ -324,14 +329,23 @@
 #define MODE_QRR_ONLY				0	// Measure only reverse recovery (Qrr) parameters
 #define MODE_QRR_TQ					1	// Measure Qrr-tq parameters
 
+// DUT_TRIG_SOURCE
+//
+#define DUT_TRIG_CROVU				0
+#define DUT_TRIG_QSU				1
+#define DUT_TRIG_SCOPE				2
+
 // FAULT CODES
 //
 #define FAULT_NONE					0	// No fault
 #define FAULT_PROTOCOL				1	// Error in communication protocol
 #define FAULT_LOGIC_GENERAL			2	// High-level logic state-machine error
-#define FAULT_LOGIC_FCROVU			3	// FCROVU node error
-#define FAULT_LOGIC_QPU				4	// QPU node error
-#define FAULT_LOGIC_SCOPE			5	// SCOPE node error
+// 3
+#define FAULT_LOGIC_FCROVU			4	// FCROVU node error
+// 5-10
+#define FAULT_LOGIC_SCOPE			11	// SCOPE node error
+// 12-13
+#define FAULT_LOGIC_QPU				14	// QPU node error
 
 // FAULT EXTENDED CODES
 //
@@ -350,6 +364,23 @@
 //
 #define WARNING_NONE				0
 #define WARNING_WATCHDOG_RESET		1001	// System has been reseted by WD
+
+// Problems
+#define PROBLEM_NONE				0	// No problem
+#define PROBLEM_MANUAL_STOP			1	// Requested manual stop of the measurement
+#define PROBLEM_NO_DIRECT_CURRENT	2	// No direct current
+// 3
+#define PROBLEM_IRR_TO_HIGH			4	// Reverse current is too high
+#define PROBLEM_DEVICE_TRIGGERED	5	// Device remains in trigged state
+//
+#define PROBLEM_SCOPE_CALC_IRR		21	// Problem calculating Irr
+#define PROBLEM_SCOPE_CALC_IRR_025	22	// Problem calculating 25% fraction Irr
+#define PROBLEM_SCOPE_CALC_IRR_090	23	// Problem calculating 90% fraction Irr
+#define PROBLEM_SCOPE_CALC_VZ		24	// Problem calculating V zero crossing
+#define PROBLEM_SCOPE_CALC_DIDT		25	// Problem calculating actual dIdt
+// 26-28
+#define PROBLEM_SCOPE_CALC_FAILED	29	// Calculations on scope node are failed
+//
 
 // DISABLE CODES
 //
